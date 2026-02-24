@@ -1,34 +1,38 @@
 const express = require('express');
 const router = express.Router();
+
 const {
-    registerUser,
-    authUser,
-    getUserProfile,
-    updateUserProfile,
-    getUsers,
-    approveFarmer,
-    updateUserStatus,
-    updateUserRole
+  registerUser,
+  authUser,
+  getUserProfile,
+  updateUserProfile,
+  getUsers,
+  approveFarmer,
+  updateUserStatus,
+  updateUserRole,
 } = require('../controllers/userController');
+
 const { protect, authorize } = require('../middleware/authMiddleware');
 
-router.post('/', registerUser);
+// PUBLIC ROUTES
+router.post('/register', registerUser);
 router.post('/login', authUser);
-router.route('/profile')
-    .get(protect, getUserProfile)
-    .put(protect, updateUserProfile);
 
-// Admin routes
-router.route('/')
-    .get(protect, authorize('Admin'), getUsers);
+// USER ROUTES (Logged In)
+router
+  .route('/profile')
+  .get(protect, getUserProfile)
+  .put(protect, updateUserProfile);
 
-router.route('/:id/approve')
-    .put(protect, authorize('Admin'), approveFarmer);
+// ADMIN ROUTES
 
-router.route('/:id/status')
-    .put(protect, authorize('Admin'), updateUserStatus);
+router.get('/', protect, authorize('Admin'), getUsers);
 
-router.route('/:id/role')
-    .put(protect, authorize('Admin'), updateUserRole);
+router.put('/:id/approve', protect, authorize('Admin'), approveFarmer);
+
+router.put('/:id/status', protect, authorize('Admin'), updateUserStatus);
+
+router.put('/:id/role', protect, authorize('Admin'), updateUserRole);
+
 
 module.exports = router;

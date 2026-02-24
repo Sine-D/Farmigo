@@ -1,5 +1,7 @@
 require('dotenv').config();
 const express = require('express');
+const mongoose = require("mongoose");
+
 const cors = require('cors');
 const connectDB = require('./config/db');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
@@ -12,6 +14,7 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const sustainabilityRoutes = require('./routes/sustainabilityRoutes');
 const communityRoutes = require('./routes/communityRoutes');
 const lmsRoutes = require('./routes/lmsRoutes');
+const makeOrderRoute = require('./routes/makeOrderRoute');
 
 const { swaggerUi, specs } = require('./config/swagger');
 
@@ -40,6 +43,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/sustainability', sustainabilityRoutes);
 app.use('/api/community', communityRoutes);
 app.use('/api/lms', lmsRoutes);
+app.use('/api/makeOrder', makeOrderRoute);
 
 // Error Middleware
 app.use(notFound);
