@@ -12,6 +12,7 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const sustainabilityRoutes = require('./routes/sustainabilityRoutes');
 const communityRoutes = require('./routes/communityRoutes');
 const lmsRoutes = require('./routes/lmsRoutes');
+const disputeRoutes = require('./routes/disputeRoutes');
 
 const { swaggerUi, specs } = require('./config/swagger');
 
@@ -40,6 +41,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/sustainability', sustainabilityRoutes);
 app.use('/api/community', communityRoutes);
 app.use('/api/lms', lmsRoutes);
+app.use('/api/disputes', disputeRoutes);
 
 // Error Middleware
 app.use(notFound);
