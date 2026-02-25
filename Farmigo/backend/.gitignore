@@ -6,6 +6,11 @@
 backend/.env
 frontend/.env
 cookies.txt
+**/.env
+**/.env.*
+
+# dependencies
+**/node_modules/
 
 # === Node ===
 node_modules/
