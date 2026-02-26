@@ -5,7 +5,7 @@ const generateToken = require('../utils/generateToken');
 // @route   POST /api/users
 // @access  Public
 const registerUser = async (req, res) => {
-    const { name, email, password, role, phoneNumber, location, farmDetails } = req.body;
+    const { name, email, password, role, phoneNumber,whatsappOptIn, location, farmDetails } = req.body;
 
     const userExists = await User.findOne({ email });
 
@@ -20,6 +20,7 @@ const registerUser = async (req, res) => {
         password,
         role,
         phoneNumber,
+        whatsappOptIn,
         location,
         farmDetails
     });
@@ -79,6 +80,7 @@ const getUserProfile = async (req, res) => {
             email: user.email,
             role: user.role,
             phoneNumber: user.phoneNumber,
+            whatsappOptIn: user.whatsappOptIn, 
             location: user.location,
             farmDetails: user.farmDetails
         });
@@ -97,7 +99,8 @@ const updateUserProfile = async (req, res) => {
     if (user) {
         user.name = req.body.name || user.name;
         user.email = req.body.email || user.email;
-        user.phoneNumber = req.body.phoneNumber || user.phoneNumber;
+        if (req.body.phoneNumber !== undefined) user.phoneNumber = req.body.phoneNumber;
+        if (req.body.whatsappOptIn !== undefined) user.whatsappOptIn = req.body.whatsappOptIn;
         user.location = req.body.location || user.location;
         if (req.body.farmDetails) {
             user.farmDetails = req.body.farmDetails;
@@ -113,6 +116,8 @@ const updateUserProfile = async (req, res) => {
             name: updatedUser.name,
             email: updatedUser.email,
             role: updatedUser.role,
+            phoneNumber: updatedUser.phoneNumber,
+            whatsappOptIn: updatedUser.whatsappOptIn,
             token: generateToken(updatedUser._id),
         });
     } else {
