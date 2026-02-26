@@ -27,7 +27,10 @@ const userSchema = mongoose.Schema(
                 awardedAt: { type: Date, default: Date.now },
             },
         ],
-        phoneNumber: String,
+        phoneNumber: { 
+            type: String,
+             default: ""
+        },
         location: String,
         farmDetails: {
             farmName: String,
@@ -41,7 +44,11 @@ const userSchema = mongoose.Schema(
         isActive: {
             type: Boolean,
             default: true,
-        },
+        },         
+        whatsappOptIn: {
+             type: Boolean,
+              default: false 
+        }
     },
     {
         timestamps: true,
