@@ -15,8 +15,12 @@ const sustainabilityRoutes = require('./routes/sustainabilityRoutes');
 const communityRoutes = require('./routes/communityRoutes');
 const lmsRoutes = require('./routes/lmsRoutes');
 const makeOrderRoute = require('./routes/makeOrderRoute');
-
+const paymentRoutes = require('./routes/paymentRoutes');
 const { swaggerUi, specs } = require('./config/swagger');
+const refundRoutes = require('./routes/refundRoutes');
+const payoutRoutes = require('./routes/payoutRoutes');
+const invoiceRoutes = require('./routes/invoiceRoutes');
+const deliveryRoutes = require('./routes/deliveryRoutes');
 
 connectDB();
 
@@ -44,6 +48,11 @@ app.use('/api/sustainability', sustainabilityRoutes);
 app.use('/api/community', communityRoutes);
 app.use('/api/lms', lmsRoutes);
 app.use('/api/makeOrder', makeOrderRoute);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/refunds', refundRoutes);
+app.use('/api/payouts', payoutRoutes);
+app.use('/api/invoices', invoiceRoutes);
+app.use('/api/delivery', deliveryRoutes);
 
 // Error Middleware
 app.use(notFound);

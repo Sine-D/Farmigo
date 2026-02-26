@@ -16,6 +16,10 @@ const transactionSchema = mongoose.Schema(
             type: Number,
             required: true,
         },
+        currency: {
+            type: String,
+            default: 'LKR',
+        },
         type: {
             type: String,
             required: true,
