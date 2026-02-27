@@ -8,7 +8,8 @@ const {
     getUsers,
     approveFarmer,
     updateUserStatus,
-    updateUserRole
+    updateUserRole,
+    deleteUser
 } = require('../controllers/userController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
@@ -126,5 +127,8 @@ router.route('/:id/status')
 
 router.route('/:id/role')
     .put(protect, authorize('Admin'), asyncHandler(updateUserRole));
+
+router.route('/:id')
+    .delete(protect, authorize('Admin'), asyncHandler(deleteUser));
 
 module.exports = router;

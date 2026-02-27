@@ -5,7 +5,7 @@ const generateToken = require('../utils/generateToken');
 // @route   POST /api/users
 // @access  Public
 const registerUser = async (req, res) => {
-    const { name, email, password, role, phoneNumber,whatsappOptIn, location, farmDetails } = req.body;
+    const { name, email, password, role, phoneNumber, whatsappOptIn, location, farmDetails } = req.body;
 
     const userExists = await User.findOne({ email });
 
@@ -101,7 +101,7 @@ const getUserProfile = async (req, res) => {
             email: user.email,
             role: user.role,
             phoneNumber: user.phoneNumber,
-            whatsappOptIn: user.whatsappOptIn, 
+            whatsappOptIn: user.whatsappOptIn,
             location: user.location,
             farmDetails: user.farmDetails
         });
@@ -207,6 +207,25 @@ const updateUserRole = async (req, res) => {
     }
 };
 
+// @desc    Delete user
+// @route   DELETE /api/users/:id
+// @access  Private/Admin
+const deleteUser = async (req, res) => {
+    const user = await User.findById(req.params.id);
+
+    if (user) {
+        if (user.role === 'Admin') {
+            res.status(400);
+            throw new Error('Cannot delete Admin user');
+        }
+        await User.deleteOne({ _id: user._id });
+        res.json({ message: 'User removed' });
+    } else {
+        res.status(404);
+        throw new Error('User not found');
+    }
+};
+
 module.exports = {
     registerUser,
     authUser,
@@ -215,5 +234,6 @@ module.exports = {
     getUsers,
     approveFarmer,
     updateUserStatus,
-    updateUserRole
+    updateUserRole,
+    deleteUser
 };
