@@ -67,21 +67,6 @@ const userSchema = mongoose.Schema(
             'Organic',
             'Mixed',
           ],
-        badges: [
-            {
-                name: String,
-                awardedAt: { type: Date, default: Date.now },
-            },
-        ],
-        phoneNumber: { 
-            type: String,
-             default: ""
-        },
-        location: String,
-        farmDetails: {
-            farmName: String,
-            size: String,
-            produceType: [String],
         },
       ],
     },
@@ -103,7 +88,7 @@ const userSchema = mongoose.Schema(
     isApproved: {
       type: Boolean,
       default: function () {
-        return this.role !== 'Farmer'; 
+        return this.role !== 'Farmer';
         // Farmers must be approved by Admin
       },
     },
@@ -111,14 +96,10 @@ const userSchema = mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true,
-        isActive: {
-            type: Boolean,
-            default: true,
-        },         
-        whatsappOptIn: {
-             type: Boolean,
-              default: false 
-        }
+    },
+    whatsappOptIn: {
+      type: Boolean,
+      default: false
     },
   },
   {
