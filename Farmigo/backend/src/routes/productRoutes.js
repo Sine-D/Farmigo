@@ -84,6 +84,11 @@ router.route('/:id')
     .put(protect, authorize('Farmer', 'Admin'), asyncHandler(updateProduct))
     .delete(protect, authorize('Farmer', 'Admin'), asyncHandler(deleteProduct));
 
+router.get('/preorders', async (req, res) => {
+    const products = await Product.find({ isPreOrder: true, isApproved: true });
+    res.json(products);
+});
+
 /**
  * @swagger
  * /api/products/{id}/approve:
