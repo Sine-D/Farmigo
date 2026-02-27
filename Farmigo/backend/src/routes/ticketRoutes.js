@@ -71,15 +71,11 @@ router.get('/admin', protect, authorize('Admin', 'Support'), asyncHandler(getAll
 router.route('/:id')
     .put(protect, authorize('Admin', 'Support'), asyncHandler(updateTicketStatus));
 
-<<<<<<< HEAD
 // Ticket chat/messages (Owner + Admin/Support)
 router.route('/:id/messages')
-    .post(protect, addTicketMessage)
-    .get(protect, getTicketMessages);
+    .post(protect, asyncHandler(addTicketMessage))
+    .get(protect, asyncHandler(getTicketMessages));
 
-router.route('/weather/:city')
-    .get(protect, getWeatherData);
-=======
 /**
  * @swagger
  * /api/tickets/weather/{city}:
@@ -94,6 +90,6 @@ router.route('/weather/:city')
  *         required: true
  */
 router.get('/weather/:city', protect, asyncHandler(getWeatherData));
->>>>>>> main-sineth
+
 
 module.exports = router;
