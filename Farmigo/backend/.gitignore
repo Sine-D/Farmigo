@@ -1,13 +1,5 @@
 # === ENV & Secrets ===
-.env
-*.env
-.env.local
-.env.*.local
-backend/.env
-frontend/.env
-cookies.txt
-**/.env
-**/.env.*
+
 
 # dependencies
 **/node_modules/

@@ -13,6 +13,8 @@ const sustainabilityRoutes = require('./routes/sustainabilityRoutes');
 const communityRoutes = require('./routes/communityRoutes');
 const lmsRoutes = require('./routes/lmsRoutes');
 const disputeRoutes = require('./routes/disputeRoutes');
+const orderRoutes = require('./routes/orderRoutes');
+
 
 const { swaggerUi, specs } = require('./config/swagger');
 
@@ -37,6 +39,7 @@ const startServer = async () => {
         app.use('/api/users', userRoutes);
         app.use('/api/tickets', ticketRoutes);
         app.use('/api/products', productRoutes);
+        app.use('/api/orders', orderRoutes);
         app.use('/api/admin', adminRoutes);
         app.use('/api/notifications', notificationRoutes);
         app.use('/api/categories', categoryRoutes);
