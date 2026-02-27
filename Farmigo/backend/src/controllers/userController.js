@@ -14,14 +14,34 @@ const registerUser = async (req, res) => {
         throw new Error('User already exists');
     }
 
+    // Email validation: must contain @ and end with gmail.com
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    if (!emailRegex.test(email)) {
+        res.status(400);
+        throw new Error('Please use a valid Gmail address (example@gmail.com)');
+    }
+
+    // Password validation: 8+ characters and mixed case (upper and lower)
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+        res.status(400);
+        throw new Error('Password must be at least 8 characters long and contain both uppercase and lowercase letters');
+    }
+
+    // Role-specific validation
+    if (role === 'Farmer' && (!farmDetails || !farmDetails.farmName)) {
+        res.status(400);
+        throw new Error('Farmers must provide farm details');
+    }
+
     const user = await User.create({
         name,
         email,
         password,
-        role,
+        role: role || 'Buyer', // Default to Buyer if no role provided
         phoneNumber,
         location,
-        farmDetails
+        farmDetails: role === 'Farmer' ? farmDetails : undefined
     });
 
     if (user) {
@@ -30,6 +50,7 @@ const registerUser = async (req, res) => {
             name: user.name,
             email: user.email,
             role: user.role,
+            isApproved: user.isApproved,
             token: generateToken(user._id),
         });
     } else {

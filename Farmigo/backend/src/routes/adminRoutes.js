@@ -6,10 +6,31 @@ const {
 } = require('../controllers/adminController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
+const asyncHandler = require('../middleware/asyncHandler');
+
 router.use(protect);
 router.use(authorize('Admin'));
 
-router.get('/stats', getDashboardStats);
-router.get('/reports/farmers', getFarmerReport);
+/**
+ * @swagger
+ * /api/admin/stats:
+ *   get:
+ *     summary: Get dashboard statistics
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.get('/stats', asyncHandler(getDashboardStats));
+
+/**
+ * @swagger
+ * /api/admin/reports/farmers:
+ *   get:
+ *     summary: Get farmer reports
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ */
+router.get('/reports/farmers', asyncHandler(getFarmerReport));
 
 module.exports = router;

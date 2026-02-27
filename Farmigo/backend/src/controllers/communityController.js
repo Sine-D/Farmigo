@@ -64,9 +64,57 @@ const likePost = async (req, res) => {
     }
 };
 
+// @desc    Update a forum post
+// @route   PUT /api/community/forum/:id
+// @access  Private
+const updatePost = async (req, res) => {
+    const post = await ForumPost.findById(req.params.id);
+
+    if (post) {
+        // Check if user is post owner or admin
+        if (post.user.toString() !== req.user._id.toString() && req.user.role !== 'Admin') {
+            res.status(403);
+            throw new Error('You are not authorized to update this post');
+        }
+
+        post.title = req.body.title || post.title;
+        post.content = req.body.content || post.content;
+        post.category = req.body.category || post.category;
+
+        const updatedPost = await post.save();
+        res.json(updatedPost);
+    } else {
+        res.status(404);
+        throw new Error('Post not found');
+    }
+};
+
+// @desc    Delete a forum post
+// @route   DELETE /api/community/forum/:id
+// @access  Private
+const deletePost = async (req, res) => {
+    const post = await ForumPost.findById(req.params.id);
+
+    if (post) {
+        // Check if user is post owner or admin
+        if (post.user.toString() !== req.user._id.toString() && req.user.role !== 'Admin') {
+            res.status(403);
+            throw new Error('You are not authorized to delete this post');
+        }
+
+        await post.deleteOne();
+        res.json({ message: 'Post removed' });
+    } else {
+        res.status(404);
+        throw new Error('Post not found');
+    }
+};
+
 module.exports = {
     createPost,
     getPosts,
     addComment,
-    likePost
+    likePost,
+    updatePost,
+    deletePost
 };

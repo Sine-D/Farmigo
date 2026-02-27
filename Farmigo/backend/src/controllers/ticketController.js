@@ -62,28 +62,48 @@ const getWeatherData = async (req, res) => {
     const apiKey = process.env.WEATHER_API_KEY;
 
     if (!apiKey || apiKey === 'your_weather_api_key_here') {
-        // Mock data if API key is not provided
         return res.json({
             city,
             temperature: '25°C',
-            condition: 'Sunny',
-            forecast: 'Clear skies for the next 3 days. Good for harvesting.',
-            note: 'API Key not configured. Showing mock data.'
+            condition: 'Clear',
+            humidity: 60,
+            agriculturalAdvice: 'API Key not configured. Showing mock advice: Ideal weather for general farm maintenance.',
+            note: 'Please add your OpenWeather API Key to the .env file.'
         });
     }
 
     try {
         const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
+        const { main, weather, name } = response.data;
+        const temp = main.temp;
+        const humidity = main.humidity;
+        const condition = weather[0].main;
+
+        let advice = '';
+
+        // Agricultural advice logic
+        if (condition === 'Rain' || condition === 'Drizzle') {
+            advice = 'Rain expected. Avoid harvesting tomatoes or other delicate fruits today to prevent rot. Ensure drainage is clear.';
+        } else if (temp > 30) {
+            advice = 'High temperatures detected. Increase irrigation frequency for young crops and provide shade if possible.';
+        } else if (humidity > 80) {
+            advice = 'High humidity levels. Monitor for fungal infections or pests. Good time for organic soil enrichment.';
+        } else if (condition === 'Clear' || condition === 'Clouds') {
+            advice = 'Optimal conditions for harvesting and outdoor maintenance. A great day to apply fertilizers.';
+        } else {
+            advice = 'Maintain standard care. Keep an eye on local alerts.';
+        }
+
         res.json({
-            city: response.data.name,
-            temperature: `${response.data.main.temp}°C`,
-            condition: response.data.weather[0].main,
-            humidity: response.data.main.humidity,
-            wind: response.data.wind.speed
+            city: name,
+            temperature: `${temp}°C`,
+            condition: condition,
+            humidity: `${humidity}%`,
+            agriculturalAdvice: advice
         });
     } catch (error) {
-        res.status(500);
-        throw new Error('Failed to fetch weather data');
+        res.status(error.response?.status || 500);
+        throw new Error(error.response?.data?.message || 'Failed to fetch weather data from OpenWeather');
     }
 };
 
