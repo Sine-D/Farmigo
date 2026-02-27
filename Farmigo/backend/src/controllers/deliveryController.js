@@ -1,6 +1,18 @@
-// controllers/deliveryController.js
 const Order = require('../models/makeOrderModel');
 const User = require('../models/userModel');
+
+// Helper: Auto-update delivery status based on harvest/expected delivery
+const updateSmartStatus = (order) => {
+  const now = new Date();
+
+  if (order.harvestDate && now >= order.harvestDate && order.deliveryStatus === 'Pending') {
+    order.deliveryStatus = 'Harvesting';
+  }
+
+  if (order.expectedDeliveryDate && now >= order.expectedDeliveryDate && order.deliveryStatus === 'Harvesting') {
+    order.deliveryStatus = 'Ready for Dispatch';
+  }
+};
 
 // Update order dispatch info (Admin/Farmer)
 exports.updateDispatch = async (req, res) => {
@@ -10,21 +22,20 @@ exports.updateDispatch = async (req, res) => {
 
     const order = await Order.findById(orderId);
 
-    if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
+    if (!order) return res.status(404).json({ message: 'Order not found' });
 
     // Only admin or the farmer of this order can update dispatch
-    if (
-      req.user.role !== 'Admin' &&
-      order.farmerId.toString() !== req.user._id.toString()
-    ) {
+    if (req.user.role !== 'Admin' && order.farmerId.toString() !== req.user._id.toString()) {
       return res.status(403).json({ message: 'Not authorized' });
     }
 
+    // Manual updates
     if (dispatchStatus) order.deliveryStatus = dispatchStatus;
     if (address) order.deliveryAddress = address;
     if (route) order.deliveryRoute = route;
+
+    // Auto-update smart status
+    updateSmartStatus(order);
 
     await order.save();
 
@@ -48,6 +59,10 @@ exports.getOrdersForDelivery = async (req, res) => {
 
     const orders = await Order.find(filter).sort({ createdAt: -1 });
 
+    // Auto-update statuses for all orders before sending
+    orders.forEach(order => updateSmartStatus(order));
+    await Promise.all(orders.map(order => order.save()));
+
     res.status(200).json({
       success: true,
       data: orders,
@@ -62,9 +77,7 @@ exports.confirmDelivery = async (req, res) => {
   try {
     const order = await Order.findById(req.params.orderId);
 
-    if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
+    if (!order) return res.status(404).json({ message: 'Order not found' });
 
     // Only assigned farmer can confirm
     if (order.farmerId.toString() !== req.user._id.toString()) {

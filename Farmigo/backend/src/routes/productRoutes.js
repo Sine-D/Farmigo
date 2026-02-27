@@ -19,6 +19,11 @@ router.route('/:id')
     .put(protect, authorize('Farmer', 'Admin'), updateProduct)
     .delete(protect, authorize('Farmer', 'Admin'), deleteProduct);
 
+router.get('/preorders', async (req, res) => {
+    const products = await Product.find({ isPreOrder: true, isApproved: true });
+    res.json(products);
+});
+
 router.route('/:id/approve')
     .put(protect, authorize('Admin'), approveProduct);
 

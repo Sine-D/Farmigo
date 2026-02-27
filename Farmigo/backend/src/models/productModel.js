@@ -37,6 +37,28 @@ const productSchema = mongoose.Schema(
             type: Boolean,
             default: false,
         },
+
+        // 🌱 NEW FIELDS FOR SMART HARVEST SYSTEM
+
+        harvestDate: {
+            type: Date,
+        },
+
+        isPreOrder: {
+            type: Boolean,
+            default: false,
+        },
+
+        estimatedHarvestDuration: {
+            type: Number, // days
+            default: 0,
+        },
+
+        availabilityStatus: {
+            type: String,
+            enum: ['Growing', 'Ready for Harvest', 'Harvested', 'Out of Season'],
+            default: 'Growing',
+        }
     },
     {
         timestamps: true,

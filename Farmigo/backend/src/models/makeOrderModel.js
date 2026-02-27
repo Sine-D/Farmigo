@@ -79,10 +79,33 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
 
+    // 🌱 HARVEST BASED SCHEDULING (NEW)
+
+    isPreOrder: {
+      type: Boolean,
+      default: false,
+    },
+
+    harvestDate: {
+      type: Date,
+    },
+
+    expectedDeliveryDate: {
+      type: Date,
+    },
+
     // DELIVERY
     deliveryStatus: {
       type: String,
-      enum: ['pending', 'confirmed', 'in_transit', 'delivered', 'cancelled'],
+      enum: [
+        'pending',
+        'scheduled',          // waiting for harvest
+        'harvesting',         // farmer harvesting
+        'ready_for_dispatch',
+        'in_transit',
+        'delivered',
+        'cancelled'
+      ],
       default: 'pending',
     },
 
