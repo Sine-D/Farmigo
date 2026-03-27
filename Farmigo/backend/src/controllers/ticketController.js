@@ -198,11 +198,56 @@ const getWeatherData = async (req, res) => {
     }
 };
 
+// @desc    Delete a ticket
+// @route   DELETE /api/tickets/:id
+// @access  Private
+const deleteTicket = async (req, res) => {
+    const ticket = await Ticket.findById(req.params.id);
+
+    if (!ticket) {
+        res.status(404);
+        throw new Error('Ticket not found');
+    }
+
+    const isOwner = ticket.user.toString() === req.user._id.toString();
+    const isStaff = ['Admin', 'Support'].includes(req.user.role);
+
+    if (!isOwner && !isStaff) {
+        res.status(403);
+        throw new Error('Not authorized to delete this ticket');
+    }
+
+    // Delete all messages related to this ticket first
+    await TicketMessage.deleteMany({ ticket: ticket._id });
+
+    // Delete the ticket
+    await ticket.deleteOne();
+
+    // Notify relevant users
+    if (isStaff) {
+        await createNotification(
+            ticket.user,
+            'Ticket Deleted',
+            `Your ticket "${ticket.subject}" was deleted by support staff.`,
+            'Ticket'
+        );
+    } else {
+        await notifyStaff(
+            'Ticket Deleted',
+            `User deleted ticket: ${ticket.subject}`,
+            'Ticket'
+        );
+    }
+
+    res.json({ message: 'Ticket deleted successfully' });
+};
+
 module.exports = {
     createTicket,
     getTickets,
     getAllTickets,
     updateTicketStatus,
+    deleteTicket,
     addTicketMessage,
     getTicketMessages,
     getWeatherData
