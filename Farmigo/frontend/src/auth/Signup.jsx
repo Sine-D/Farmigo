@@ -1,0 +1,308 @@
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { FaLeaf, FaArrowRight } from "react-icons/fa";
+import { GoogleLogin } from '@react-oauth/google';
+
+const Signup = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    cpassword: '',
+    role: 'farmer',
+    farmName: ''
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    if (error) setError('');
+  };
+
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setLoading(true);
+    setError('');
+    
+    try {
+      const response = await fetch('http://localhost:5001/api/users/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: credentialResponse.credential }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSuccess('Google Registration successful!');
+        localStorage.setItem('user', JSON.stringify({
+          userId: data._id,
+          name: data.name,
+          email: data.email,
+          role: data.role
+        }));
+        localStorage.setItem('token', data.token);
+        setTimeout(() => { navigate('/dashboard'); }, 2000);
+      } else {
+        setError(data.message || 'Google signup failed');
+      }
+    } catch (err) {
+      setError('Network error with Google authentication');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const validateForm = () => {
+    if (!formData.name || !formData.email || !formData.password || !formData.cpassword) {
+      setError('All fields are required');
+      return false;
+    }
+    if (formData.role === 'Farmer' && !formData.farmName) {
+      setError('Farm Name is required for farmers');
+      return false;
+    }
+    if (formData.password !== formData.cpassword) {
+      setError('Passwords do not match');
+      return false;
+    }
+    
+    // Backend matching validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    if (!emailRegex.test(formData.email)) {
+      setError('Please use a valid Gmail address (example@gmail.com)');
+      return false;
+    }
+    
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+    if (!passwordRegex.test(formData.password)) {
+      setError('Password must be at least 8 characters long and contain both uppercase and lowercase letters');
+      return false;
+    }
+    
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
+
+    setLoading(true);
+    setError('');
+    setSuccess('');
+
+    // Prepare data for backend
+    const payload = {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      role: formData.role.charAt(0).toUpperCase() + formData.role.slice(1).toLowerCase(), // Capitalize
+    };
+
+    if (payload.role === 'Farmer') {
+      payload.farmDetails = { farmName: formData.farmName };
+    }
+
+    try {
+      const response = await fetch('http://localhost:5001/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSuccess('Registration successful! Redirecting to login...');
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
+      } else {
+        setError(data.message || 'Registration failed');
+      }
+    } catch (err) {
+      setError('Network error. Please make sure the server is running on port 5001.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen w-full flex items-center justify-center relative p-4 sm:p-8 bg-[#f5f7fa]">
+      {/* Full Page Background */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center z-0" 
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')" }}
+      >
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+      </div>
+
+      <div className="w-full max-w-[1100px] h-auto min-h-[700px] bg-white rounded-[40px] shadow-2xl overflow-hidden flex z-10 relative">
+        {/* Left Side (Image Panel) */}
+        <div className="hidden md:flex w-1/2 p-1.5">
+          <div 
+            className="w-full h-full min-h-[600px] rounded-[32px] overflow-hidden relative flex flex-col justify-end p-10 text-white"
+            style={{ 
+              backgroundImage: "url('https://images.unsplash.com/photo-1625246333195-78d9c38ad449?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80')",
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-[#ccff00] text-black text-sm font-bold px-3 py-1 rounded-full">12k+</div>
+                <p className="text-sm font-semibold uppercase tracking-wider">Join with 12k+ farmers!</p>
+              </div>
+              <h1 className="text-5xl font-black mb-4 leading-none tracking-tighter text-[#ccff00]">Back to<br/>nature.</h1>
+              <p className="text-white/80 font-medium">Get started and connect directly with markets.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Side (Form) */}
+        <div className="w-full md:w-1/2 p-10 sm:p-14 flex flex-col justify-center bg-white relative">
+          <Link to="/" className="absolute top-8 right-8 text-gray-400 hover:text-green-600 transition-colors hidden sm:block font-medium">
+            Back to Home
+          </Link>
+
+          <div className="max-w-[400px] w-full mx-auto">
+            <div className="flex justify-center md:justify-start items-center gap-2 mb-8">
+              <FaLeaf className="text-3xl text-[#137f13]" />
+              <span className="text-2xl font-black tracking-tight text-gray-900">FARMIGO</span>
+            </div>
+
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">Create an Account</h2>
+            <p className="text-gray-500 mb-6">Join us to start your farming journey.</p>
+
+            {success && <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-sm font-medium">{success}</div>}
+            {error && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm font-medium">{error}</div>}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="flex bg-gray-100 p-1 rounded-xl w-full mb-2">
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, role: 'farmer' }))}
+                  className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors ${formData.role === 'farmer' ? 'bg-white shadow text-[#137f13]' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  Farmer
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, role: 'buyer' }))}
+                  className={`flex-1 py-2 text-sm font-bold rounded-lg transition-colors ${formData.role === 'buyer' ? 'bg-white shadow text-[#137f13]' : 'text-gray-500 hover:text-gray-700'}`}
+                >
+                  Buyer
+                </button>
+              </div>
+
+              <div>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Full Name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full pb-3 border-b-2 border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#137f13] transition-colors bg-transparent font-medium"
+                />
+              </div>
+
+              {formData.role === 'farmer' && (
+                <div>
+                  <input
+                    type="text"
+                    name="farmName"
+                    placeholder="Farm Name"
+                    value={formData.farmName}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full pb-3 border-b-2 border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#137f13] transition-colors bg-transparent font-medium"
+                  />
+                </div>
+              )}
+
+              <div>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email Address"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full pb-3 border-b-2 border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#137f13] transition-colors bg-transparent font-medium"
+                />
+              </div>
+
+              <div>
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full pb-3 border-b-2 border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#137f13] transition-colors bg-transparent font-medium"
+                />
+              </div>
+
+              <div>
+                <input
+                  type="password"
+                  name="cpassword"
+                  placeholder="Confirm Password"
+                  value={formData.cpassword}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full pb-3 border-b-2 border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#137f13] transition-colors bg-transparent font-medium"
+                />
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={loading}
+                className="w-full py-4 bg-[#1c2a1c] hover:bg-[#121c12] text-white rounded-xl font-bold transition-all relative group overflow-hidden mt-6 shadow-lg flex items-center justify-center gap-2"
+              >
+                <div className="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay group-hover:opacity-50 transition-opacity" style={{backgroundImage: "url('https://images.unsplash.com/photo-1589923188900-85dae523342b?w=600&q=80')"}}></div>
+                <span className="relative z-10">{loading ? 'Creating Account...' : 'Sign Up'}</span>
+                {!loading && (
+                  <div className="relative z-10 w-8 h-8 rounded-full bg-[#ccff00] text-black flex items-center justify-center ml-2 group-hover:scale-110 transition-transform">
+                    <FaArrowRight className="text-xs" />
+                  </div>
+                )}
+              </button>
+            </form>
+
+            <div className="mt-6 text-center text-sm">
+              <span className="text-gray-500">Already have an account? </span>
+              <Link to="/login" className="text-[#137f13] font-bold hover:underline">Log In</Link>
+            </div>
+
+            <div className="mt-8 flex flex-col items-center justify-center gap-4">
+              <span className="text-gray-400 text-sm">or signup with</span>
+              <div className="w-full flex justify-center">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => setError('Google Signup Failed')}
+                  useOneTap
+                  theme="outline"
+                  shape="circle"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Signup;
