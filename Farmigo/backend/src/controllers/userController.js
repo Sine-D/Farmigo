@@ -1,5 +1,7 @@
 const User = require('../models/userModel');
 const generateToken = require('../utils/generateToken');
+const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // REGISTER USER
 const registerUser = async (req, res) => {
@@ -94,6 +96,49 @@ const authUser = async (req, res) => {
   } else {
     res.status(401);
     throw new Error('Invalid email or password');
+  }
+};
+
+// GOOGLE LOGIN
+const googleLogin = async (req, res) => {
+  const { credential } = req.body;
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const { name, email, picture } = ticket.getPayload();
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Create a default Buyer account if doesn't exist
+      user = await User.create({
+        name,
+        email,
+        password: Math.random().toString(36).slice(-10), // Random password
+        role: 'Buyer',
+      });
+    }
+
+    if (!user.isActive) {
+      res.status(401);
+      throw new Error('Account is deactivated');
+    }
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isApproved: user.isApproved,
+      token: generateToken(user._id),
+    });
+  } catch (error) {
+    res.status(401);
+    throw new Error('Google authentication failed');
   }
 };
 
@@ -238,6 +283,7 @@ const deleteUser = async (req, res) => {
 module.exports = {
   registerUser,
   authUser,
+  googleLogin,
   getUserProfile,
   updateUserProfile,
   getUsers,
