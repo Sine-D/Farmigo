@@ -13,11 +13,13 @@ import Signup from "./auth/Signup";
 import Dashboard from "./pages/Dashboard";
 import Contact from "./pages/contact";
 import CartPage from "./pages/CartPage";
-
 import Explore from "./pages/Explore";
 import VideoHero from "./components/VideoHero";
 import FarmerSpotlight from "./components/FarmerSpotlight";
 import Newsletter from "./components/Newsletter";
+import SupportCenter from "./pages/SupportCenter";
+import TicketChatPage from "./pages/TicketChatPage";
+import DisputeChatPage from "./pages/DisputeChatPage";
 
 const sectionMap = {
   "/": "home",
@@ -52,16 +54,23 @@ const FullLandingPage = () => {
       <Review />
       <Newsletter />
       <Contact />
-
-      {/* Add other components similarly */}
     </>
   );
 };
 
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
-  const hideLayoutPaths = ["/login", "/signup", "/dashboard"];
-  const shouldHideLayout = hideLayoutPaths.includes(location.pathname);
+  const hideLayoutPaths = [
+    "/login",
+    "/signup",
+    "/dashboard",
+    "/support",
+  ];
+
+  const shouldHideLayout =
+    hideLayoutPaths.includes(location.pathname) ||
+    location.pathname.startsWith("/support/tickets/") ||
+    location.pathname.startsWith("/support/disputes/");
 
   return (
     <>
@@ -87,6 +96,10 @@ const App = () => {
           <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/cart" element={<CartPage />} />
+
+          <Route path="/support" element={<SupportCenter />} />
+          <Route path="/support/tickets/:id" element={<TicketChatPage />} />
+          <Route path="/support/disputes/:id" element={<DisputeChatPage />} />
         </Routes>
       </LayoutWrapper>
     </Router>
