@@ -4,6 +4,7 @@ const asyncHandler = require('../middleware/asyncHandler');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 const {
+<<<<<<< Updated upstream
     registerUser,
     authUser,
     getUserProfile,
@@ -80,55 +81,45 @@ router.post('/', asyncHandler(registerUser));
  *       401:
  *         description: Invalid credentials
  */
+=======
+  registerUser,
+  authUser,
+  getUserProfile,
+  updateUserProfile,
+  getUsers,
+  approveFarmer,
+  updateUserStatus,
+  updateUserRole,
+  deleteUser
+} = require('../controllers/userController');
+
+const { protect, authorize } = require('../middleware/authMiddleware');
+const asyncHandler = require('../middleware/asyncHandler');
+
+// PUBLIC
+router.post('/register', asyncHandler(registerUser));
+>>>>>>> Stashed changes
 router.post('/login', asyncHandler(authUser));
 
-/**
- * @swagger
- * /api/users/profile:
- *   get:
- *     summary: Get user profile
- *     tags: [Users]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Profile retrieved
- *   put:
- *     summary: Update user profile
- *     tags: [Users]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Profile updated
- */
+// USER
 router.route('/profile')
-    .get(protect, asyncHandler(getUserProfile))
-    .put(protect, asyncHandler(updateUserProfile));
+  .get(protect, asyncHandler(getUserProfile))
+  .put(protect, asyncHandler(updateUserProfile));
 
-// Admin routes
-/**
- * @swagger
- * /api/users:
- *   get:
- *     summary: Get all users (Admin only)
- *     tags: [Admin]
- *     security:
- *       - bearerAuth: []
- */
+// ADMIN
 router.route('/')
-    .get(protect, authorize('Admin'), asyncHandler(getUsers));
+  .get(protect, authorize('Admin'), asyncHandler(getUsers));
 
 router.route('/:id/approve')
-    .put(protect, authorize('Admin'), asyncHandler(approveFarmer));
+  .put(protect, authorize('Admin'), asyncHandler(approveFarmer));
 
 router.route('/:id/status')
-    .put(protect, authorize('Admin'), asyncHandler(updateUserStatus));
+  .put(protect, authorize('Admin'), asyncHandler(updateUserStatus));
 
 router.route('/:id/role')
-    .put(protect, authorize('Admin'), asyncHandler(updateUserRole));
+  .put(protect, authorize('Admin'), asyncHandler(updateUserRole));
 
 router.route('/:id')
-    .delete(protect, authorize('Admin'), asyncHandler(deleteUser));
+  .delete(protect, authorize('Admin'), asyncHandler(deleteUser));
 
 module.exports = router;
