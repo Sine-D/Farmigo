@@ -63,14 +63,10 @@ const LayoutWrapper = ({ children }) => {
   const hideLayoutPaths = [
     "/login",
     "/signup",
-    "/dashboard",
-    "/support",
   ];
 
   const shouldHideLayout =
-    hideLayoutPaths.includes(location.pathname) ||
-    location.pathname.startsWith("/support/tickets/") ||
-    location.pathname.startsWith("/support/disputes/");
+    hideLayoutPaths.includes(location.pathname);
 
   return (
     <>

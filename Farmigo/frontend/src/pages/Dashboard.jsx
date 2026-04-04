@@ -86,30 +86,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-[#f9fafb]">
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm px-6 py-4">
-        <div className="max-w-[1200px] mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <FaLeaf className="text-[#137f13] text-xl" />
-            <span className="text-xl font-black tracking-tight text-gray-900">FARMIGO</span>
-            <span className="ml-2 bg-[#f0fdf4] border border-[#bbf7d0] text-[#137f13] text-xs font-bold px-3 py-0.5 rounded-full">Dashboard</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setTheme(t => t === "light" ? "dark" : "light")}
-              className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:border-[#137f13] hover:text-[#137f13] transition-colors"
-            >
-              {theme === "light" ? <BiMoon /> : <BiSun />}
-            </button>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-sm px-4 py-2 rounded-xl transition-colors border border-red-100"
-            >
-              <FaSignOutAlt /> Logout
-            </button>
-          </div>
-        </div>
-      </header>
-
       <main className="max-w-[1200px] mx-auto px-4 sm:px-8 py-10">
         <div className="bg-gradient-to-br from-[#1c2a1c] to-[#2d4a2d] rounded-[28px] p-8 md:p-10 mb-10 relative overflow-hidden shadow-2xl">
           <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-[#ccff00]/10" />

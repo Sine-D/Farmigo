@@ -1,12 +1,11 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { BiMenu } from "react-icons/bi";
-import { FaLeaf } from "react-icons/fa";
+import { FaLeaf, FaUserCircle } from "react-icons/fa";
 import {
   Container,
   Navbar as BsNavbar,
   Nav,
-  Button,
 } from "react-bootstrap";
 
 
@@ -19,8 +18,10 @@ const navLinks = [
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [expanded, setExpanded] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,8 +32,17 @@ const Navbar = () => {
       }
     };
     window.addEventListener("scroll", handleScroll);
+    
+    // Check for user login status on mount and when location changes
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    } else {
+      setUser(null);
+    }
+
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [location]);
 
   const handleNavClick = (path, section) => {
     setExpanded(false);
@@ -44,6 +54,13 @@ const Navbar = () => {
     } else {
       navigate(path);
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    setUser(null);
+    navigate('/');
   };
 
   return (
@@ -81,13 +98,32 @@ const Navbar = () => {
           </Nav>
 
           <div className="d-flex align-items-center gap-3 mt-3 mt-lg-0">
-            <Link
-              to="/login"
-              className="px-6 py-2 rounded-full font-bold text-white transition-all duration-300 hover:-translate-y-1 shadow-[0_4px_15px_rgba(19,127,19,0.3)] hover:shadow-[0_8px_25px_rgba(19,127,19,0.4)]"
-              style={{ backgroundColor: "var(--primary-green)", textDecoration: "none" }}
-            >
-              Login
-            </Link>
+            {user ? (
+              <div className="d-flex align-items-center gap-3">
+                <Link
+                  to="/dashboard"
+                  className="d-flex align-items-center gap-2 px-4 py-2 rounded-full font-bold text-white transition-all duration-300 hover:-translate-y-1 shadow-[0_4px_15px_rgba(19,127,19,0.3)]"
+                  style={{ backgroundColor: "var(--primary-green)", textDecoration: "none" }}
+                >
+                  <FaUserCircle className="fs-4" />
+                  <span>Dashboard</span>
+                </Link>
+                <button 
+                  onClick={handleLogout}
+                  className="text-xs font-bold text-gray-500 hover:text-red-500 transition-colors uppercase tracking-widest bg-transparent border-0"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="px-6 py-2 rounded-full font-bold text-white transition-all duration-300 hover:-translate-y-1 shadow-[0_4px_15px_rgba(19,127,19,0.3)] hover:shadow-[0_8px_25px_rgba(19,127,19,0.4)]"
+                style={{ backgroundColor: "var(--primary-green)", textDecoration: "none" }}
+              >
+                Login
+              </Link>
+            )}
           </div>
         </BsNavbar.Collapse>
       </Container>
@@ -96,3 +132,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
