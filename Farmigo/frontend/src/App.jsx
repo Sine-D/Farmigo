@@ -65,12 +65,12 @@ const LayoutWrapper = ({ children }) => {
     "/signup",
   ];
 
-  const shouldHideLayout =
-    hideLayoutPaths.includes(location.pathname);
+  const shouldHideLayout = hideLayoutPaths.includes(location.pathname);
+  const shouldHideAnnouncement = shouldHideLayout || location.pathname === "/dashboard";
 
   return (
     <>
-      {!shouldHideLayout && <AnnouncementBar />}
+      {!shouldHideAnnouncement && <AnnouncementBar />}
       {!shouldHideLayout && <Navbar />}
       {children}
       {!shouldHideLayout && <Footer />}

@@ -9,11 +9,16 @@ const contactSchema = mongoose.Schema(
     email: {
       type: String,
       required: [true, 'Please add an email'],
+      lowercase: true,
+      trim: true,
       match: [/^\S+@\S+\.\S+$/, 'Please add a valid email'],
     },
     message: {
       type: String,
       required: [true, 'Please add a message'],
+    },
+    reply: {
+      type: String,
     },
     status: {
       type: String,
