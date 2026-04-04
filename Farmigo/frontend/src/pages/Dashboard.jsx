@@ -7,11 +7,13 @@ import {
 } from 'react-icons/fa';
 import { BiMoon, BiSun, BiTrendingUp } from "react-icons/bi";
 import ContactHistory from '../components/ContactHistory';
+import ProfileModal from '../components/ProfileModal';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [theme, setTheme] = useState("light");
   const [user, setUser] = useState(null);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -66,20 +68,11 @@ const Dashboard = () => {
       color: "bg-amber-50/50 border-amber-100/50",
       iconColor: "bg-amber-500 text-white",
       link: "/cart",
-    },
-    {
-      icon: <FaHeadset />,
-      title: "Support Hub",
-      desc: "Direct line to community specialists and dispute resolution.",
-      color: "bg-emerald-50/50 border-emerald-100/50",
-      iconColor: "bg-emerald-500 text-white",
-      link: "/support",
     }
   ];
 
   return (
     <div className="min-h-screen bg-[#fcfcfc] text-gray-900 font-sans">
-      {/* Top Padding to clear fixed Navbar */}
       <div className="pt-[110px] pb-20 px-4 sm:px-8 max-w-[1400px] mx-auto">
         
         {/* Header Section */}
@@ -97,7 +90,7 @@ const Dashboard = () => {
                     Welcome, {user.name.split(' ')[0]} <span className="text-[#137f13]">.</span>
                 </h1>
                 <p className="text-gray-500 font-medium max-w-[500px]">
-                    Manage your agricultural supply chain, monitor assets, and connect with the global market in real-time.
+                    Manage your agricultural supply chain and connect with the global market.
                 </p>
             </div>
             
@@ -106,8 +99,8 @@ const Dashboard = () => {
                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Current Balance</p>
                     <p className="text-xl font-black text-gray-900">LKR 42,500.00</p>
                 </div>
-                <div className="w-12 h-12 bg-[#ccff00] rounded-xl flex items-center justify-center text-[#1c2a1c] shadow-md cursor-pointer hover:scale-105 transition-transform">
-                    <BiTrendingUp className="text-2xl" />
+                <div className="w-12 h-12 bg-[#ccff00] rounded-xl flex items-center justify-center text-[#1c2a1c] shadow-md cursor-pointer hover:scale-105 transition-transform" onClick={handleLogout}>
+                    <FaSignOutAlt className="text-xl text-red-500" />
                 </div>
             </div>
         </div>
@@ -128,87 +121,74 @@ const Dashboard = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          
-          {/* Main Actions Area */}
-          <div className="lg:col-span-8 flex flex-col gap-10">
+        {/* Core Operations Section */}
+        <div className="bg-white rounded-[40px] p-8 md:p-10 border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.03)] relative overflow-hidden mb-12">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-[#137f13]/5 rounded-full -mr-32 -mt-32 blur-[100px] pointer-events-none" />
             
-            {/* Quick Actions Panel */}
-            <div className="bg-white rounded-[40px] p-8 md:p-10 border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.03)] relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-[#137f13]/5 rounded-full -mr-20 -mt-20 blur-3xl pointer-events-none" />
-                
-                <h3 className="text-2xl font-black text-gray-900 mb-8 flex items-center gap-3">
-                    <div className="w-2 h-8 bg-[#ccff00] rounded-full" />
-                    Core Operations
-                </h3>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 relative z-10">
-                    {cards.map((card, i) => (
-                        <Link to={card.link} key={i} className="no-underline group">
-                            <div className={`rounded-[32px] border-2 p-8 ${card.color} border-transparent hover:border-[#ccff00] bg-[#fcfcfc] transition-all duration-500 h-full flex flex-col group-hover:shadow-2xl group-hover:bg-white`}>
-                                <div className={`w-14 h-14 rounded-2xl ${card.iconColor} flex items-center justify-center text-2xl mb-8 group-hover:scale-110 transition-transform shadow-lg`}>
-                                    {card.icon}
-                                </div>
-                                <h4 className="font-black text-gray-900 text-xl mb-3 tracking-tight">{card.title}</h4>
-                                <p className="text-gray-500 text-sm leading-relaxed flex-1 font-medium">{card.desc}</p>
-                                <div className="mt-8 flex items-center justify-between">
-                                    <span className="text-[#137f13] font-black text-[11px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Launch Module</span>
-                                    <div className="w-10 h-10 rounded-full border-2 border-gray-100 flex items-center justify-center text-gray-300 group-hover:border-[#ccff00] group-hover:text-[#1c2a1c] group-hover:bg-[#ccff00] transition-all transform group-hover:rotate-45">
-                                        <FaArrowRight className="text-xs" />
-                                    </div>
+            <h3 className="text-2xl font-black text-gray-900 mb-10 flex items-center gap-3">
+                <div className="w-2 h-8 bg-[#ccff00] rounded-full" />
+                Core Operations
+            </h3>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
+                {cards.map((card, i) => (
+                    <Link to={card.link} key={i} className="no-underline group h-full">
+                        <div className={`rounded-[32px] border-2 p-8 ${card.color} border-transparent hover:border-[#ccff00] bg-[#fcfcfc] transition-all duration-500 h-full flex flex-col group-hover:shadow-2xl group-hover:bg-white min-h-[400px]`}>
+                            <div className={`w-14 h-14 rounded-2xl ${card.iconColor} flex items-center justify-center text-2xl mb-8 group-hover:scale-110 transition-transform shadow-lg`}>
+                                {card.icon}
+                            </div>
+                            <h4 className="font-black text-gray-900 text-xl mb-3 tracking-tight">{card.title}</h4>
+                            <p className="text-gray-500 text-sm leading-relaxed flex-1 font-medium">{card.desc}</p>
+                            <div className="mt-8 flex items-center justify-between">
+                                <span className="text-[#137f13] font-black text-[11px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Launch</span>
+                                <div className="w-10 h-10 rounded-full border-2 border-gray-100 flex items-center justify-center text-gray-300 group-hover:border-[#ccff00] group-hover:text-[#1c2a1c] group-hover:bg-[#ccff00] transition-all transform group-hover:rotate-45">
+                                    <FaArrowRight className="text-xs" />
                                 </div>
                             </div>
-                        </Link>
-                    ))}
+                        </div>
+                    </Link>
+                ))}
+
+                <ContactHistory />
+            </div>
+        </div>
+
+        {/* BOTTOM UTILITY SECTION */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div 
+              className="bg-[#1c2a1c] rounded-[40px] p-8 md:p-10 text-white flex items-center justify-between shadow-2xl relative overflow-hidden group cursor-pointer"
+              onClick={() => setIsProfileOpen(true)}
+            >
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
+                <div>
+                    <h3 className="text-2xl font-black mb-2">Account Settings</h3>
+                    <p className="text-white/60 font-medium text-sm">Security & multi-channel preferences.</p>
+                </div>
+                <div className="w-14 h-14 bg-[#ccff00] text-[#1c2a1c] rounded-2xl flex items-center justify-center shadow-xl hover:scale-110 transition-transform">
+                    <FaCog className="text-xl" />
                 </div>
             </div>
 
-            {/* Account Settings Shortcut */}
-            <div className="bg-[#1c2a1c] rounded-[40px] p-8 md:p-10 text-white flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl relative overflow-hidden group">
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
-                <div className="relative z-10">
-                    <h3 className="text-2xl font-black mb-2">Settings & Profile</h3>
-                    <p className="text-white/60 font-medium max-w-[400px]">Customize your notification preferences, update security protocols, and manage business details.</p>
-                </div>
-                <button className="relative z-10 px-8 py-4 bg-[#ccff00] text-[#1c2a1c] rounded-2xl font-black flex items-center gap-3 hover:bg-[#b8e600] transition-colors shadow-xl group-hover:translate-x-2 transition-transform">
-                    Manage Account <FaCog className="animate-spin-slow" />
-                </button>
-            </div>
-          </div>
-          
-          {/* Support/Messages Sidebar */}
-          <div className="lg:col-span-4 flex flex-col gap-8">
-            {/* Quick Logout Card */}
-            <div className="bg-white rounded-[32px] p-6 border border-gray-100 flex items-center justify-between group cursor-pointer hover:border-red-100 transition-colors" onClick={handleLogout}>
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-500 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-                        <FaSignOutAlt />
+            <div className="bg-gradient-to-br from-[#137f13] to-[#1c2a1c] rounded-[40px] p-8 md:p-10 text-white flex items-center justify-between shadow-xl relative overflow-hidden">
+                <div className="relative z-10 flex items-center gap-6">
+                    <div className="w-16 h-16 rounded-3xl bg-[#ccff00] flex items-center justify-center text-[#1c2a1c] text-2xl shadow-2xl">
+                        <FaRocket />
                     </div>
                     <div>
-                        <p className="font-black text-gray-900 leading-none mb-1">Secure Sign Out</p>
-                        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">End Session</p>
+                        <h4 className="text-xl font-black mb-1">Scale your Farm</h4>
+                        <p className="text-white/70 text-sm font-medium">Read our new trade analytics guide.</p>
                     </div>
                 </div>
-            </div>
-
-            {/* Integration of Message History Component */}
-            <ContactHistory />
-            
-            {/* Pro Tips Card */}
-            <div className="bg-gradient-to-br from-[#137f13] to-[#1c2a1c] rounded-[32px] p-8 text-white relative overflow-hidden">
-                <div className="relative z-10">
-                    <FaRocket className="text-3xl text-[#ccff00] mb-6 animate-bounce" />
-                    <h4 className="text-xl font-black mb-2">Platform Pro-Tip</h4>
-                    <p className="text-white/70 text-sm leading-relaxed mb-6">Users who monitor their cold storage every 6 hours see a <span className="text-[#ccff00] font-bold">12% reduction</span> in waste.</p>
-                    <Link to="/explore" className="text-[11px] font-black uppercase tracking-widest text-[#ccff00] hover:underline">Read Analytics Guide</Link>
-                </div>
-                <div className="absolute bottom-0 right-0 p-4 opacity-10">
-                    <FaLeaf className="text-8xl" />
+                <div className="absolute bottom-0 right-0 p-4 opacity-5">
+                    <FaLeaf className="text-9xl" />
                 </div>
             </div>
-          </div>
         </div>
+
       </div>
+
+      {/* Profile Sync Popup */}
+      <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { FaInbox, FaReply, FaClock, FaCheckCircle, FaExclamationCircle } from 'react-icons/fa';
+import { FaInbox, FaReply, FaClock, FaCheckCircle, FaExclamationCircle, FaArrowRight } from 'react-icons/fa';
 import { apiGet } from '../utils/api';
 
 const ContactHistory = () => {
@@ -24,97 +24,68 @@ const ContactHistory = () => {
     }, []);
 
     if (loading) return (
-        <div className="bg-white rounded-[40px] p-8 border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.03)] animate-pulse">
-            <div className="h-6 w-32 bg-gray-100 rounded-full mb-8"></div>
-            <div className="space-y-6">
-                <div className="h-32 bg-gray-50/50 rounded-3xl"></div>
-                <div className="h-32 bg-gray-50/50 rounded-3xl"></div>
-            </div>
+        <div className="rounded-[32px] border-2 border-transparent bg-[#fcfcfc] p-8 h-full animate-pulse">
+            <div className="w-14 h-14 rounded-2xl bg-gray-100 mb-8"></div>
+            <div className="h-6 w-32 bg-gray-100 rounded-full mb-4"></div>
+            <div className="h-20 bg-gray-50 rounded-2xl"></div>
         </div>
     );
 
     return (
-        <div className="bg-white rounded-[40px] p-8 border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.03)] relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#137f13]/5 rounded-full -mr-10 -mt-10 blur-2xl pointer-events-none" />
+        <div className="rounded-[32px] border-2 border-transparent hover:border-[#ccff00] bg-[#fcfcfc] p-8 transition-all duration-500 h-full flex flex-col group/hub relative overflow-hidden hover:shadow-2xl hover:bg-white min-h-[500px]">
+             <div className="absolute top-0 right-0 w-64 h-64 bg-[#137f13]/5 rounded-full -mr-20 -mt-20 blur-3xl pointer-events-none" />
             
-            <div className="flex items-center justify-between mb-8 relative z-10">
-                <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-2xl bg-[#eefaf0] text-[#137f13] flex items-center justify-center text-xl shadow-sm">
-                        <FaInbox />
-                    </div>
-                    <div>
-                        <h3 className="text-xl font-black text-[#1c2a1c]">Live Inquiries</h3>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Support History</p>
-                    </div>
-                </div>
+            <div className={`w-14 h-14 rounded-2xl bg-[#137f13] text-white flex items-center justify-center text-2xl mb-8 group-hover/hub:scale-110 transition-transform shadow-lg relative z-10`}>
+                <FaInbox />
             </div>
 
-            {error && (
-                <div className="p-4 bg-red-50 text-red-600 rounded-2xl text-[11px] font-black uppercase tracking-widest mb-6 flex items-center gap-3 border border-red-100 shadow-sm transition-all animate-shake">
-                    <FaExclamationCircle className="text-sm" /> {error}
-                </div>
-            )}
+            <div className="relative z-10 flex-1">
+                <h4 className="font-black text-gray-900 text-xl mb-3 tracking-tight">Support Hub</h4>
+                <p className="text-gray-500 text-sm leading-relaxed font-medium mb-6">Live inquiry tracking & resolutions.</p>
 
-            {messages.length === 0 ? (
-                <div className="text-center py-20 bg-gray-50/50 rounded-[32px] border border-dashed border-gray-200">
-                    <div className="text-gray-300 text-5xl mb-6 flex justify-center scale-110">
-                        <FaInbox />
+                {error && (
+                    <div className="p-3 bg-red-50 text-red-600 rounded-2xl text-[10px] font-black uppercase tracking-widest mb-4 border border-red-100">
+                        {error}
                     </div>
-                    <p className="text-[#1c2a1c] font-black text-sm uppercase tracking-widest">System Clear</p>
-                    <p className="text-gray-400 text-xs mt-2 font-medium">New requests will log here.</p>
-                </div>
-            ) : (
-                <div className="space-y-6 max-h-[600px] overflow-y-auto pr-3 custom-scrollbar relative z-10">
-                    {messages.map((msg) => (
-                        <div key={msg._id} className="group border border-gray-100 rounded-[32px] p-6 hover:border-[#ccff00] transition-all bg-[#fafafa]/80 hover:bg-white hover:shadow-2xl">
-                            <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center gap-2">
-                                    <span className={`text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full ${
+                )}
+
+                <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                    {messages.length === 0 ? (
+                        <div className="py-8 text-center bg-gray-50/50 rounded-3xl border border-dashed border-gray-200">
+                            <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">No active tickets</p>
+                        </div>
+                    ) : (
+                        messages.map((msg) => (
+                            <div key={msg._id} className="bg-white border border-gray-50 rounded-2xl p-4 shadow-sm group/msg hover:border-[#ccff00]/30 transition-colors">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${
                                         msg.status === 'Replied' ? 'bg-[#ccff00] text-[#1c2a1c]' : 'bg-[#eefaf0] text-[#137f13]'
                                     }`}>
                                         {msg.status}
                                     </span>
-                                    <span className="text-[10px] text-gray-400 font-bold flex items-center gap-1">
-                                        <FaClock className="text-[9px]" /> {new Date(msg.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                                    </span>
+                                    <span className="text-[9px] text-gray-400 font-bold">{new Date(msg.createdAt).toLocaleDateString()}</span>
                                 </div>
-                                {msg.status === 'Replied' && (
-                                    <div className="w-6 h-6 rounded-full bg-[#ccff00] text-[#1c2a1c] flex items-center justify-center text-[10px] shadow-sm">
-                                        <FaCheckCircle />
+                                <p className="text-xs text-gray-600 line-clamp-1 italic mb-2">"{msg.message}"</p>
+                                {msg.reply && (
+                                    <div className="pt-2 border-t border-gray-100">
+                                        <p className="text-[10px] font-black text-[#137f13] uppercase tracking-widest mb-1 flex items-center gap-1">
+                                            <FaReply className="text-[8px]" /> Admin Response
+                                        </p>
+                                        <p className="text-xs text-gray-900 font-bold leading-tight">{msg.reply}</p>
                                     </div>
                                 )}
                             </div>
-                            
-                            <div className="mb-6">
-                                <p className="text-[11px] font-black uppercase tracking-widest text-[#137f13] mb-2">Original Ticket</p>
-                                <p className="text-xs text-gray-800 leading-relaxed font-medium bg-white p-4 rounded-2xl border border-gray-50 shadow-inner">"{msg.message}"</p>
-                            </div>
-
-                            {msg.reply ? (
-                                <div className="bg-gradient-to-br from-[#f0fdf4] to-[#fcfcfc] border border-[#137f13]/10 rounded-[28px] p-5 shadow-[0_10px_30px_rgba(0,0,0,0.02)]">
-                                    <div className="flex items-center gap-2 mb-3 text-[#137f13]">
-                                        <div className="p-1 bg-[#137f13] rounded-md">
-                                            <FaReply className="text-[8px] text-white" />
-                                        </div>
-                                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">Resolution</span>
-                                    </div>
-                                    <p className="text-[13px] text-gray-900 leading-relaxed font-black">
-                                        {msg.reply}
-                                    </p>
-                                </div>
-                            ) : (
-                                <div className="flex items-center gap-3 text-[10px] text-gray-500 bg-white py-3 px-5 rounded-2xl border border-dashed border-gray-200">
-                                    <div className="relative flex h-2 w-2">
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-                                    </div>
-                                    <span className="font-bold tracking-widest uppercase">Processing Logistics...</span>
-                                </div>
-                            )}
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
-            )}
+            </div>
+
+            <div className="mt-8 flex items-center justify-between relative z-10">
+                <span className="text-[#137f13] font-black text-[11px] uppercase tracking-widest opacity-0 group-hover/hub:opacity-100 transition-opacity">View Full History</span>
+                <div className="w-10 h-10 rounded-full border-2 border-gray-100 flex items-center justify-center text-gray-300 group-hover/hub:border-[#ccff00] group-hover/hub:text-[#1c2a1c] group-hover/hub:bg-[#ccff00] transition-all transform group-hover/hub:rotate-45">
+                    <FaArrowRight className="text-xs" />
+                </div>
+            </div>
         </div>
     );
 };
