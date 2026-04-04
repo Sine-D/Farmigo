@@ -25,6 +25,7 @@ const refundRoutes = require('./routes/refundRoutes');
 const payoutRoutes = require('./routes/payoutRoutes');
 const invoiceRoutes = require('./routes/invoiceRoutes');
 const deliveryRoutes = require('./routes/deliveryRoutes');
+const contactRoutes = require('./routes/contactRoutes');
 
 const startServer = async () => {
     try {
@@ -44,6 +45,8 @@ const startServer = async () => {
         });
 
         // Routes
+        app.post('/api/contact', contactRoutes); // Fallback direct
+        app.use('/api/contact', contactRoutes);
         app.use('/api/users', userRoutes);
         app.use('/api/tickets', ticketRoutes);
         app.use('/api/products', productRoutes);

@@ -12,7 +12,8 @@ const {
     approveFarmer,
     updateUserStatus,
     updateUserRole,
-    deleteUser
+    deleteUser,
+    googleLogin
 } = require('../controllers/userController');
 
 /**
@@ -81,6 +82,7 @@ router.post('/', asyncHandler(registerUser));
  *         description: Invalid credentials
  */
 router.post('/login', asyncHandler(authUser));
+router.post('/google', asyncHandler(googleLogin));
 
 /**
  * @swagger

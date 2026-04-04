@@ -5,6 +5,7 @@ const {
     getTickets,
     getAllTickets,
     updateTicketStatus,
+    deleteTicket,
     addTicketMessage,
     getTicketMessages,
     getWeatherData
@@ -69,7 +70,8 @@ router.get('/admin', protect, authorize('Admin', 'Support'), asyncHandler(getAll
  *         required: true
  */
 router.route('/:id')
-    .put(protect, authorize('Admin', 'Support'), asyncHandler(updateTicketStatus));
+    .put(protect, authorize('Admin', 'Support'), asyncHandler(updateTicketStatus))
+    .delete(protect, asyncHandler(deleteTicket));
 
 // Ticket chat/messages (Owner + Admin/Support)
 router.route('/:id/messages')
