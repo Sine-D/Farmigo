@@ -16,10 +16,6 @@ const communityRoutes = require('./routes/communityRoutes');
 const lmsRoutes = require('./routes/lmsRoutes');
 const makeOrderRoute = require('./routes/makeOrderRoute');
 const paymentRoutes = require('./routes/paymentRoutes');
-const disputeRoutes = require('./routes/disputeRoutes');
-const orderRoutes = require('./routes/orderRoutes');
-
-
 const { swaggerUi, specs } = require('./config/swagger');
 const refundRoutes = require('./routes/refundRoutes');
 const payoutRoutes = require('./routes/payoutRoutes');
@@ -47,14 +43,12 @@ const startServer = async () => {
         app.use('/api/users', userRoutes);
         app.use('/api/tickets', ticketRoutes);
         app.use('/api/products', productRoutes);
-        app.use('/api/orders', orderRoutes);
         app.use('/api/admin', adminRoutes);
         app.use('/api/notifications', notificationRoutes);
         app.use('/api/categories', categoryRoutes);
         app.use('/api/sustainability', sustainabilityRoutes);
         app.use('/api/community', communityRoutes);
         app.use('/api/lms', lmsRoutes);
-        app.use('/api/disputes', disputeRoutes);
 
 // Routes
 app.use('/api/users', userRoutes);

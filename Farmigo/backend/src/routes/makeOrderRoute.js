@@ -8,6 +8,7 @@ const {
   updateDeliveryStatus,
   updatePaymentStatus,
   cancelOrder,
+  deleteOrder,
 } = require('../controllers/makeOrderController');
 
 const { protect, authorize } = require('../middleware/authMiddleware');
@@ -23,5 +24,9 @@ router.put('/delivery/:id', protect, authorize('farmer'), updateDeliveryStatus);
 
 // ------------------- PAYMENT ROUTES ------------------- //
 router.put('/payment/:id', protect, updatePaymentStatus);
+
+// ------------------- ADMIN / DELETE ROUTE ------------------- //
+// Delete an order completely (hard delete)
+router.delete('/:id', protect, deleteOrder);
 
 module.exports = router;

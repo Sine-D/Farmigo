@@ -6,42 +6,61 @@ const orderSchema = new mongoose.Schema(
     buyerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      required: [true, 'Buyer is required'],
     },
     farmerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      required: [true, 'Farmer is required'],
     },
 
     // ORDER ITEMS
-    items: [
-      {
-        name: { type: String, required: true }, // snapshot name
-        image: { type: String }, // optional snapshot
-        productId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Product',
-          required: true,
+    items: {
+      type: [
+        {
+          name: { type: String, required: [true, 'Product name is required'] },
+          image: { type: String },
+          productId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Product',
+            required: [true, 'Product reference is required'],
+          },
+          quantity: {
+            type: Number,
+            required: [true, 'Quantity is required'],
+            min: [1, 'Quantity must be at least 1'],
+          },
+          price: {
+            type: Number,
+            required: [true, 'Price is required'],
+            min: [0, 'Price cannot be negative'],
+          },
         },
-        quantity: { type: Number, required: true },
-        price: { type: Number, required: true },
+      ],
+      validate: {
+        validator: function (v) {
+          return Array.isArray(v) && v.length > 0;
+        },
+        message: 'Order must have at least one item',
       },
-    ],
+    },
 
     // SHIPPING ADDRESS
     shippingAddress: {
-      address: { type: String, required: true },
-      city: { type: String, required: true },
-      postalCode: { type: String, required: true },
-      country: { type: String, required: true },
+      address: { type: String, required: [true, 'Address is required'] },
+      city: { type: String, required: [true, 'City is required'] },
+      postalCode: { type: String, required: [true, 'Postal code is required'] },
+      country: { type: String, required: [true, 'Country is required'] },
     },
 
     // PAYMENT
     paymentMethod: {
       type: String,
-      enum: ['card', 'cash_on_delivery', 'bank_transfer'],
-      required: true,
+      enum: {
+        values: ['card', 'cash_on_delivery', 'bank_transfer'],
+        message: 'Payment method must be card, cash_on_delivery, or bank_transfer',
+      },
+      required: [true, 'Payment method is required'],
     },
 
     paymentStatus: {
@@ -57,41 +76,39 @@ const orderSchema = new mongoose.Schema(
       email_address: { type: String },
     },
 
-    isPaid: {
-      type: Boolean,
-      default: false,
-    },
-    paidAt: {
-      type: Date,
-    },
+    isPaid: { type: Boolean, default: false },
+    paidAt: { type: Date },
 
     // PRICE DETAILS
-    taxPrice: {
-      type: Number,
-      default: 0,
-    },
-    shippingPrice: {
-      type: Number,
-      default: 0,
-    },
+    taxPrice: { type: Number, default: 0, min: [0, 'Tax price cannot be negative'] },
+    shippingPrice: { type: Number, default: 0, min: [0, 'Shipping price cannot be negative'] },
     totalAmount: {
       type: Number,
-      required: true,
+      required: [true, 'Total amount is required'],
+      min: [0, 'Total amount cannot be negative'],
     },
 
-    // 🌱 HARVEST BASED SCHEDULING (NEW)
-
-    isPreOrder: {
-      type: Boolean,
-      default: false,
-    },
+    // 🌱 HARVEST BASED SCHEDULING
+    isPreOrder: { type: Boolean, default: false },
 
     harvestDate: {
       type: Date,
+      validate: {
+        validator: function (v) {
+          return !v || v > Date.now();
+        },
+        message: 'Harvest date must be in the future',
+      },
     },
 
     expectedDeliveryDate: {
       type: Date,
+      validate: {
+        validator: function (v) {
+          return !v || v > Date.now();
+        },
+        message: 'Expected delivery date must be in the future',
+      },
     },
 
     // DELIVERY
@@ -104,23 +121,15 @@ const orderSchema = new mongoose.Schema(
         'ready_for_dispatch',
         'in_transit',
         'delivered',
-        'cancelled'
+        'cancelled',
       ],
       default: 'pending',
     },
 
-    isDelivered: {
-      type: Boolean,
-      default: false,
-    },
-    deliveredAt: {
-      type: Date,
-    },
+    isDelivered: { type: Boolean, default: false },
+    deliveredAt: { type: Date },
 
-    trackingNumber: {
-      type: String,
-      unique: true,
-    },
+    trackingNumber: { type: String, unique: true },
 
     // OVERALL ORDER STATUS
     status: {
