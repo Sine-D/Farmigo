@@ -75,23 +75,17 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: function () {
         return this.role !== 'Farmer';
-<<<<<<< Updated upstream
         // Farmers must be approved by Admin
-=======
->>>>>>> Stashed changes
       },
     },
 
     isActive: {
       type: Boolean,
       default: true,
-<<<<<<< Updated upstream
     },
     whatsappOptIn: {
       type: Boolean,
       default: false
-=======
->>>>>>> Stashed changes
     },
   },
   { timestamps: true }
