@@ -172,7 +172,7 @@ const updateUserProfile = async (req, res) => {
 
   if (user) {
     user.name = req.body.name || user.name;
-    user.email = req.body.email || user.email;
+    // Email change is disabled as per user request
     if (req.body.phoneNumber !== undefined) user.phoneNumber = req.body.phoneNumber;
     if (req.body.whatsappOptIn !== undefined) user.whatsappOptIn = req.body.whatsappOptIn;
     user.location = req.body.location || user.location;

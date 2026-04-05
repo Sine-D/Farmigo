@@ -20,6 +20,8 @@ import Newsletter from "./components/Newsletter";
 import SupportCenter from "./pages/SupportCenter";
 import TicketChatPage from "./pages/TicketChatPage";
 import DisputeChatPage from "./pages/DisputeChatPage";
+import Profile from "./pages/Profile";
+import { Toaster } from "sonner";
 
 const sectionMap = {
   "/": "home",
@@ -63,10 +65,11 @@ const LayoutWrapper = ({ children }) => {
   const hideLayoutPaths = [
     "/login",
     "/signup",
+    "/profile",
   ];
 
   const shouldHideLayout = hideLayoutPaths.includes(location.pathname);
-  const shouldHideAnnouncement = shouldHideLayout || location.pathname === "/dashboard";
+  const shouldHideAnnouncement = shouldHideLayout || location.pathname === "/dashboard" || location.pathname === "/profile";
 
   return (
     <>
@@ -78,9 +81,12 @@ const LayoutWrapper = ({ children }) => {
   );
 };
 
+
+
 const App = () => {
   return (
     <Router>
+      <Toaster position="top-right" richColors closeButton />
       <LayoutWrapper>
         <Routes>
           <Route path="/" element={<FullLandingPage />} />
@@ -92,6 +98,7 @@ const App = () => {
           <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/profile" element={<Profile />} />
 
           <Route path="/support" element={<SupportCenter />} />
           <Route path="/support/tickets/:id" element={<TicketChatPage />} />

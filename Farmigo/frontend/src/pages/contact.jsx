@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import '../index.css';
 import contactImage from '../assets/images/contactimage.png';
 import { FaLeaf, FaArrowRight } from "react-icons/fa";
+import { toast } from "sonner";
 import { apiPost } from '../utils/api';
 
 const Contact = () => {
@@ -11,8 +12,6 @@ const Contact = () => {
     message: ''
   });
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,24 +19,20 @@ const Contact = () => {
       ...prev,
       [name]: value
     }));
-    if (error) setError("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
-    setSuccess(false);
 
     try {
       // Use standard apiPost utility instead of manual fetch
       const result = await apiPost('/contact', formData);
       
-      setSuccess(true);
+      toast.success("Message sent Successfully! We'll reply soon.");
       setFormData({ name: '', email: '', message: '' });
-      setTimeout(() => setSuccess(false), 5000);
     } catch (err) {
-      setError(err.message || "Network error. Please make sure the backend server is running.");
+      toast.error(err.message || "Network error. Please make sure the backend server is running.");
     } finally {
       setLoading(false);
     }
@@ -72,9 +67,6 @@ const Contact = () => {
 
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Get in touch</h2>
             <p className="text-gray-500 mb-8">Have any questions, feedback, or suggestions? We'd love to hear from you!</p>
-
-            {success && <div className="mb-6 p-4 bg-green-100 text-green-700 rounded-xl text-sm font-bold shadow-sm border border-green-200">Message sent Successfully! We'll reply soon.</div>}
-            {error && <div className="mb-6 p-4 bg-red-100 text-red-700 rounded-xl text-sm font-bold shadow-sm border border-red-200">{error}</div>}
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>

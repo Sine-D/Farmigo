@@ -7,11 +7,15 @@ import {
 } from 'react-icons/fa';
 import { BiMoon, BiSun, BiTrendingUp } from "react-icons/bi";
 import ContactHistory from '../components/ContactHistory';
+import ProfileModal from '../components/ProfileModal';
+
+import { toast } from "sonner";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [theme, setTheme] = useState("light");
   const [user, setUser] = useState(null);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -28,6 +32,7 @@ const Dashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    toast.success("Logged out successfully");
     navigate('/login');
   };
 
@@ -42,173 +47,316 @@ const Dashboard = () => {
     );
   }
 
-  const cards = [
+  const ops = [
     {
       icon: <FaSnowflake />,
       title: "Cold Storage",
       desc: "Precision climate control for your perishable assets.",
-      color: "bg-blue-50/50 border-blue-100/50",
-      iconColor: "bg-blue-500 text-white",
+      tag: "Infrastructure",
+      stat: "–3°C",
+      statLabel: "Avg. Temp",
       link: "/#cold-storage",
+      accent: "#3b82f6",
+      accentLight: "#eff6ff",
+      accentBorder: "#bfdbfe",
+      tagBg: "bg-blue-100 text-blue-600",
+      iconBg: "bg-blue-500",
+      barColor: "bg-blue-400",
     },
     {
       icon: <FaShoppingBasket />,
       title: "Marketplace",
       desc: "Direct farm-to-table commerce gateway.",
-      color: "bg-[#137f13]/5 border-[#137f13]/10",
-      iconColor: "bg-[#137f13] text-white",
+      tag: "Commerce",
+      stat: "1.2k",
+      statLabel: "Live Listings",
       link: "/explore",
+      accent: "#137f13",
+      accentLight: "#f0fdf4",
+      accentBorder: "#bbf7d0",
+      tagBg: "bg-emerald-100 text-emerald-700",
+      iconBg: "bg-[#137f13]",
+      barColor: "bg-emerald-400",
     },
     {
       icon: <FaClipboardList />,
       title: "My Orders",
-      desc: "Live logistics Tracking and transaction history.",
-      color: "bg-amber-50/50 border-amber-100/50",
-      iconColor: "bg-amber-500 text-white",
+      desc: "Live logistics tracking and transaction history.",
+      tag: "Logistics",
+      stat: "12",
+      statLabel: "Active",
       link: "/cart",
+      accent: "#f59e0b",
+      accentLight: "#fffbeb",
+      accentBorder: "#fde68a",
+      tagBg: "bg-amber-100 text-amber-700",
+      iconBg: "bg-amber-500",
+      barColor: "bg-amber-400",
     },
-    {
-      icon: <FaHeadset />,
-      title: "Support Hub",
-      desc: "Direct line to community specialists and dispute resolution.",
-      color: "bg-emerald-50/50 border-emerald-100/50",
-      iconColor: "bg-emerald-500 text-white",
-      link: "/support",
-    }
   ];
 
   return (
     <div className="min-h-screen bg-[#fcfcfc] text-gray-900 font-sans">
-      {/* Top Padding to clear fixed Navbar */}
       <div className="pt-[110px] pb-20 px-4 sm:px-8 max-w-[1400px] mx-auto">
         
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row items-end justify-between gap-6 mb-12">
+        {/* ── Hero Banner ───────────────────────────────────────── */}
+        <div className="relative rounded-[36px] overflow-hidden mb-10 shadow-[0_24px_80px_rgba(19,127,19,0.18)]">
+          {/* base gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#0d1a0d] via-[#1c2a1c] to-[#0a1f1a]" />
+          {/* color blobs */}
+          <div className="absolute -top-20 -right-20 w-80 h-80 bg-[#ccff00]/15 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute -bottom-20 -left-10 w-64 h-64 bg-[#137f13]/30 rounded-full blur-[80px] pointer-events-none" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-32 bg-[#71f66a]/5 rounded-full blur-[60px] pointer-events-none" />
+          {/* subtle grid */}
+          <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.6) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.6) 1px,transparent 1px)', backgroundSize: '40px 40px' }} />
+
+          <div className="relative z-10 p-8 md:p-12 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+            {/* Left — greeting */}
             <div className="flex-1">
-                <div className="flex items-center gap-3 mb-3">
-                    <span className="px-3 py-1 bg-[#137f13]/10 text-[#137f13] text-[10px] font-black uppercase tracking-widest rounded-full border border-[#137f13]/20">
-                        System Online
-                    </span>
-                    <span className="flex items-center gap-1.5 text-gray-400 text-[10px] font-bold uppercase tracking-widest">
-                        <FaShieldAlt className="text-[9px]" /> Verified Profile
-                    </span>
-                </div>
-                <h1 className="text-4xl md:text-5xl font-black tracking-tight text-[#1c2a1c] mb-2">
-                    Welcome, {user.name.split(' ')[0]} <span className="text-[#137f13]">.</span>
-                </h1>
-                <p className="text-gray-500 font-medium max-w-[500px]">
-                    Manage your agricultural supply chain, monitor assets, and connect with the global market in real-time.
-                </p>
+              <div className="flex items-center gap-3 mb-5">
+                <span className="flex items-center gap-2 px-3 py-1.5 bg-[#ccff00]/15 border border-[#ccff00]/25 text-[#ccff00] text-[9px] font-black uppercase tracking-[0.2em] rounded-full">
+                  <span className="w-1.5 h-1.5 bg-[#ccff00] rounded-full animate-pulse" />
+                  System Online
+                </span>
+                <span className="flex items-center gap-1.5 text-white/30 text-[9px] font-black uppercase tracking-widest">
+                  <FaShieldAlt className="text-[8px] text-[#71f66a]" /> Verified Profile
+                </span>
+              </div>
+              <h1 className="text-4xl md:text-5xl font-black tracking-tight text-white mb-3 leading-none">
+                Welcome, <span className="text-[#ccff00]">{user.name.split(' ')[0]}</span>
+                <span className="text-[#71f66a]/60"> .</span>
+              </h1>
+              <p className="text-white/40 font-medium max-w-[440px] text-sm leading-relaxed">
+                Manage your agricultural supply chain and connect with the global market.
+              </p>
             </div>
-            
-            <div className="flex items-center gap-4 bg-white p-2 rounded-2xl border border-gray-100 shadow-sm">
-                <div className="flex flex-col items-end px-3">
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Current Balance</p>
-                    <p className="text-xl font-black text-gray-900">LKR 42,500.00</p>
+
+            {/* Right — balance card + logout */}
+            <div className="flex items-center gap-4">
+              {/* Balance */}
+              <div className="bg-white/8 backdrop-blur-sm border border-white/10 rounded-2xl px-6 py-4">
+                <p className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em] mb-1">Current Balance</p>
+                <p className="text-2xl font-black text-white">LKR 42,500<span className="text-white/40 text-lg">.00</span></p>
+                <p className="text-[9px] text-[#71f66a] font-bold mt-1">↑ +2.4% this month</p>
+              </div>
+              {/* Logout button */}
+              <button
+                onClick={handleLogout}
+                className="flex flex-col items-center gap-1.5 group"
+                title="Logout"
+              >
+                <div className="w-14 h-14 bg-[#ccff00] rounded-2xl flex items-center justify-center shadow-[0_8px_24px_rgba(204,255,0,0.35)] group-hover:scale-110 group-hover:bg-[#b8e600] transition-all">
+                  <FaSignOutAlt className="text-xl text-red-600" />
                 </div>
-                <div className="w-12 h-12 bg-[#ccff00] rounded-xl flex items-center justify-center text-[#1c2a1c] shadow-md cursor-pointer hover:scale-105 transition-transform">
-                    <BiTrendingUp className="text-2xl" />
-                </div>
+                <span className="text-[8px] text-white/30 font-black uppercase tracking-widest">Logout</span>
+              </button>
             </div>
+          </div>
         </div>
 
-        {/* Quick Stats Grid */}
+        {/* ── Colorful Stats Grid ───────────────────────────────── */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
           {[
-            { label: "Active Orders", value: "12", trend: "+2 this week" },
-            { label: "Tons Traded", value: "8.4", trend: "Market high" },
-            { label: "Storage Capacity", value: "84%", trend: "Optimal" },
-            { label: "Eco Rating", value: "Grade A", trend: "Top 5%" },
+            {
+              label: "Active Orders",
+              value: "12",
+              trend: "+2 this week",
+              trendUp: true,
+              icon: "📦",
+              accent: "from-violet-500 to-purple-600",
+              glow: "rgba(139,92,246,0.25)",
+              bg: "bg-gradient-to-br from-violet-50 to-purple-50",
+              border: "border-violet-100",
+              labelColor: "text-violet-400",
+              trendBg: "bg-violet-100 text-violet-600",
+            },
+            {
+              label: "Tons Traded",
+              value: "8.4",
+              trend: "Market high",
+              trendUp: true,
+              icon: "📈",
+              accent: "from-sky-400 to-blue-600",
+              glow: "rgba(14,165,233,0.25)",
+              bg: "bg-gradient-to-br from-sky-50 to-blue-50",
+              border: "border-sky-100",
+              labelColor: "text-sky-400",
+              trendBg: "bg-sky-100 text-sky-600",
+            },
+            {
+              label: "Storage Capacity",
+              value: "84%",
+              trend: "Optimal",
+              trendUp: true,
+              icon: "🧊",
+              accent: "from-emerald-400 to-teal-600",
+              glow: "rgba(16,185,129,0.25)",
+              bg: "bg-gradient-to-br from-emerald-50 to-teal-50",
+              border: "border-emerald-100",
+              labelColor: "text-emerald-500",
+              trendBg: "bg-emerald-100 text-emerald-700",
+            },
+            {
+              label: "Eco Rating",
+              value: "Grade A",
+              trend: "Top 5%",
+              trendUp: true,
+              icon: "🌿",
+              accent: "from-amber-400 to-orange-500",
+              glow: "rgba(251,191,36,0.25)",
+              bg: "bg-gradient-to-br from-amber-50 to-orange-50",
+              border: "border-amber-100",
+              labelColor: "text-amber-500",
+              trendBg: "bg-amber-100 text-amber-700",
+            },
           ].map((stat, i) => (
-            <div key={i} className="bg-white rounded-3xl p-6 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.02)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] group">
-              <p className="text-gray-400 text-[11px] font-black uppercase tracking-widest mb-1 group-hover:text-[#137f13] transition-colors">{stat.label}</p>
-              <h3 className="text-3xl font-black text-gray-900 mb-2 truncate">{stat.value}</h3>
-              <p className="text-[10px] font-bold text-[#137f13] bg-[#f0fdf4] inline-block px-2 py-0.5 rounded-md">{stat.trend}</p>
+            <div
+              key={i}
+              className={`relative ${stat.bg} border ${stat.border} rounded-3xl p-6 overflow-hidden group cursor-default
+                transition-all duration-500 hover:-translate-y-1`}
+              style={{ boxShadow: `0 8px 30px ${stat.glow}` }}
+            >
+              {/* gradient pill accent top-right */}
+              <div className={`absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br ${stat.accent} rounded-full opacity-10 group-hover:opacity-20 transition-opacity blur-md`} />
+              {/* emoji icon */}
+              <div className="text-3xl mb-4 select-none">{stat.icon}</div>
+              <p className={`${stat.labelColor} text-[10px] font-black uppercase tracking-widest mb-1`}>{stat.label}</p>
+              <h3 className="text-3xl font-black text-gray-900 mb-3 tracking-tight">{stat.value}</h3>
+              <span className={`inline-flex items-center gap-1 text-[10px] font-black px-2.5 py-1 rounded-full ${stat.trendBg}`}>
+                {stat.trendUp ? '↑' : '↓'} {stat.trend}
+              </span>
             </div>
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-          
-          {/* Main Actions Area */}
-          <div className="lg:col-span-8 flex flex-col gap-10">
-            
-            {/* Quick Actions Panel */}
-            <div className="bg-white rounded-[40px] p-8 md:p-10 border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.03)] relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-[#137f13]/5 rounded-full -mr-20 -mt-20 blur-3xl pointer-events-none" />
-                
-                <h3 className="text-2xl font-black text-gray-900 mb-8 flex items-center gap-3">
-                    <div className="w-2 h-8 bg-[#ccff00] rounded-full" />
-                    Core Operations
-                </h3>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 relative z-10">
-                    {cards.map((card, i) => (
-                        <Link to={card.link} key={i} className="no-underline group">
-                            <div className={`rounded-[32px] border-2 p-8 ${card.color} border-transparent hover:border-[#ccff00] bg-[#fcfcfc] transition-all duration-500 h-full flex flex-col group-hover:shadow-2xl group-hover:bg-white`}>
-                                <div className={`w-14 h-14 rounded-2xl ${card.iconColor} flex items-center justify-center text-2xl mb-8 group-hover:scale-110 transition-transform shadow-lg`}>
-                                    {card.icon}
-                                </div>
-                                <h4 className="font-black text-gray-900 text-xl mb-3 tracking-tight">{card.title}</h4>
-                                <p className="text-gray-500 text-sm leading-relaxed flex-1 font-medium">{card.desc}</p>
-                                <div className="mt-8 flex items-center justify-between">
-                                    <span className="text-[#137f13] font-black text-[11px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Launch Module</span>
-                                    <div className="w-10 h-10 rounded-full border-2 border-gray-100 flex items-center justify-center text-gray-300 group-hover:border-[#ccff00] group-hover:text-[#1c2a1c] group-hover:bg-[#ccff00] transition-all transform group-hover:rotate-45">
-                                        <FaArrowRight className="text-xs" />
-                                    </div>
-                                </div>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
+        {/* ── Core Operations ─── bento grid ───────────────────── */}
+        <div className="mb-12">
+          {/* Section header */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-6 rounded-full bg-[#ccff00]" />
+              <h3 className="text-xl font-black text-gray-900 tracking-tight">Core Operations</h3>
             </div>
-
-            {/* Account Settings Shortcut */}
-            <div className="bg-[#1c2a1c] rounded-[40px] p-8 md:p-10 text-white flex flex-col md:flex-row items-center justify-between gap-8 shadow-2xl relative overflow-hidden group">
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
-                <div className="relative z-10">
-                    <h3 className="text-2xl font-black mb-2">Settings & Profile</h3>
-                    <p className="text-white/60 font-medium max-w-[400px]">Customize your notification preferences, update security protocols, and manage business details.</p>
-                </div>
-                <button className="relative z-10 px-8 py-4 bg-[#ccff00] text-[#1c2a1c] rounded-2xl font-black flex items-center gap-3 hover:bg-[#b8e600] transition-colors shadow-xl group-hover:translate-x-2 transition-transform">
-                    Manage Account <FaCog className="animate-spin-slow" />
-                </button>
-            </div>
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{ops.length + 1} modules</span>
           </div>
-          
-          {/* Support/Messages Sidebar */}
-          <div className="lg:col-span-4 flex flex-col gap-8">
-            {/* Quick Logout Card */}
-            <div className="bg-white rounded-[32px] p-6 border border-gray-100 flex items-center justify-between group cursor-pointer hover:border-red-100 transition-colors" onClick={handleLogout}>
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-500 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-                        <FaSignOutAlt />
+
+          {/* Bento grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+            {ops.map((op, i) => (
+              <Link to={op.link} key={i} className="no-underline group">
+                <div
+                  className="relative rounded-[28px] p-6 border-2 overflow-hidden flex flex-col gap-5
+                    transition-all duration-400 hover:-translate-y-1 hover:shadow-2xl cursor-pointer"
+                  style={{
+                    background: op.accentLight,
+                    borderColor: op.accentBorder,
+                    boxShadow: `0 4px 20px ${op.accent}18`,
+                  }}
+                >
+                  {/* Top row: icon + tag */}
+                  <div className="flex items-start justify-between">
+                    <div
+                      className={`w-12 h-12 ${op.iconBg} text-white rounded-2xl flex items-center justify-center text-lg shadow-lg
+                        group-hover:scale-110 transition-transform duration-300`}
+                    >
+                      {op.icon}
                     </div>
+                    <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${op.tagBg}`}>
+                      {op.tag}
+                    </span>
+                  </div>
+
+                  {/* Title + desc */}
+                  <div>
+                    <h4 className="font-black text-gray-900 text-lg tracking-tight mb-1">{op.title}</h4>
+                    <p className="text-gray-500 text-sm leading-relaxed font-medium">{op.desc}</p>
+                  </div>
+
+                  {/* Stat row */}
+                  <div className="flex items-center justify-between pt-3 border-t border-black/5">
                     <div>
-                        <p className="font-black text-gray-900 leading-none mb-1">Secure Sign Out</p>
-                        <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">End Session</p>
+                      <p className="text-2xl font-black text-gray-900 leading-none">{op.stat}</p>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">{op.statLabel}</p>
                     </div>
+                    <div
+                      className="w-9 h-9 rounded-full border-2 flex items-center justify-center
+                        group-hover:rotate-45 transition-transform duration-300"
+                      style={{ borderColor: op.accent, color: op.accent }}
+                    >
+                      <FaArrowRight className="text-[10px]" />
+                    </div>
+                  </div>
+
+                  {/* Bottom accent bar */}
+                  <div className={`absolute bottom-0 left-0 right-0 h-1 ${op.barColor} opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-b-[28px]`} />
                 </div>
+              </Link>
+            ))}
+
+            {/* Support Hub — ContactHistory embedded in its own styled shell */}
+            <div className="relative rounded-[28px] border-2 border-dashed border-[#137f13]/20 bg-[#f9fefe] overflow-hidden flex flex-col
+              transition-all duration-400 hover:-translate-y-1"
+              style={{ boxShadow: '0 4px 20px rgba(19,127,19,0.07)' }}
+            >
+              {/* Top ribbon */}
+              <div className="px-6 pt-5 pb-3 bg-[#137f13]/5 border-b border-[#137f13]/10 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-[#137f13] text-white rounded-xl flex items-center justify-center text-sm shadow-md">
+                    <FaHeadset />
+                  </div>
+                  <div>
+                    <h4 className="font-black text-gray-900 text-sm leading-none">Support Hub</h4>
+                    <p className="text-[10px] text-[#137f13] font-bold uppercase tracking-widest mt-0.5">Live tickets</p>
+                  </div>
+                </div>
+                <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-[#137f13]/10 text-[#137f13]">Support</span>
+              </div>
+              {/* ContactHistory component inside */}
+              <div className="flex-1 overflow-hidden">
+                <ContactHistory compact />
+              </div>
             </div>
 
-            {/* Integration of Message History Component */}
-            <ContactHistory />
-            
-            {/* Pro Tips Card */}
-            <div className="bg-gradient-to-br from-[#137f13] to-[#1c2a1c] rounded-[32px] p-8 text-white relative overflow-hidden">
-                <div className="relative z-10">
-                    <FaRocket className="text-3xl text-[#ccff00] mb-6 animate-bounce" />
-                    <h4 className="text-xl font-black mb-2">Platform Pro-Tip</h4>
-                    <p className="text-white/70 text-sm leading-relaxed mb-6">Users who monitor their cold storage every 6 hours see a <span className="text-[#ccff00] font-bold">12% reduction</span> in waste.</p>
-                    <Link to="/explore" className="text-[11px] font-black uppercase tracking-widest text-[#ccff00] hover:underline">Read Analytics Guide</Link>
-                </div>
-                <div className="absolute bottom-0 right-0 p-4 opacity-10">
-                    <FaLeaf className="text-8xl" />
-                </div>
-            </div>
           </div>
         </div>
+
+        {/* BOTTOM UTILITY SECTION */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div 
+              className="bg-[#1c2a1c] rounded-[40px] p-8 md:p-10 text-white flex items-center justify-between shadow-2xl relative overflow-hidden group cursor-pointer"
+              onClick={() => setIsProfileOpen(true)}
+            >
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
+                <div>
+                    <h3 className="text-2xl font-black mb-2">Account Settings</h3>
+                    <p className="text-white/60 font-medium text-sm">Security & multi-channel preferences.</p>
+                </div>
+                <div className="w-14 h-14 bg-[#ccff00] text-[#1c2a1c] rounded-2xl flex items-center justify-center shadow-xl hover:scale-110 transition-transform">
+                    <FaCog className="text-xl" />
+                </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-[#137f13] to-[#1c2a1c] rounded-[40px] p-8 md:p-10 text-white flex items-center justify-between shadow-xl relative overflow-hidden">
+                <div className="relative z-10 flex items-center gap-6">
+                    <div className="w-16 h-16 rounded-3xl bg-[#ccff00] flex items-center justify-center text-[#1c2a1c] text-2xl shadow-2xl">
+                        <FaRocket />
+                    </div>
+                    <div>
+                        <h4 className="text-xl font-black mb-1">Scale your Farm</h4>
+                        <p className="text-white/70 text-sm font-medium">Read our new trade analytics guide.</p>
+                    </div>
+                </div>
+                <div className="absolute bottom-0 right-0 p-4 opacity-5">
+                    <FaLeaf className="text-9xl" />
+                </div>
+            </div>
+        </div>
+
       </div>
+
+      {/* Profile Sync Popup */}
+      <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
     </div>
   );
 };
