@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaLeaf, FaArrowRight } from "react-icons/fa";
 import { GoogleLogin } from '@react-oauth/google';
+import { toast } from "sonner";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -10,8 +11,6 @@ const Login = () => {
     password: ''
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -19,16 +18,15 @@ const Login = () => {
       ...prev,
       [name]: value
     }));
-    if (error) setError('');
   };
 
   const validateForm = () => {
     if (!formData.email || !formData.password) {
-      setError('All fields are required');
+      toast.error('All fields are required');
       return false;
     }
     if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      setError('Please enter a valid email address');
+      toast.error('Please enter a valid email address');
       return false;
     }
     return true;
@@ -36,7 +34,6 @@ const Login = () => {
 
   const handleGoogleSuccess = async (credentialResponse) => {
     setLoading(true);
-    setError('');
     
     try {
       const response = await fetch('http://localhost:5001/api/users/google', {
@@ -48,7 +45,7 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess('Google Login successful!');
+        toast.success('Google Login successful!');
         localStorage.setItem('user', JSON.stringify({
           userId: data._id,
           name: data.name,
@@ -58,10 +55,10 @@ const Login = () => {
         localStorage.setItem('token', data.token);
         setTimeout(() => { navigate('/dashboard'); }, 2000);
       } else {
-        setError(data.message || 'Google Login failed');
+        toast.error(data.message || 'Google Login failed');
       }
     } catch (err) {
-      setError('Network error with Google authentication');
+      toast.error('Network error with Google authentication');
     } finally {
       setLoading(false);
     }
@@ -71,8 +68,6 @@ const Login = () => {
     e.preventDefault();
     if (!validateForm()) return;
     setLoading(true);
-    setError('');
-    setSuccess('');
 
     try {
       const response = await fetch('http://localhost:5001/api/users/login', {
@@ -84,7 +79,7 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess('Login successful! Redirecting to dashboard...');
+        toast.success('Login successful! Redirecting to dashboard...');
         localStorage.setItem('user', JSON.stringify({
           userId: data._id,
           name: data.name,
@@ -94,10 +89,10 @@ const Login = () => {
         localStorage.setItem('token', data.token);
         setTimeout(() => { navigate('/dashboard'); }, 2000);
       } else {
-        setError(data.message || 'Login failed');
+        toast.error(data.message || 'Login failed');
       }
     } catch (err) {
-      setError('Network error. Please make sure the server is running on port 5001.');
+      toast.error('Network error. Please make sure the server is running on port 5001.');
     } finally {
       setLoading(false);
     }
@@ -150,9 +145,6 @@ const Login = () => {
 
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
             <p className="text-gray-500 mb-8">Welcome back! Please enter your details.</p>
-
-            {success && <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-sm font-medium">{success}</div>}
-            {error && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm font-medium">{error}</div>}
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
@@ -212,7 +204,7 @@ const Login = () => {
               <div className="w-full flex justify-center">
                 <GoogleLogin
                   onSuccess={handleGoogleSuccess}
-                  onError={() => setError('Google Login Failed')}
+                  onError={() => toast.error('Google Login Failed')}
                   useOneTap
                   theme="outline"
                   shape="circle"

@@ -9,6 +9,8 @@ import { BiMoon, BiSun, BiTrendingUp } from "react-icons/bi";
 import ContactHistory from '../components/ContactHistory';
 import ProfileModal from '../components/ProfileModal';
 
+import { toast } from "sonner";
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [theme, setTheme] = useState("light");
@@ -30,6 +32,7 @@ const Dashboard = () => {
   const handleLogout = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    toast.success("Logged out successfully");
     navigate('/login');
   };
 

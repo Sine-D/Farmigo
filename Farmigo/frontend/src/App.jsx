@@ -78,9 +78,12 @@ const LayoutWrapper = ({ children }) => {
   );
 };
 
+import { Toaster } from "sonner";
+
 const App = () => {
   return (
     <Router>
+      <Toaster position="top-right" richColors closeButton />
       <LayoutWrapper>
         <Routes>
           <Route path="/" element={<FullLandingPage />} />

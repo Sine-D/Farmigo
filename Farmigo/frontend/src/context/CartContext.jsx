@@ -1,4 +1,5 @@
 import { createContext, useState } from "react";
+import { toast } from "sonner";
 
 export const CartContext = createContext();
 
@@ -14,10 +15,15 @@ export const CartProvider = ({ children }) => {
     } else {
       setCartItems([...cartItems, { ...product, quantity: 1 }]);
     }
+    toast.success(`${product.name} added to cart`);
   };
 
   const removeFromCart = (id) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
+    const item = cartItems.find(i => i.id === id);
+    setCartItems(cartItems.filter(i => i.id !== id));
+    if (item) {
+      toast.info(`${item.name} removed from cart`);
+    }
   };
 
   const updateQuantity = (id, quantity) => {

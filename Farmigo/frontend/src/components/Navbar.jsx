@@ -16,6 +16,8 @@ const navLinks = [
   { path: "/", section: "contact", display: "Contact Us" },
 ];
 
+import { toast } from "sonner";
+
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -59,6 +61,7 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    toast.success("Logged out successfully");
     setUser(null);
     navigate('/');
   };

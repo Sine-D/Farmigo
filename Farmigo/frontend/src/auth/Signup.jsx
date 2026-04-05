@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaLeaf, FaArrowRight } from "react-icons/fa";
 import { GoogleLogin } from '@react-oauth/google';
+import { toast } from "sonner";
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -14,8 +15,6 @@ const Signup = () => {
     farmName: ''
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -23,12 +22,10 @@ const Signup = () => {
       ...prev,
       [name]: value
     }));
-    if (error) setError('');
   };
 
   const handleGoogleSuccess = async (credentialResponse) => {
     setLoading(true);
-    setError('');
     
     try {
       const response = await fetch('http://localhost:5001/api/users/google', {
@@ -40,7 +37,7 @@ const Signup = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess('Google Registration successful!');
+        toast.success('Google Registration successful!');
         localStorage.setItem('user', JSON.stringify({
           userId: data._id,
           name: data.name,
@@ -50,10 +47,10 @@ const Signup = () => {
         localStorage.setItem('token', data.token);
         setTimeout(() => { navigate('/dashboard'); }, 2000);
       } else {
-        setError(data.message || 'Google signup failed');
+        toast.error(data.message || 'Google signup failed');
       }
     } catch (err) {
-      setError('Network error with Google authentication');
+      toast.error('Network error with Google authentication');
     } finally {
       setLoading(false);
     }
@@ -61,28 +58,28 @@ const Signup = () => {
 
   const validateForm = () => {
     if (!formData.name || !formData.email || !formData.password || !formData.cpassword) {
-      setError('All fields are required');
+      toast.error('All fields are required');
       return false;
     }
     if (formData.role === 'Farmer' && !formData.farmName) {
-      setError('Farm Name is required for farmers');
+      toast.error('Farm Name is required for farmers');
       return false;
     }
     if (formData.password !== formData.cpassword) {
-      setError('Passwords do not match');
+      toast.error('Passwords do not match');
       return false;
     }
     
     // Backend matching validation
     const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
     if (!emailRegex.test(formData.email)) {
-      setError('Please use a valid Gmail address (example@gmail.com)');
+      toast.error('Please use a valid Gmail address (example@gmail.com)');
       return false;
     }
     
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
     if (!passwordRegex.test(formData.password)) {
-      setError('Password must be at least 8 characters long and contain both uppercase and lowercase letters');
+      toast.error('Password must be at least 8 characters long and contain both uppercase and lowercase letters');
       return false;
     }
     
@@ -94,8 +91,6 @@ const Signup = () => {
     if (!validateForm()) return;
 
     setLoading(true);
-    setError('');
-    setSuccess('');
 
     // Prepare data for backend
     const payload = {
@@ -121,15 +116,15 @@ const Signup = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess('Registration successful! Redirecting to login...');
+        toast.success('Registration successful! Redirecting to login...');
         setTimeout(() => {
           navigate('/login');
         }, 2000);
       } else {
-        setError(data.message || 'Registration failed');
+        toast.error(data.message || 'Registration failed');
       }
     } catch (err) {
-      setError('Network error. Please make sure the server is running on port 5001.');
+      toast.error('Network error. Please make sure the server is running on port 5001.');
     } finally {
       setLoading(false);
     }
@@ -182,9 +177,6 @@ const Signup = () => {
 
             <h2 className="text-3xl font-bold text-gray-900 mb-2">Create an Account</h2>
             <p className="text-gray-500 mb-6">Join us to start your farming journey.</p>
-
-            {success && <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-sm font-medium">{success}</div>}
-            {error && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm font-medium">{error}</div>}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="flex bg-gray-100 p-1 rounded-xl w-full mb-2">
@@ -291,7 +283,7 @@ const Signup = () => {
               <div className="w-full flex justify-center">
                 <GoogleLogin
                   onSuccess={handleGoogleSuccess}
-                  onError={() => setError('Google Signup Failed')}
+                  onError={() => toast.error('Google Signup Failed')}
                   useOneTap
                   theme="outline"
                   shape="circle"

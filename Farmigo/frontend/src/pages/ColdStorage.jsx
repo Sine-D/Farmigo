@@ -15,6 +15,10 @@ const ColdStorage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [ratingFilter, setRatingFilter] = useState('');
 
+  const handleContact = (name, contact) => {
+    toast.info(`Contacting ${name} at ${contact}...`);
+  };
+
   const filtered = coldStorages.filter(s => {
     const matchSearch = s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.location.toLowerCase().includes(searchTerm.toLowerCase());
     const matchRating = ratingFilter === '' || s.rating >= parseFloat(ratingFilter);
@@ -78,7 +82,10 @@ const ColdStorage = () => {
           <div className="relative rounded-[28px] overflow-hidden shadow-2xl h-[480px]">
             <img src={img} alt="Cold storage map" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent flex items-end p-6">
-              <button className="flex items-center gap-2 bg-white text-gray-800 font-bold px-5 py-2.5 rounded-xl shadow-lg hover:bg-[#f0fdf4] hover:text-[#137f13] transition-colors text-sm">
+              <button 
+                className="flex items-center gap-2 bg-white text-gray-800 font-bold px-5 py-2.5 rounded-xl shadow-lg hover:bg-[#f0fdf4] hover:text-[#137f13] transition-colors text-sm"
+                onClick={() => toast.info("Opening map views...")}
+              >
                 <FaMapMarkerAlt /> View in Full Map
               </button>
             </div>
@@ -108,7 +115,10 @@ const ColdStorage = () => {
                     {renderStars(storage.rating)}
                     <span className="text-xs text-gray-500 ml-1 font-semibold">{storage.rating}</span>
                   </div>
-                  <button className="flex items-center gap-2 bg-[#1c2a1c] hover:bg-[#121c12] text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors shadow-md">
+                  <button 
+                    className="flex items-center gap-2 bg-[#1c2a1c] hover:bg-[#121c12] text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors shadow-md"
+                    onClick={() => handleContact(storage.name, storage.contact)}
+                  >
                     <FaPhone className="text-[#ccff00]" /> Contact
                   </button>
                 </div>
