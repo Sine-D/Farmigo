@@ -47,31 +47,52 @@ const Dashboard = () => {
     );
   }
 
-  const cards = [
+  const ops = [
     {
       icon: <FaSnowflake />,
       title: "Cold Storage",
       desc: "Precision climate control for your perishable assets.",
-      color: "bg-blue-50/50 border-blue-100/50",
-      iconColor: "bg-blue-500 text-white",
+      tag: "Infrastructure",
+      stat: "–3°C",
+      statLabel: "Avg. Temp",
       link: "/#cold-storage",
+      accent: "#3b82f6",
+      accentLight: "#eff6ff",
+      accentBorder: "#bfdbfe",
+      tagBg: "bg-blue-100 text-blue-600",
+      iconBg: "bg-blue-500",
+      barColor: "bg-blue-400",
     },
     {
       icon: <FaShoppingBasket />,
       title: "Marketplace",
       desc: "Direct farm-to-table commerce gateway.",
-      color: "bg-[#137f13]/5 border-[#137f13]/10",
-      iconColor: "bg-[#137f13] text-white",
+      tag: "Commerce",
+      stat: "1.2k",
+      statLabel: "Live Listings",
       link: "/explore",
+      accent: "#137f13",
+      accentLight: "#f0fdf4",
+      accentBorder: "#bbf7d0",
+      tagBg: "bg-emerald-100 text-emerald-700",
+      iconBg: "bg-[#137f13]",
+      barColor: "bg-emerald-400",
     },
     {
       icon: <FaClipboardList />,
       title: "My Orders",
-      desc: "Live logistics Tracking and transaction history.",
-      color: "bg-amber-50/50 border-amber-100/50",
-      iconColor: "bg-amber-500 text-white",
+      desc: "Live logistics tracking and transaction history.",
+      tag: "Logistics",
+      stat: "12",
+      statLabel: "Active",
       link: "/cart",
-    }
+      accent: "#f59e0b",
+      accentLight: "#fffbeb",
+      accentBorder: "#fde68a",
+      tagBg: "bg-amber-100 text-amber-700",
+      iconBg: "bg-amber-500",
+      barColor: "bg-amber-400",
+    },
   ];
 
   return (
@@ -208,36 +229,96 @@ const Dashboard = () => {
           ))}
         </div>
 
-        {/* Core Operations Section */}
-        <div className="bg-white rounded-[40px] p-8 md:p-10 border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.03)] relative overflow-hidden mb-12">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-[#137f13]/5 rounded-full -mr-32 -mt-32 blur-[100px] pointer-events-none" />
-            
-            <h3 className="text-2xl font-black text-gray-900 mb-10 flex items-center gap-3">
-                <div className="w-2 h-8 bg-[#ccff00] rounded-full" />
-                Core Operations
-            </h3>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
-                {cards.map((card, i) => (
-                    <Link to={card.link} key={i} className="no-underline group h-full">
-                        <div className={`rounded-[32px] border-2 p-8 ${card.color} border-transparent hover:border-[#ccff00] bg-[#fcfcfc] transition-all duration-500 h-full flex flex-col group-hover:shadow-2xl group-hover:bg-white min-h-[400px]`}>
-                            <div className={`w-14 h-14 rounded-2xl ${card.iconColor} flex items-center justify-center text-2xl mb-8 group-hover:scale-110 transition-transform shadow-lg`}>
-                                {card.icon}
-                            </div>
-                            <h4 className="font-black text-gray-900 text-xl mb-3 tracking-tight">{card.title}</h4>
-                            <p className="text-gray-500 text-sm leading-relaxed flex-1 font-medium">{card.desc}</p>
-                            <div className="mt-8 flex items-center justify-between">
-                                <span className="text-[#137f13] font-black text-[11px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Launch</span>
-                                <div className="w-10 h-10 rounded-full border-2 border-gray-100 flex items-center justify-center text-gray-300 group-hover:border-[#ccff00] group-hover:text-[#1c2a1c] group-hover:bg-[#ccff00] transition-all transform group-hover:rotate-45">
-                                    <FaArrowRight className="text-xs" />
-                                </div>
-                            </div>
-                        </div>
-                    </Link>
-                ))}
-
-                <ContactHistory />
+        {/* ── Core Operations ─── bento grid ───────────────────── */}
+        <div className="mb-12">
+          {/* Section header */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-1 h-6 rounded-full bg-[#ccff00]" />
+              <h3 className="text-xl font-black text-gray-900 tracking-tight">Core Operations</h3>
             </div>
+            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{ops.length + 1} modules</span>
+          </div>
+
+          {/* Bento grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+            {ops.map((op, i) => (
+              <Link to={op.link} key={i} className="no-underline group">
+                <div
+                  className="relative rounded-[28px] p-6 border-2 overflow-hidden flex flex-col gap-5
+                    transition-all duration-400 hover:-translate-y-1 hover:shadow-2xl cursor-pointer"
+                  style={{
+                    background: op.accentLight,
+                    borderColor: op.accentBorder,
+                    boxShadow: `0 4px 20px ${op.accent}18`,
+                  }}
+                >
+                  {/* Top row: icon + tag */}
+                  <div className="flex items-start justify-between">
+                    <div
+                      className={`w-12 h-12 ${op.iconBg} text-white rounded-2xl flex items-center justify-center text-lg shadow-lg
+                        group-hover:scale-110 transition-transform duration-300`}
+                    >
+                      {op.icon}
+                    </div>
+                    <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${op.tagBg}`}>
+                      {op.tag}
+                    </span>
+                  </div>
+
+                  {/* Title + desc */}
+                  <div>
+                    <h4 className="font-black text-gray-900 text-lg tracking-tight mb-1">{op.title}</h4>
+                    <p className="text-gray-500 text-sm leading-relaxed font-medium">{op.desc}</p>
+                  </div>
+
+                  {/* Stat row */}
+                  <div className="flex items-center justify-between pt-3 border-t border-black/5">
+                    <div>
+                      <p className="text-2xl font-black text-gray-900 leading-none">{op.stat}</p>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">{op.statLabel}</p>
+                    </div>
+                    <div
+                      className="w-9 h-9 rounded-full border-2 flex items-center justify-center
+                        group-hover:rotate-45 transition-transform duration-300"
+                      style={{ borderColor: op.accent, color: op.accent }}
+                    >
+                      <FaArrowRight className="text-[10px]" />
+                    </div>
+                  </div>
+
+                  {/* Bottom accent bar */}
+                  <div className={`absolute bottom-0 left-0 right-0 h-1 ${op.barColor} opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-b-[28px]`} />
+                </div>
+              </Link>
+            ))}
+
+            {/* Support Hub — ContactHistory embedded in its own styled shell */}
+            <div className="relative rounded-[28px] border-2 border-dashed border-[#137f13]/20 bg-[#f9fefe] overflow-hidden flex flex-col
+              transition-all duration-400 hover:-translate-y-1"
+              style={{ boxShadow: '0 4px 20px rgba(19,127,19,0.07)' }}
+            >
+              {/* Top ribbon */}
+              <div className="px-6 pt-5 pb-3 bg-[#137f13]/5 border-b border-[#137f13]/10 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-[#137f13] text-white rounded-xl flex items-center justify-center text-sm shadow-md">
+                    <FaHeadset />
+                  </div>
+                  <div>
+                    <h4 className="font-black text-gray-900 text-sm leading-none">Support Hub</h4>
+                    <p className="text-[10px] text-[#137f13] font-bold uppercase tracking-widest mt-0.5">Live tickets</p>
+                  </div>
+                </div>
+                <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-[#137f13]/10 text-[#137f13]">Support</span>
+              </div>
+              {/* ContactHistory component inside */}
+              <div className="flex-1 overflow-hidden">
+                <ContactHistory compact />
+              </div>
+            </div>
+
+          </div>
         </div>
 
         {/* BOTTOM UTILITY SECTION */}

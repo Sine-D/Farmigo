@@ -92,7 +92,9 @@ const Profile = () => {
       const updatedUser = await apiPut('/users/profile', formData);
       localStorage.setItem('user', JSON.stringify(updatedUser));
       toast.success('Profile synchronized successfully!');
-      setTimeout(() => navigate('/dashboard'), 1500);
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (err) {
       toast.error(err.message || 'Failed to update profile.');
     } finally {

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { FaInbox, FaReply, FaClock, FaCheckCircle, FaExclamationCircle, FaArrowRight } from 'react-icons/fa';
+import { FaReply, FaArrowRight } from 'react-icons/fa';
 import { apiGet } from '../utils/api';
 
-const ContactHistory = () => {
+const ContactHistory = ({ compact = false }) => {
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -19,10 +19,55 @@ const ContactHistory = () => {
                 setLoading(false);
             }
         };
-
         fetchMessages();
     }, []);
 
+    /* ── Compact mode (embedded inside Support Hub bento card) ── */
+    if (compact) {
+        if (loading) return (
+            <div className="p-5 space-y-2 animate-pulse">
+                {[...Array(2)].map((_, i) => (
+                    <div key={i} className="h-14 bg-gray-100 rounded-2xl" />
+                ))}
+            </div>
+        );
+        return (
+            <div className="p-5 space-y-3">
+                {error && (
+                    <div className="p-3 bg-red-50 text-red-500 rounded-xl text-[10px] font-black uppercase tracking-widest border border-red-100">
+                        {error}
+                    </div>
+                )}
+                {messages.length === 0 ? (
+                    <div className="py-6 text-center">
+                        <p className="text-xs text-gray-400 font-black uppercase tracking-widest">No active tickets</p>
+                    </div>
+                ) : (
+                    messages.slice(0, 3).map((msg) => (
+                        <div key={msg._id} className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
+                            <div className="flex items-center justify-between mb-1.5">
+                                <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${
+                                    msg.status === 'Replied' ? 'bg-[#ccff00] text-[#1c2a1c]' : 'bg-[#eefaf0] text-[#137f13]'
+                                }`}>{msg.status}</span>
+                                <span className="text-[9px] text-gray-400 font-bold">{new Date(msg.createdAt).toLocaleDateString()}</span>
+                            </div>
+                            <p className="text-xs text-gray-600 line-clamp-1 italic">"{msg.message}"</p>
+                            {msg.reply && (
+                                <div className="mt-2 pt-2 border-t border-gray-100">
+                                    <p className="text-[9px] font-black text-[#137f13] uppercase tracking-widest flex items-center gap-1 mb-0.5">
+                                        <FaReply className="text-[7px]" /> Reply
+                                    </p>
+                                    <p className="text-xs text-gray-700 font-semibold line-clamp-1">{msg.reply}</p>
+                                </div>
+                            )}
+                        </div>
+                    ))
+                )}
+            </div>
+        );
+    }
+
+    /* ── Full (standalone) mode ──────────────────────────────── */
     if (loading) return (
         <div className="rounded-[32px] border-2 border-transparent bg-[#fcfcfc] p-8 h-full animate-pulse">
             <div className="w-14 h-14 rounded-2xl bg-gray-100 mb-8"></div>
@@ -36,12 +81,12 @@ const ContactHistory = () => {
              <div className="absolute top-0 right-0 w-64 h-64 bg-[#137f13]/5 rounded-full -mr-20 -mt-20 blur-3xl pointer-events-none" />
             
             <div className={`w-14 h-14 rounded-2xl bg-[#137f13] text-white flex items-center justify-center text-2xl mb-8 group-hover/hub:scale-110 transition-transform shadow-lg relative z-10`}>
-                <FaInbox />
+                <FaReply />
             </div>
 
             <div className="relative z-10 flex-1">
                 <h4 className="font-black text-gray-900 text-xl mb-3 tracking-tight">Support Hub</h4>
-                <p className="text-gray-500 text-sm leading-relaxed font-medium mb-6">Live inquiry tracking & resolutions.</p>
+                <p className="text-gray-500 text-sm leading-relaxed font-medium mb-6">Live inquiry tracking &amp; resolutions.</p>
 
                 {error && (
                     <div className="p-3 bg-red-50 text-red-600 rounded-2xl text-[10px] font-black uppercase tracking-widest mb-4 border border-red-100">
@@ -60,9 +105,7 @@ const ContactHistory = () => {
                                 <div className="flex items-center justify-between mb-2">
                                     <span className={`text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${
                                         msg.status === 'Replied' ? 'bg-[#ccff00] text-[#1c2a1c]' : 'bg-[#eefaf0] text-[#137f13]'
-                                    }`}>
-                                        {msg.status}
-                                    </span>
+                                    }`}>{msg.status}</span>
                                     <span className="text-[9px] text-gray-400 font-bold">{new Date(msg.createdAt).toLocaleDateString()}</span>
                                 </div>
                                 <p className="text-xs text-gray-600 line-clamp-1 italic mb-2">"{msg.message}"</p>

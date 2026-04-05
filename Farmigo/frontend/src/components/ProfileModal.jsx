@@ -94,7 +94,9 @@ const ProfileModal = ({ isOpen, onClose }) => {
       const updatedUser = await apiPut('/users/profile', formData);
       localStorage.setItem('user', JSON.stringify(updatedUser));
       toast.success('Profile synchronized!');
-      setTimeout(() => onClose(), 800);
+      setTimeout(() => {
+          window.location.reload();
+      }, 800);
     } catch (err) {
       toast.error(err.message || 'Failed to update profile.');
     } finally {
