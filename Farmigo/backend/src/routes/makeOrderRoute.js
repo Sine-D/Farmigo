@@ -14,13 +14,13 @@ const {
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 // ------------------- BUYER ROUTES ------------------- //
-router.post('/', protect, authorize('buyer'), createOrder);
-router.get('/buyer', protect, authorize('buyer'), getBuyerOrders);
-router.put('/cancel/:id', protect, authorize('buyer'), cancelOrder);
+router.post('/', protect, authorize('Buyer'), createOrder);
+router.get('/buyer', protect, authorize('Buyer'), getBuyerOrders);
+router.put('/cancel/:id', protect, authorize('Buyer'), cancelOrder);
 
 // ------------------- FARMER ROUTES ------------------- //
-router.get('/farmer', protect, authorize('farmer'), getFarmerOrders);
-router.put('/delivery/:id', protect, authorize('farmer'), updateDeliveryStatus);
+router.get('/farmer', protect, authorize('Farmer'), getFarmerOrders);
+router.put('/delivery/:id', protect, authorize('Farmer'), updateDeliveryStatus);
 
 // ------------------- PAYMENT ROUTES ------------------- //
 router.put('/payment/:id', protect, updatePaymentStatus);

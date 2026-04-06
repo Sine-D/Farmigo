@@ -4,20 +4,85 @@ const asyncHandler = require('../middleware/asyncHandler');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 const {
-  registerUser,
-  authUser,
-  getUserProfile,
-  updateUserProfile,
-  getUsers,
-  approveFarmer,
-  updateUserStatus,
-  updateUserRole,
-  deleteUser,
+    registerUser,
+    authUser,
+    getUserProfile,
+    updateUserProfile,
+    getUsers,
+    approveFarmer,
+    updateUserStatus,
+    updateUserRole,
+    deleteUser,
+    googleLogin
 } = require('../controllers/userController');
 
-// PUBLIC
-router.post('/register', asyncHandler(registerUser));
+/**
+ * @swagger
+ * /api/users:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *               - password
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *                 enum: [Farmer, Buyer]
+ *               farmDetails:
+ *                 type: object
+ *                 properties:
+ *                   farmName:
+ *                     type: string
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *       400:
+ *         description: Invalid input or user exists
+ */
+router.post('/', asyncHandler(registerUser));
+
+/**
+ * @swagger
+ * /api/users/login:
+ *   post:
+ *     summary: Authenticate user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *       401:
+ *         description: Invalid credentials
+ */
 router.post('/login', asyncHandler(authUser));
+router.post('/google', asyncHandler(googleLogin));
 
 // USER
 router

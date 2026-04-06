@@ -21,6 +21,8 @@ const refundRoutes = require('./routes/refundRoutes');
 const payoutRoutes = require('./routes/payoutRoutes');
 const invoiceRoutes = require('./routes/invoiceRoutes');
 const deliveryRoutes = require('./routes/deliveryRoutes');
+const contactRoutes = require('./routes/contactRoutes');
+//const disputeRoutes = require('./routes/disputeRoutes');
 
 const startServer = async () => {
     try {
@@ -40,6 +42,8 @@ const startServer = async () => {
         });
 
         // Routes
+        app.post('/api/contact', contactRoutes); // Fallback direct
+        app.use('/api/contact', contactRoutes);
         app.use('/api/users', userRoutes);
         app.use('/api/tickets', ticketRoutes);
         app.use('/api/products', productRoutes);
@@ -49,23 +53,13 @@ const startServer = async () => {
         app.use('/api/sustainability', sustainabilityRoutes);
         app.use('/api/community', communityRoutes);
         app.use('/api/lms', lmsRoutes);
-
-// Routes
-app.use('/api/users', userRoutes);
-app.use('/api/tickets', ticketRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/notifications', notificationRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/sustainability', sustainabilityRoutes);
-app.use('/api/community', communityRoutes);
-app.use('/api/lms', lmsRoutes);
-app.use('/api/makeOrder', makeOrderRoute);
-app.use('/api/payments', paymentRoutes);
-app.use('/api/refunds', refundRoutes);
-app.use('/api/payouts', payoutRoutes);
-app.use('/api/invoices', invoiceRoutes);
-app.use('/api/delivery', deliveryRoutes);
+        //app.use('/api/disputes', disputeRoutes);
+        app.use('/api/makeOrder', makeOrderRoute);
+        app.use('/api/payments', paymentRoutes);
+        app.use('/api/refunds', refundRoutes);
+        app.use('/api/payouts', payoutRoutes);
+        app.use('/api/invoices', invoiceRoutes);
+        app.use('/api/delivery', deliveryRoutes);
         // Error Middleware
         app.use(notFound);
         app.use(errorHandler);

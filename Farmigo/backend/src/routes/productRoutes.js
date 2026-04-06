@@ -11,6 +11,7 @@ const {
 const { protect, authorize } = require('../middleware/authMiddleware');
 
 const asyncHandler = require('../middleware/asyncHandler');
+const Product = require('../models/productModel');
 
 /**
  * @swagger

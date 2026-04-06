@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema(
   {
-    // USERS
     buyerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -52,8 +51,6 @@ const orderSchema = new mongoose.Schema(
       postalCode: { type: String, required: [true, 'Postal code is required'] },
       country: { type: String, required: [true, 'Country is required'] },
     },
-
-    // PAYMENT
     paymentMethod: {
       type: String,
       enum: {
@@ -62,13 +59,11 @@ const orderSchema = new mongoose.Schema(
       },
       required: [true, 'Payment method is required'],
     },
-
     paymentStatus: {
       type: String,
       enum: ['pending', 'paid', 'failed', 'refunded'],
       default: 'pending',
     },
-
     paymentResult: {
       id: { type: String },
       status: { type: String },
@@ -116,8 +111,8 @@ const orderSchema = new mongoose.Schema(
       type: String,
       enum: [
         'pending',
-        'scheduled',          // waiting for harvest
-        'harvesting',         // farmer harvesting
+        'scheduled',
+        'harvesting',
         'ready_for_dispatch',
         'in_transit',
         'delivered',
@@ -141,7 +136,6 @@ const orderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// AUTO GENERATE TRACKING NUMBER
 orderSchema.pre('save', function (next) {
   if (!this.trackingNumber) {
     this.trackingNumber =
@@ -152,4 +146,4 @@ orderSchema.pre('save', function (next) {
   next();
 });
 
-module.exports = mongoose.model('Order', orderSchema);
+module.exports = mongoose.model('MakeOrder', orderSchema);
