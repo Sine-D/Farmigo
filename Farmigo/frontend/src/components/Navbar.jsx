@@ -104,12 +104,12 @@ const Navbar = () => {
             {user ? (
               <div className="d-flex align-items-center gap-3">
                 <Link
-                  to="/dashboard"
+                  to={user.role === 'Admin' ? "/admin" : "/dashboard"}
                   className="d-flex align-items-center gap-2 px-4 py-2 rounded-full font-bold text-white transition-all duration-300 hover:-translate-y-1 shadow-[0_4px_15px_rgba(19,127,19,0.3)]"
                   style={{ backgroundColor: "var(--primary-green)", textDecoration: "none" }}
                 >
                   <FaUserCircle className="fs-4" />
-                  <span>Dashboard</span>
+                  <span>{user.role === 'Admin' ? "Admin Panel" : "Dashboard"}</span>
                 </Link>
                 <button 
                   onClick={handleLogout}

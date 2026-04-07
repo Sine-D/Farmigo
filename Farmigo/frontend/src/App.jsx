@@ -11,6 +11,7 @@ import Review from "./pages/Review";
 import Login from "./auth/Login";
 import Signup from "./auth/Signup";
 import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import Contact from "./pages/contact";
 import CartPage from "./pages/CartPage";
 import Explore from "./pages/Explore";
@@ -66,10 +67,11 @@ const LayoutWrapper = ({ children }) => {
     "/login",
     "/signup",
     "/profile",
+    "/admin",
   ];
 
   const shouldHideLayout = hideLayoutPaths.includes(location.pathname);
-  const shouldHideAnnouncement = shouldHideLayout || location.pathname === "/dashboard" || location.pathname === "/profile";
+  const shouldHideAnnouncement = shouldHideLayout || location.pathname === "/dashboard" || location.pathname === "/profile" || location.pathname === "/admin";
 
   return (
     <>
@@ -97,6 +99,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/profile" element={<Profile />} />
 

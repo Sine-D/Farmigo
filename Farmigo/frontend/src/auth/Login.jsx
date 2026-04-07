@@ -53,7 +53,13 @@ const Login = () => {
           role: data.role
         }));
         localStorage.setItem('token', data.token);
-        setTimeout(() => { navigate('/dashboard'); }, 2000);
+        setTimeout(() => { 
+          if (data.role === 'Admin') {
+            navigate('/admin');
+          } else {
+            navigate('/dashboard'); 
+          }
+        }, 2000);
       } else {
         toast.error(data.message || 'Google Login failed');
       }
@@ -87,7 +93,13 @@ const Login = () => {
           role: data.role
         }));
         localStorage.setItem('token', data.token);
-        setTimeout(() => { navigate('/dashboard'); }, 2000);
+        setTimeout(() => { 
+          if (data.role === 'Admin') {
+            navigate('/admin');
+          } else {
+            navigate('/dashboard'); 
+          }
+        }, 2000);
       } else {
         toast.error(data.message || 'Login failed');
       }

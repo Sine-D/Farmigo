@@ -31,6 +31,29 @@ const startServer = async () => {
     try {
         await connectDB();
 
+        // Seed Admin User
+        const User = require('./models/userModel');
+        const adminEmail = 'admin@farmigo.com';
+        const adminExists = await User.findOne({ email: adminEmail });
+        
+        if (!adminExists) {
+            await User.create({
+                name: 'System Admin',
+                email: adminEmail,
+                password: 'AdminPassword@123',
+                role: 'Admin',
+                isApproved: true,
+                isActive: true
+            });
+            console.log('Admin user created');
+        } else {
+            adminExists.password = 'AdminPassword@123';
+            adminExists.role = 'Admin'; // Ensure role is correct
+            await adminExists.save();
+            console.log('Admin user updated');
+        }
+
+
         const app = express();
 
         app.use(express.json());
