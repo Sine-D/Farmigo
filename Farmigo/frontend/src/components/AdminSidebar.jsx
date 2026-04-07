@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   FaUsers, FaLeaf, FaShoppingBasket, FaMoneyBillWave,
   FaChartLine, FaCheckCircle, FaExclamationTriangle,
-  FaSignOutAlt, FaCog, FaHeadset
+  FaSignOutAlt, FaCog, FaHeadset, FaGraduationCap
 } from 'react-icons/fa';
 import { toast } from "sonner";
 
@@ -23,11 +23,12 @@ const AdminSidebar = () => {
         { icon: <FaUsers />, label: 'Users', path: '/admin/users' },
         { icon: <FaCheckCircle />, label: 'Farmer Approvals', path: '/admin/approvals' },
         { icon: <FaHeadset />, label: 'Support Hub', path: '/admin/support' },
+        { icon: <FaGraduationCap />, label: 'LMS Learning', path: '/admin/lms' },
+        { icon: <FaUsers />, label: 'Community', path: '/admin/community' },
         { icon: <FaLeaf />, label: 'Sustainability', path: '/admin/sustainability' },
         { icon: <FaShoppingBasket />, label: 'Marketplace', path: '/admin/market' },
         { icon: <FaMoneyBillWave />, label: 'Transactions', path: '/admin/transactions' },
-        { icon: <FaExclamationTriangle />, label: 'Disputes', path: '/admin/disputes' },
-        { icon: <FaCog />, label: 'System Settings', path: '/admin/settings' }
+        { icon: <FaExclamationTriangle />, label: 'Disputes', path: '/admin/disputes' }
     ];
 
     return (

@@ -14,6 +14,8 @@ import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import SupportManagement from "./pages/SupportManagement";
 import SustainabilityManagement from "./pages/SustainabilityManagement";
+import CommunityManagement from "./pages/CommunityManagement";
+import LMSManagement from "./pages/LMSManagement";
 import Contact from "./pages/contact";
 import CartPage from "./pages/CartPage";
 import Explore from "./pages/Explore";
@@ -72,6 +74,8 @@ const LayoutWrapper = ({ children }) => {
     "/admin",
     "/admin/support",
     "/admin/sustainability",
+    "/admin/community",
+    "/admin/lms",
   ];
 
   const shouldHideLayout = hideLayoutPaths.includes(location.pathname);
@@ -109,6 +113,8 @@ const App = () => {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/support" element={<SupportManagement />} />
           <Route path="/admin/sustainability" element={<SustainabilityManagement />} />
+          <Route path="/admin/community" element={<CommunityManagement />} />
+          <Route path="/admin/lms" element={<LMSManagement />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/profile" element={<Profile />} />
 
