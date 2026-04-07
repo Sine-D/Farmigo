@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   FaGraduationCap, FaBook, FaSearch, FaStar, 
   FaPlayCircle, FaCheckCircle, FaUsers, FaArrowRight,
-  FaClock, FaChartLine, FaShieldAlt
+  FaClock, FaChartLine, FaShieldAlt, FaFilter, FaBell
 } from 'react-icons/fa';
 import { toast } from 'sonner';
 
@@ -13,34 +13,40 @@ const LMSCourses = () => {
     const [activeFilter, setActiveFilter] = useState('All');
 
     useEffect(() => {
+        const fetchCourses = async () => {
+            try {
+                // Using a fallback for the URL if env is not defined
+                const response = await fetch('http://localhost:5001/api/lms/courses');
+                if (response.ok) {
+                    const data = await response.json();
+                    setCourses(data);
+                } else {
+                    throw new Error('Failed to fetch');
+                }
+            } catch (error) {
+                console.error("LMS Fetch Error:", error);
+                // Premium Dummy Data
+                setCourses([
+                    { _id: '1', title: 'Sustainable Rice Farming in SL', instructor: 'Dr. Wickramasinghe', category: 'Agriculture', level: 'Beginner', students: 1250, rating: 4.8, price: 'FREE', duration: '4h 30m' },
+                    { _id: '2', title: 'Modern Irrigation & Water Management', instructor: 'Prof. Amara', category: 'Technology', level: 'Intermediate', students: 840, rating: 4.5, price: 'FREE', duration: '6h 15m' },
+                    { _id: '3', title: 'Agri-Business: Export Compliance', instructor: 'Dr. Nilanthi', category: 'Business', level: 'Advanced', students: 450, rating: 4.9, price: 'PAID', duration: '12h 00m' },
+                    { _id: '4', title: 'Organic Pest Control Strategies', instructor: 'Anura J.', category: 'Organic', level: 'Intermediate', students: 1100, rating: 4.7, price: 'FREE', duration: '3h 45m' },
+                ]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchCourses();
     }, []);
 
-    const fetchCourses = async () => {
-        try {
-            const response = await fetch('http://localhost:5001/api/lms/courses');
-            const data = await response.json();
-            if (response.ok) {
-                setCourses(data);
-            }
-        } catch (error) {
-            setCourses([
-                { _id: '1', title: 'Sustainable Rice Farming in SL', instructor: 'Dr. Wickramasinghe', category: 'Agriculture', level: 'Beginner', students: 1250, rating: 4.8, price: 'FREE', duration: '4h 30m' },
-                { _id: '2', title: 'Modern Irrigation & Water Management', instructor: 'Prof. Amara', category: 'Technology', level: 'Intermediate', students: 840, rating: 4.5, price: 'FREE', duration: '6h 15m' },
-                { _id: '3', title: 'Agri-Business: Export Compliance', instructor: 'Dr. Nilanthi', category: 'Business', level: 'Advanced', students: 450, rating: 4.9, price: 'PAID', duration: '12h 00m' },
-                { _id: '4', title: 'Organic Pest Control Strategies', instructor: 'Anura J.', category: 'Organic', level: 'Intermediate', students: 1100, rating: 4.7, price: 'FREE', duration: '3h 45m' },
-            ]);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const filters = ['All', 'Agriculture', 'Technology', 'Business', 'Organic'];
 
-    const filteredCourses = courses.filter(c => {
+    const filteredCourses = courses?.filter(c => {
         const matchesFilter = activeFilter === 'All' || c.category === activeFilter;
-        return matchesFilter && c.title.toLowerCase().includes(searchTerm.toLowerCase());
-    });
+        const matchesSearch = c.title ? c.title.toLowerCase().includes(searchTerm.toLowerCase()) : true;
+        return matchesFilter && matchesSearch;
+    }) || [];
 
     const enrollInCourse = async (id) => {
         const token = localStorage.getItem('token');
@@ -54,154 +60,161 @@ const LMSCourses = () => {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             if (response.ok) {
-                toast.success("Enrolled successfully! Redirecting...");
-                // Redirect to learning portal logic
+                toast.success("Enrolled successfully!");
             }
         } catch (error) {
-            toast.error("Enrollment failed. Try again.");
+            toast.error("Enrollment failed.");
         }
     };
 
+    if (loading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-[#f8fafc]">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="animate-spin w-12 h-12 border-4 border-[#137f13] border-t-transparent rounded-full shadow-lg" />
+                    <p className="text-[#137f13] font-black uppercase tracking-widest text-xs">Initializing Academy...</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="min-h-screen bg-white">
-            {/* Hero Section */}
-            <div className="relative pt-32 pb-20 overflow-hidden bg-gradient-to-br from-[#137f13] to-[#0d1a0d]">
-                <div className="absolute top-0 right-0 w-1/2 h-full bg-emerald-500/10 rounded-bl-[400px] blur-[150px] -z-0"></div>
+        <div className="min-h-screen bg-[#f8fafc]">
+            {/* Hero Section - Explicit Dark Background */}
+            <section className="relative pt-40 pb-24 overflow-hidden bg-[#1c2a1c]">
+                <div className="absolute top-0 right-0 w-1/2 h-full bg-emerald-500/10 rounded-bl-[400px] blur-[120px] pointer-events-none"></div>
                 <div className="container mx-auto px-6 relative z-10 text-white">
                     <div className="max-w-4xl">
                         <div className="flex items-center gap-3 mb-8">
-                            <span className="px-5 py-2 bg-white/10 border border-white/20 rounded-2xl text-xs font-black uppercase tracking-widest backdrop-blur-xl">Farmigo Academy</span>
+                            <span className="px-5 py-2 bg-white/10 border border-white/20 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] backdrop-blur-xl">Farmigo Academy</span>
                             <span className="w-2 h-2 bg-[#ccff00] rounded-full shadow-[0_0_15px_#ccff00]"></span>
-                            <span className="text-white/60 font-bold">12 Active Disciplines</span>
                         </div>
-                        <h1 className="text-7xl font-black tracking-tight mb-10 leading-[0.9]">Empowering Farmers with <span className="text-[#ccff00]">Real-World</span> Knowledge.</h1>
-                        <p className="text-xl text-white/40 font-medium mb-12 max-w-2xl leading-relaxed">Master the latest agricultural technologies, business strategies, and sustainable practices through our expert-led vocational training.</p>
+                        <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-10 leading-[1.1]">
+                            Master Your Trade at <br/>
+                            <span className="text-[#ccff00]">Farmigo</span> Academy.
+                        </h1>
+                        <p className="text-lg md:text-xl text-white/60 font-medium mb-12 max-w-2xl leading-relaxed">
+                            Professional guidance for modern agriculture. Learn sustainable practices and market strategies from industry experts.
+                        </p>
                         
-                        <div className="flex flex-col sm:flex-row items-center gap-6">
+                        <div className="flex flex-col sm:flex-row items-center gap-6 max-w-2xl">
                             <div className="relative flex-1 group w-full">
                                 <FaSearch className="absolute left-6 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-[#ccff00] transition-colors" />
                                 <input 
                                     type="text" 
-                                    placeholder="What do you want to learn today?" 
-                                    className="w-full pl-16 pr-8 py-6 bg-white/5 border border-white/10 rounded-3xl backdrop-blur-3xl focus:ring-4 focus:ring-emerald-500/20 font-bold transition-all text-white placeholder-white/20"
+                                    placeholder="Search courses..." 
+                                    className="w-full pl-16 pr-8 py-5 bg-white/10 border border-white/10 rounded-3xl backdrop-blur-3xl focus:ring-4 focus:ring-emerald-500/20 font-bold transition-all text-white placeholder-white/40"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                 />
                             </div>
-                            <button className="px-12 py-6 bg-[#ccff00] text-[#1c2a1c] rounded-3xl font-black shadow-2xl shadow-[#ccff00]/20 hover:scale-[1.03] transition-all active:scale-95 text-lg">
-                                Browse All
+                            <button className="px-12 py-5 bg-[#ccff00] text-[#1c2a1c] rounded-3xl font-black shadow-2xl hover:scale-[1.03] transition-all active:scale-95 text-sm uppercase tracking-widest">
+                                Explore
                             </button>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            {/* Courses Grid */}
-            <div className="container mx-auto px-6 py-24">
-                <div className="flex items-center justify-between mb-16">
-                    <div className="flex flex-wrap gap-4">
+            {/* Courses Content */}
+            <div className="container mx-auto px-6 py-20">
+                {/* Filters */}
+                <div className="flex flex-col md:flex-row items-center justify-between mb-16 gap-8">
+                    <div className="flex flex-wrap gap-3">
                         {filters.map(f => (
                             <button
                                 key={f}
                                 onClick={() => setActiveFilter(f)}
-                                className={`px-8 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${
+                                className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${
                                     activeFilter === f 
-                                    ? 'bg-[#137f13] text-white shadow-xl shadow-emerald-700/20' 
-                                    : 'bg-gray-50 text-gray-400 hover:bg-gray-100'
+                                    ? 'bg-[#137f13] text-white shadow-xl shadow-emerald-900/20' 
+                                    : 'bg-white text-gray-400 hover:bg-gray-50 border border-gray-100 shadow-sm'
                                 }`}
                             >
                                 {f}
                             </button>
                         ))}
                     </div>
-                    <div className="flex items-center gap-2 text-gray-400 font-bold">
-                        <FaFilter className="text-xs" />
-                        <span className="text-sm">Sorting: Latest First</span>
+                </div>
+
+                {/* Grid */}
+                {filteredCourses.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                        {filteredCourses.map((course) => (
+                            <div key={course._id} className="group bg-white rounded-[40px] overflow-hidden border border-gray-100 hover:shadow-2xl transition-all flex flex-col h-full shadow-sm">
+                                <div className="relative h-60 bg-[#0d1a0d] flex items-center justify-center overflow-hidden">
+                                    <FaBook className="text-5xl text-[#ccff00] opacity-20 group-hover:scale-125 group-hover:opacity-100 transition-all duration-700" />
+                                    <div className="absolute bottom-6 left-6">
+                                        <span className="px-4 py-1.5 bg-[#ccff00] text-[#1c2a1c] rounded-xl text-[10px] font-black shadow-lg uppercase tracking-widest">
+                                            {course.level}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="p-8 flex flex-col flex-1">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#137f13]">#{course.category}</span>
+                                        <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                                            <FaStar className="text-amber-400" /> {course.rating}
+                                        </div>
+                                    </div>
+                                    <h3 className="text-lg font-black text-gray-900 tracking-tight mb-4 group-hover:text-[#137f13] transition-colors leading-tight uppercase">
+                                        {course.title}
+                                    </h3>
+                                    
+                                    <div className="mt-auto">
+                                        <div className="flex items-center justify-between py-6 border-t border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                                            <div className="flex items-center gap-4">
+                                                <div className="flex items-center gap-1.5">
+                                                    <FaClock className="text-emerald-500" /> {course.duration}
+                                                </div>
+                                                <div className="flex items-center gap-1.5">
+                                                    <FaUsers className="text-blue-500" /> {course.students}
+                                                </div>
+                                            </div>
+                                            <span className="text-gray-900 font-extrabold">{course.price}</span>
+                                        </div>
+
+                                        <button 
+                                            onClick={() => enrollInCourse(course._id)}
+                                            className="w-full py-5 bg-[#137f13] text-white rounded-3xl font-black text-[10px] hover:bg-[#1c2a1c] transition-all uppercase tracking-[0.2em] flex items-center justify-center gap-3 shadow-lg shadow-emerald-900/10 active:scale-95"
+                                        >
+                                            Enroll Now <FaArrowRight />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-                    {filteredCourses.map((course) => (
-                        <div key={course._id} className="group bg-white rounded-[45px] overflow-hidden border border-gray-100 hover:border-emerald-500/20 hover:shadow-2xl transition-all relative flex flex-col h-full">
-                            <div className="relative h-64 overflow-hidden bg-[#0d1a0d] flex items-center justify-center">
-                                <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-[#0d1a0d]/80 z-10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                                <div className="w-24 h-24 bg-white/5 border border-white/10 rounded-[35px] flex items-center justify-center text-4xl text-[#ccff00] shadow-2xl group-hover:scale-110 transition-transform">
-                                    <FaBook />
-                                </div>
-                                <div className="absolute bottom-6 left-8 z-20 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 translate-y-4 transition-all">
-                                    <span className="px-3 py-1 bg-[#ccff00] text-[#1c2a1c] rounded-lg text-[9px] font-black uppercase tracking-widest">
-                                        {course.level}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div className="p-10 flex flex-col flex-1">
-                                <div className="flex items-center justify-between mb-4">
-                                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#137f13]"># {course.category}</span>
-                                    <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-[#137f13] rounded-lg text-[10px] font-black uppercase tracking-widest border border-emerald-100">
-                                        <FaStar className="text-amber-400" /> {course.rating}
-                                    </div>
-                                </div>
-                                <h3 className="text-2xl font-black text-gray-900 tracking-tight mb-3 group-hover:text-[#137f13] transition-colors line-clamp-2 uppercase text-sm leading-tight">{course.title}</h3>
-                                <p className="text-xs text-gray-500 font-bold mb-8 uppercase tracking-widest">Instructor: <span className="text-gray-900">{course.instructor}</span></p>
-                                
-                                <div className="mt-auto pt-8 border-t border-gray-50 flex items-center justify-between text-xs font-black text-gray-400">
-                                    <div className="flex items-center gap-6">
-                                        <div className="flex items-center gap-1.5 group/icon">
-                                            <FaClock className="group-hover/icon:text-[#137f13] transition-colors" /> {course.duration}
-                                        </div>
-                                        <div className="flex items-center gap-1.5 group/icon">
-                                            <FaUsers className="group-hover/icon:text-blue-500 transition-colors" /> {course.students}
-                                        </div>
-                                    </div>
-                                    <span className={`text-[11px] font-black ${course.price === 'FREE' ? 'text-emerald-600' : 'text-gray-900'}`}>{course.price}</span>
-                                </div>
-
-                                <button 
-                                    onClick={() => enrollInCourse(course._id)}
-                                    className="w-full mt-8 py-5 bg-[#137f13] text-white rounded-3xl font-black text-xs hover:bg-[#1c2a1c] shadow-lg shadow-emerald-500/10 transition-all uppercase tracking-widest flex items-center justify-center gap-3 active:scale-95"
-                                >
-                                    {course.price === 'FREE' ? 'Enroll For Free' : 'Secure Admission'} <FaArrowRight />
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {filteredCourses.length === 0 && (
-                    <div className="text-center py-40 border-2 border-dashed border-gray-100 rounded-[60px] bg-gray-50/50">
+                ) : (
+                    <div className="text-center py-40 border-2 border-dashed border-gray-100 rounded-[60px] bg-white">
                         <FaGraduationCap className="text-7xl text-gray-200 mb-8 mx-auto" />
-                        <h4 className="text-2xl font-black text-gray-900 mb-4 tracking-tighter">No courses found matching your search.</h4>
-                        <p className="text-gray-500 font-bold mb-10 tracking-tight">Try adjusting your filters or search terms for better results.</p>
+                        <h4 className="text-2xl font-black text-gray-900 mb-4 uppercase tracking-tighter">No courses found</h4>
                         <button 
                             onClick={() => {setActiveFilter('All'); setSearchTerm('');}}
-                            className="px-10 py-4 bg-white border border-gray-100 rounded-3xl font-black text-sm text-[#137f13] shadow-xl shadow-emerald-900/5 hover:scale-105 transition-all"
+                            className="mt-6 px-10 py-4 bg-[#137f13] text-white rounded-3xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:scale-105 transition-all"
                         >
-                            Reset Global Filters
+                            Reset Filters
                         </button>
                     </div>
                 )}
             </div>
 
-            {/* Achievement / Trust section */}
-            <div className="bg-[#1c2a1c] py-32 text-center text-white relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none">
-                    <div className="grid grid-cols-12 h-full">{[...Array(12)].map((_, i) => <div key={i} className="border-r border-white h-full"></div>)}</div>
-                </div>
-                <div className="container mx-auto px-6 relative z-10">
-                    <FaShieldAlt className="text-[#ccff00] text-5xl mb-8 mx-auto" />
-                    <h2 className="text-5xl font-black tracking-tight mb-8">Certified Vocational Standards</h2>
-                    <p className="text-white/40 text-lg font-bold max-w-2xl mx-auto mb-16 leading-relaxed uppercase tracking-widest text-sm">All courses are quality-assured by the National Institute of Agriculture in partnership with Farmigo.</p>
-                    
-                    <div className="flex flex-wrap justify-center gap-16">
+            {/* Trusted Badges */}
+            <div className="bg-[#1c2a1c] py-24 text-center">
+                <div className="container mx-auto px-6">
+                    <FaShieldAlt className="text-[#ccff00] text-4xl mb-6 mx-auto opacity-50" />
+                    <h2 className="text-3xl font-black text-white mb-2 uppercase tracking-tighter">Certified Standards</h2>
+                    <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-12">Authorized by National Agricultural Institutes</p>
+                    <div className="flex flex-wrap justify-center gap-12 sm:gap-24 opacity-60">
                         {[
-                            { label: 'Courses Issued', value: '3,450+' },
+                            { label: 'Courses Issued', value: '3.4k+' },
                             { label: 'National Rank', value: '#1' },
-                            { label: 'Trusted Schools', value: '45' }
+                            { label: 'Expert Tutors', value: '120+' }
                         ].map((stat, i) => (
                             <div key={i}>
-                                <h3 className="text-4xl font-black text-[#ccff00] mb-2">{stat.value}</h3>
-                                <p className="text-xs text-white/40 font-black uppercase tracking-widest">{stat.label}</p>
+                                <h3 className="text-3xl font-black text-[#ccff00] mb-1">{stat.value}</h3>
+                                <p className="text-[9px] text-white/40 font-black uppercase tracking-widest">{stat.label}</p>
                             </div>
                         ))}
                     </div>
