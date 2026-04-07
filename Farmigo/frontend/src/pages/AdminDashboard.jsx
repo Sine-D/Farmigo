@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import {
   FaUsers, FaLeaf, FaShoppingBasket, FaMoneyBillWave,
   FaChartLine, FaCheckCircle, FaExclamationTriangle,
-  FaSignOutAlt, FaCog, FaBell, FaSearch, FaArrowUp, FaArrowDown
+  FaBell, FaSearch
 } from 'react-icons/fa';
 import { toast } from "sonner";
+import AdminSidebar from '../components/AdminSidebar';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -52,7 +53,6 @@ const AdminDashboard = () => {
       }
     } catch (error) {
       console.error("Error fetching stats:", error);
-      // Dummy stats for demo if backend fails
       setStats({
         totalUsers: 1254,
         totalFarmers: 452,
@@ -63,56 +63,11 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    toast.success("Logged out successfully");
-    navigate('/login');
-  };
-
   if (!user) return null;
 
   return (
     <div className="min-h-screen bg-[#f4f7f6] flex">
-      {/* Sidebar */}
-      <div className="w-72 bg-[#1c2a1c] text-white p-6 flex flex-col fixed h-full shadow-2xl z-20">
-        <div className="flex items-center gap-3 mb-10 px-2">
-          <FaLeaf className="text-3xl text-[#ccff00]" />
-          <span className="text-2xl font-black tracking-tighter">FARMIGO <span className="text-[#ccff00] text-xs uppercase block">Admin Panel</span></span>
-        </div>
-
-        <nav className="flex-1 space-y-2">
-          {[
-            { icon: <FaChartLine />, label: 'Overview', active: true },
-            { icon: <FaUsers />, label: 'Users' },
-            { icon: <FaCheckCircle />, label: 'Farmer Approvals' },
-            { icon: <FaShoppingBasket />, label: 'Marketplace' },
-            { icon: <FaMoneyBillWave />, label: 'Transactions' },
-            { icon: <FaExclamationTriangle />, label: 'Disputes' },
-            { icon: <FaCog />, label: 'System Settings' }
-          ].map((item, i) => (
-            <button
-              key={i}
-              className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold text-sm ${
-                item.active 
-                  ? 'bg-[#ccff00] text-[#1c2a1c] shadow-[0_8px_20px_rgba(204,255,0,0.2)]' 
-                  : 'text-white/60 hover:bg-white/5 hover:text-white'
-              }`}
-            >
-              <span className="text-lg">{item.icon}</span>
-              {item.label}
-            </button>
-          ))}
-        </nav>
-
-        <button 
-          onClick={handleLogout}
-          className="mt-auto flex items-center gap-4 px-4 py-3 rounded-xl border border-white/10 text-white/60 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 transition-all font-bold text-sm"
-        >
-          <FaSignOutAlt />
-          Logout Session
-        </button>
-      </div>
+      <AdminSidebar />
 
       {/* Main Content */}
       <div className="flex-1 ml-72 p-8 pt-10">
@@ -168,7 +123,6 @@ const AdminDashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Activity Chart Area (Placeholder) */}
           <div className="lg:col-span-2 bg-white p-8 rounded-[40px] shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-8">
               <div>
@@ -190,7 +144,6 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Recent Alerts / Pending Approvals */}
           <div className="bg-[#1c2a1c] p-8 rounded-[40px] text-white shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#ccff00]/10 rounded-full blur-3xl"></div>
             <h3 className="text-xl font-black mb-6 relative z-10">Critical Alerts</h3>
