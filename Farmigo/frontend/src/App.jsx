@@ -69,7 +69,13 @@ const FullLandingPage = () => {
 
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
-  const hideLayoutPaths = [
+
+  const isSupportPage =
+    location.pathname === "/support" ||
+    location.pathname.startsWith("/support/tickets/") ||
+    location.pathname.startsWith("/support/disputes/");
+
+  const hideNavbarPaths = [
     "/login",
     "/signup",
     "/profile",
@@ -80,23 +86,34 @@ const LayoutWrapper = ({ children }) => {
     "/admin/lms",
   ];
 
-  const shouldHideLayout = hideLayoutPaths.includes(location.pathname);
-  const shouldHideAnnouncement = shouldHideLayout || 
-    location.pathname === "/dashboard" || 
-    location.pathname === "/profile" || 
-    location.pathname.startsWith("/admin");
+  // const shouldHideLayout = hideLayoutPaths.includes(location.pathname);
+  // const shouldHideAnnouncement = shouldHideLayout || 
+  //   location.pathname === "/dashboard" || 
+  //   location.pathname === "/profile" || 
+  //   location.pathname.startsWith("/admin");
+  const shouldHideNavbar =
+    hideNavbarPaths.includes(location.pathname) || isSupportPage;
+
+  const shouldHideAnnouncement =
+    shouldHideNavbar ||
+    location.pathname === "/dashboard" ||
+    location.pathname === "/profile" ||
+    location.pathname === "/admin";
+
+  const shouldHideFooter =
+    location.pathname === "/login" ||
+    location.pathname === "/signup" ||
+    location.pathname === "/admin";
 
   return (
     <>
       {!shouldHideAnnouncement && <AnnouncementBar />}
-      {!shouldHideLayout && <Navbar />}
+      {!shouldHideNavbar && <Navbar />}
       {children}
-      {!shouldHideLayout && <Footer />}
+      {!shouldHideFooter && <Footer />}
     </>
   );
 };
-
-
 
 const App = () => {
   return (

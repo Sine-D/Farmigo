@@ -294,29 +294,61 @@ const Dashboard = () => {
               </Link>
             ))}
 
-            {/* Support Hub — ContactHistory embedded in its own styled shell */}
-            <div className="relative rounded-[28px] border-2 border-dashed border-[#137f13]/20 bg-[#f9fefe] overflow-hidden flex flex-col
-              transition-all duration-400 hover:-translate-y-1"
-              style={{ boxShadow: '0 4px 20px rgba(19,127,19,0.07)' }}
-            >
-              {/* Top ribbon */}
-              <div className="px-6 pt-5 pb-3 bg-[#137f13]/5 border-b border-[#137f13]/10 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-[#137f13] text-white rounded-xl flex items-center justify-center text-sm shadow-md">
-                    <FaHeadset />
-                  </div>
-                  <div>
-                    <h4 className="font-black text-gray-900 text-sm leading-none">Support Hub</h4>
-                    <p className="text-[10px] text-[#137f13] font-bold uppercase tracking-widest mt-0.5">Live tickets</p>
-                  </div>
-                </div>
-                <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-[#137f13]/10 text-[#137f13]">Support</span>
-              </div>
-              {/* ContactHistory component inside */}
-              <div className="flex-1 overflow-hidden">
-                <ContactHistory compact />
-              </div>
-            </div>
+          <Link to="/support" className="no-underline group">
+  <div
+    className="relative rounded-[28px] p-6 border-2 overflow-hidden flex flex-col gap-5
+      transition-all duration-400 hover:-translate-y-1 hover:shadow-2xl cursor-pointer h-full"
+    style={{
+      background: "#f0fdf4",
+      borderColor: "#bbf7d0",
+      boxShadow: "0 4px 20px rgba(19,127,19,0.10)",
+    }}
+  >
+    {/* Top row: icon + tag */}
+    <div className="flex items-start justify-between">
+      <div
+        className="w-12 h-12 bg-[#137f13] text-white rounded-2xl flex items-center justify-center text-lg shadow-lg
+          group-hover:scale-110 transition-transform duration-300"
+      >
+        <FaHeadset />
+      </div>
+      <span className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700">
+        Support
+      </span>
+    </div>
+
+    {/* Title + desc */}
+    <div>
+      <h4 className="font-black text-gray-900 text-lg tracking-tight mb-1">
+        Support Hub
+      </h4>
+      <p className="text-gray-500 text-sm leading-relaxed font-medium">
+        Manage tickets, disputes, and communication threads with the support team.
+      </p>
+    </div>
+
+
+    {/* Stat row */}
+    <div className="flex items-center justify-between pt-3 border-t border-black/5 mt-auto">
+      <div>
+        <p className="text-2xl font-black text-gray-900 leading-none">24/7</p>
+        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">
+          Availability
+        </p>
+      </div>
+      <div
+        className="w-9 h-9 rounded-full border-2 flex items-center justify-center
+          group-hover:rotate-45 transition-transform duration-300"
+        style={{ borderColor: "#137f13", color: "#137f13" }}
+      >
+        <FaArrowRight className="text-[10px]" />
+      </div>
+    </div>
+
+    {/* Bottom accent bar */}
+    <div className="absolute bottom-0 left-0 right-0 h-1 bg-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-b-[28px]" />
+  </div>
+</Link>
 
           </div>
         </div>

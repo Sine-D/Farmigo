@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   FaLeaf,
   FaArrowLeft,
@@ -8,32 +8,31 @@ import {
   FaPlus,
   FaComments,
   FaTrash,
-  FaCheckCircle,
-  FaClock,
 } from "react-icons/fa";
 import { apiDelete, apiGet, apiPost, apiPut } from "../utils/api";
 
 const ticketStatusColors = {
   Open: "bg-blue-100 text-blue-700 border-blue-200",
   "In Progress": "bg-amber-100 text-amber-700 border-amber-200",
-  Closed: "bg-green-100 text-green-700 border-green-200",
+  Closed: "bg-emerald-100 text-emerald-700 border-emerald-200",
 };
 
 const disputeStatusColors = {
   Open: "bg-red-100 text-red-700 border-red-200",
   "Under Review": "bg-amber-100 text-amber-700 border-amber-200",
-  Resolved: "bg-green-100 text-green-700 border-green-200",
+  Resolved: "bg-emerald-100 text-emerald-700 border-emerald-200",
   Rejected: "bg-gray-100 text-gray-700 border-gray-200",
 };
 
 const fieldClass =
-  "w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#137f13] bg-white text-gray-900 placeholder:text-gray-400";
+  "w-full rounded-2xl border border-gray-200 bg-[#f8faf8] px-4 py-3 text-gray-900 placeholder:text-gray-400 outline-none focus:border-[#137f13] focus:ring-4 focus:ring-[#137f13]/10 transition";
 
 const selectClass =
-  "w-full rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#137f13] bg-white text-gray-900";
-
+  "w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 font-medium outline-none appearance-none focus:border-[#137f13] focus:ring-4 focus:ring-[#137f13]/10 transition shadow-sm";
 const SupportCenter = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const [user, setUser] = useState(null);
 
   const [activeTab, setActiveTab] = useState("tickets");
@@ -41,6 +40,11 @@ const SupportCenter = () => {
   const [disputes, setDisputes] = useState([]);
   const [loadingTickets, setLoadingTickets] = useState(true);
   const [loadingDisputes, setLoadingDisputes] = useState(true);
+
+  const [myOrders, setMyOrders] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -66,6 +70,21 @@ const SupportCenter = () => {
   }, [user]);
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tab = params.get("tab");
+    const orderIdParam = params.get("orderId");
+
+    if (tab === "tickets" || tab === "disputes") {
+      setActiveTab(tab);
+    }
+
+    if (orderIdParam) {
+      setDisputeForm((prev) => ({ ...prev, orderId: orderIdParam }));
+      setActiveTab("disputes");
+    }
+  }, [location.search]);
+
+  useEffect(() => {
     const userData = localStorage.getItem("user");
     const token = localStorage.getItem("token");
 
@@ -81,8 +100,20 @@ const SupportCenter = () => {
     if (user) {
       loadTickets();
       loadDisputes();
+      if (!isStaff) {
+        loadMyOrders();
+      }
     }
-  }, [user]);
+  }, [user, isStaff]);
+
+  useEffect(() => {
+    if (disputeForm.orderId && myOrders.length > 0) {
+      const foundOrder = myOrders.find((order) => order._id === disputeForm.orderId);
+      if (foundOrder) {
+        setSelectedOrder(foundOrder);
+      }
+    }
+  }, [disputeForm.orderId, myOrders]);
 
   const loadTickets = async () => {
     try {
@@ -106,6 +137,46 @@ const SupportCenter = () => {
     } finally {
       setLoadingDisputes(false);
     }
+  };
+
+  const loadMyOrders = async () => {
+    try {
+      setLoadingOrders(true);
+      const data = await apiGet("/orders/myorders");
+      const orders = Array.isArray(data) ? data : [];
+      setMyOrders(orders);
+    } catch (err) {
+      setError(err.message || "Failed to load your orders");
+    } finally {
+      setLoadingOrders(false);
+    }
+  };
+
+  const handleSelectOrderForDispute = (order) => {
+    setSelectedOrder(order);
+    setDisputeForm((prev) => ({
+      ...prev,
+      orderId: order._id,
+    }));
+  };
+
+  const getOrderTitle = (order) => {
+    if (!order?.orderItems || order.orderItems.length === 0) {
+      return `Order #${order?._id?.slice(-6) || "Unknown"}`;
+    }
+
+    const firstItem =
+      order.orderItems[0]?.name ||
+      order.orderItems[0]?.product?.name ||
+      "Order Item";
+
+    const extraCount = order.orderItems.length - 1;
+
+    return extraCount > 0 ? `${firstItem} + ${extraCount} more` : firstItem;
+  };
+
+  const getShortOrderCode = (order) => {
+    return `ORD-${order?._id?.slice(-6)?.toUpperCase() || "000000"}`;
   };
 
   const handleCreateTicket = async (e) => {
@@ -161,8 +232,8 @@ const SupportCenter = () => {
     setError("");
     setSuccess("");
 
-    if (!disputeForm.orderId.trim() || !disputeForm.description.trim()) {
-      setError("Please fill order ID and description");
+    if (!disputeForm.orderId || !disputeForm.description.trim()) {
+      setError("Please select an order and enter description");
       return;
     }
 
@@ -174,6 +245,7 @@ const SupportCenter = () => {
         reason: "Other",
         description: "",
       });
+      setSelectedOrder(null);
       loadDisputes();
       setActiveTab("disputes");
     } catch (err) {
@@ -183,9 +255,7 @@ const SupportCenter = () => {
 
   const handleDisputeStatusUpdate = async (disputeId, status) => {
     try {
-      await apiPut(`/disputes/${disputeId}/status`, {
-        status,
-      });
+      await apiPut(`/disputes/${disputeId}/status`, { status });
       setSuccess("Dispute status updated");
       loadDisputes();
     } catch (err) {
@@ -220,9 +290,11 @@ const SupportCenter = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const backRoute = user?.role === "Admin" ? "/admin" : "/dashboard";
+
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f9fafb]">
+      <div className="min-h-screen flex items-center justify-center bg-[#f4f7f6]">
         <div className="text-[#137f13] font-bold text-lg">
           Loading support center...
         </div>
@@ -231,62 +303,60 @@ const SupportCenter = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7faf7]">
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
-        <div className="max-w-[1300px] mx-auto px-4 sm:px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+    <div className="min-h-screen bg-[#f4f7f6]">
+      <main className="max-w-[1400px] mx-auto px-4 sm:px-8 py-10">
+        <div className="mb-8 bg-white rounded-[32px] border border-gray-100 shadow-sm p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
+          <div className="flex items-center gap-4">
             <button
-              onClick={() => navigate("/dashboard")}
-              className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:text-[#137f13] hover:border-[#137f13] transition"
+              onClick={() => navigate(backRoute)}
+              className="w-12 h-12 rounded-2xl border border-gray-200 bg-[#f8faf8] flex items-center justify-center text-gray-700 hover:text-[#137f13] hover:border-[#137f13] transition"
             >
               <FaArrowLeft />
             </button>
 
-            <div className="w-11 h-11 rounded-2xl bg-[#137f13] text-white flex items-center justify-center shadow-lg">
+            <div className="w-14 h-14 rounded-2xl bg-[#1c2a1c] text-[#ccff00] flex items-center justify-center text-xl shadow-lg">
               <FaLeaf />
             </div>
 
             <div>
-              <h1 className="text-xl sm:text-2xl font-black text-gray-900">
-                Communication, Support & Dispute Resolution
+              <h1 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight">
+                Support Center
               </h1>
-              <p className="text-sm text-gray-500">
-                Tickets, disputes, status handling, and conversation threads
+              <p className="text-sm text-gray-500 font-medium">
+                Manage tickets, disputes and communication threads
               </p>
             </div>
           </div>
 
-          <div className="hidden sm:flex items-center gap-2">
-            <span className="px-3 py-1 rounded-full bg-[#f0fdf4] border border-[#bbf7d0] text-[#137f13] text-xs font-bold">
+          <div className="flex items-center gap-3">
+            <span className="px-4 py-2 rounded-2xl bg-[#f0fdf4] border border-[#bbf7d0] text-[#137f13] text-xs font-black uppercase tracking-widest">
               {user.role}
             </span>
           </div>
         </div>
-      </header>
 
-      <main className="max-w-[1300px] mx-auto px-4 sm:px-8 py-8">
         {error && (
-          <div className="mb-5 rounded-2xl border border-red-200 bg-red-50 text-red-700 px-4 py-3 font-medium">
+          <div className="mb-5 rounded-2xl border border-red-200 bg-red-50 text-red-700 px-4 py-3 font-medium shadow-sm">
             {error}
           </div>
         )}
 
         {success && (
-          <div className="mb-5 rounded-2xl border border-green-200 bg-green-50 text-green-700 px-4 py-3 font-medium">
+          <div className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 text-emerald-700 px-4 py-3 font-medium shadow-sm">
             {success}
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-[28px] shadow-sm border border-gray-100 p-4 sm:p-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+          <div className="xl:col-span-2 space-y-6">
+            <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 p-5 md:p-6">
               <div className="flex flex-wrap gap-3 mb-6">
                 <button
                   onClick={() => setActiveTab("tickets")}
-                  className={`px-5 py-3 rounded-2xl font-bold transition ${
+                  className={`px-5 py-3 rounded-2xl font-black transition ${
                     activeTab === "tickets"
-                      ? "bg-[#137f13] text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      ? "bg-[#1c2a1c] text-[#ccff00] shadow-lg"
+                      : "bg-[#f5f7f6] text-gray-700 hover:bg-gray-100"
                   }`}
                 >
                   <span className="inline-flex items-center gap-2">
@@ -296,10 +366,10 @@ const SupportCenter = () => {
 
                 <button
                   onClick={() => setActiveTab("disputes")}
-                  className={`px-5 py-3 rounded-2xl font-bold transition ${
+                  className={`px-5 py-3 rounded-2xl font-black transition ${
                     activeTab === "disputes"
-                      ? "bg-[#137f13] text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      ? "bg-[#1c2a1c] text-[#ccff00] shadow-lg"
+                      : "bg-[#f5f7f6] text-gray-700 hover:bg-gray-100"
                   }`}
                 >
                   <span className="inline-flex items-center gap-2">
@@ -310,7 +380,7 @@ const SupportCenter = () => {
 
               {activeTab === "tickets" && (
                 <>
-                  <div className="flex flex-col md:flex-row gap-3 mb-5">
+                  <div className="flex flex-col md:flex-row gap-3 mb-6">
                     <input
                       type="text"
                       placeholder="Search tickets..."
@@ -322,8 +392,7 @@ const SupportCenter = () => {
                     <select
                       value={ticketStatusFilter}
                       onChange={(e) => setTicketStatusFilter(e.target.value)}
-                      className="rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#137f13] bg-white text-gray-900"
-                    >
+className="min-w-[140px] rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 font-medium outline-none appearance-none focus:border-[#137f13] focus:ring-4 focus:ring-[#137f13]/10 transition shadow-sm"                    >
                       <option>All</option>
                       <option>Open</option>
                       <option>In Progress</option>
@@ -332,12 +401,16 @@ const SupportCenter = () => {
                   </div>
 
                   {loadingTickets ? (
-                    <div className="text-gray-500 font-medium">Loading tickets...</div>
+                    <div className="text-gray-500 font-medium">
+                      Loading tickets...
+                    </div>
                   ) : filteredTickets.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
-                      <p className="font-bold text-gray-700">No tickets found</p>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Create a new ticket using the form on the right.
+                    <div className="rounded-[28px] border border-dashed border-gray-300 bg-[#f8faf8] p-10 text-center">
+                      <p className="font-black text-gray-700 text-lg">
+                        No tickets found
+                      </p>
+                      <p className="text-sm text-gray-500 mt-2">
+                        Create a new ticket using the panel on the right.
                       </p>
                     </div>
                   ) : (
@@ -345,9 +418,9 @@ const SupportCenter = () => {
                       {filteredTickets.map((ticket) => (
                         <div
                           key={ticket._id}
-                          className="rounded-[24px] border border-gray-100 bg-[#fcfffc] shadow-sm p-5"
+                          className="rounded-[28px] border border-gray-100 bg-white shadow-sm hover:shadow-md transition p-5"
                         >
-                          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5">
                             <div className="flex-1">
                               <div className="flex flex-wrap items-center gap-2 mb-3">
                                 <h3 className="text-lg font-black text-gray-900">
@@ -355,7 +428,7 @@ const SupportCenter = () => {
                                 </h3>
 
                                 <span
-                                  className={`text-xs font-bold px-3 py-1 rounded-full border ${
+                                  className={`text-xs font-black px-3 py-1 rounded-full border ${
                                     ticketStatusColors[ticket.status] ||
                                     "bg-gray-100 text-gray-700 border-gray-200"
                                   }`}
@@ -363,16 +436,16 @@ const SupportCenter = () => {
                                   {ticket.status}
                                 </span>
 
-                                <span className="text-xs font-bold px-3 py-1 rounded-full border bg-purple-100 text-purple-700 border-purple-200">
+                                <span className="text-xs font-black px-3 py-1 rounded-full border bg-purple-100 text-purple-700 border-purple-200">
                                   {ticket.priority}
                                 </span>
                               </div>
 
-                              <p className="text-gray-600 leading-relaxed mb-3">
+                              <p className="text-gray-600 leading-relaxed mb-4 font-medium">
                                 {ticket.description}
                               </p>
 
-                              <div className="text-sm text-gray-500 flex flex-wrap gap-4">
+                              <div className="text-sm text-gray-500 flex flex-wrap gap-4 font-medium">
                                 <span>
                                   Created:{" "}
                                   {ticket.createdAt
@@ -391,7 +464,7 @@ const SupportCenter = () => {
                             <div className="flex flex-wrap gap-2">
                               <Link
                                 to={`/support/tickets/${ticket._id}`}
-                                className="px-4 py-2 rounded-xl bg-[#137f13] text-white font-bold hover:bg-[#0f6a0f] transition no-underline inline-flex items-center gap-2"
+                                className="px-4 py-3 rounded-2xl bg-[#1c2a1c] text-[#ccff00] font-black hover:opacity-95 transition no-underline inline-flex items-center gap-2 shadow-sm"
                               >
                                 <FaComments /> Open Chat
                               </Link>
@@ -400,10 +473,12 @@ const SupportCenter = () => {
                                 <select
                                   value={ticket.status}
                                   onChange={(e) =>
-                                    handleTicketStatusUpdate(ticket._id, e.target.value)
+                                    handleTicketStatusUpdate(
+                                      ticket._id,
+                                      e.target.value
+                                    )
                                   }
-                                  className="px-3 py-2 rounded-xl border border-gray-200 outline-none bg-white text-gray-900"
-                                >
+className="min-w-[150px] px-4 py-3 rounded-2xl border border-gray-200 outline-none bg-white text-gray-900 font-medium appearance-none focus:border-[#137f13] focus:ring-4 focus:ring-[#137f13]/10 transition shadow-sm"                                >
                                   <option>Open</option>
                                   <option>In Progress</option>
                                   <option>Closed</option>
@@ -412,7 +487,7 @@ const SupportCenter = () => {
 
                               <button
                                 onClick={() => handleDeleteTicket(ticket._id)}
-                                className="px-4 py-2 rounded-xl bg-red-50 text-red-600 border border-red-100 font-bold hover:bg-red-100 transition inline-flex items-center gap-2"
+                                className="px-4 py-3 rounded-2xl bg-red-50 text-red-600 border border-red-100 font-black hover:bg-red-100 transition inline-flex items-center gap-2"
                               >
                                 <FaTrash /> Delete
                               </button>
@@ -427,10 +502,10 @@ const SupportCenter = () => {
 
               {activeTab === "disputes" && (
                 <>
-                  <div className="flex flex-col md:flex-row gap-3 mb-5">
+                  <div className="flex flex-col md:flex-row gap-3 mb-6">
                     <input
                       type="text"
-                      placeholder="Search disputes by reason, description, or order id..."
+                      placeholder="Search disputes..."
                       value={disputeSearch}
                       onChange={(e) => setDisputeSearch(e.target.value)}
                       className={`${fieldClass} flex-1`}
@@ -439,8 +514,7 @@ const SupportCenter = () => {
                     <select
                       value={disputeStatusFilter}
                       onChange={(e) => setDisputeStatusFilter(e.target.value)}
-                      className="rounded-2xl border border-gray-200 px-4 py-3 outline-none focus:border-[#137f13] bg-white text-gray-900"
-                    >
+className="min-w-[140px] rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-900 font-medium outline-none appearance-none focus:border-[#137f13] focus:ring-4 focus:ring-[#137f13]/10 transition shadow-sm"                    >
                       <option>All</option>
                       <option>Open</option>
                       <option>Under Review</option>
@@ -450,12 +524,16 @@ const SupportCenter = () => {
                   </div>
 
                   {loadingDisputes ? (
-                    <div className="text-gray-500 font-medium">Loading disputes...</div>
+                    <div className="text-gray-500 font-medium">
+                      Loading disputes...
+                    </div>
                   ) : filteredDisputes.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center">
-                      <p className="font-bold text-gray-700">No disputes found</p>
-                      <p className="text-sm text-gray-500 mt-1">
-                        Create a dispute using an order ID from your order history.
+                    <div className="rounded-[28px] border border-dashed border-gray-300 bg-[#f8faf8] p-10 text-center">
+                      <p className="font-black text-gray-700 text-lg">
+                        No disputes found
+                      </p>
+                      <p className="text-sm text-gray-500 mt-2">
+                        Create a dispute using the panel on the right.
                       </p>
                     </div>
                   ) : (
@@ -463,9 +541,9 @@ const SupportCenter = () => {
                       {filteredDisputes.map((dispute) => (
                         <div
                           key={dispute._id}
-                          className="rounded-[24px] border border-gray-100 bg-[#fffdfc] shadow-sm p-5"
+                          className="rounded-[28px] border border-gray-100 bg-white shadow-sm hover:shadow-md transition p-5"
                         >
-                          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+                          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5">
                             <div className="flex-1">
                               <div className="flex flex-wrap items-center gap-2 mb-3">
                                 <h3 className="text-lg font-black text-gray-900">
@@ -473,7 +551,7 @@ const SupportCenter = () => {
                                 </h3>
 
                                 <span
-                                  className={`text-xs font-bold px-3 py-1 rounded-full border ${
+                                  className={`text-xs font-black px-3 py-1 rounded-full border ${
                                     disputeStatusColors[dispute.status] ||
                                     "bg-gray-100 text-gray-700 border-gray-200"
                                   }`}
@@ -482,28 +560,49 @@ const SupportCenter = () => {
                                 </span>
                               </div>
 
-                              <p className="text-gray-600 leading-relaxed mb-3">
+                              <p className="text-gray-600 leading-relaxed mb-4 font-medium">
                                 {dispute.description}
                               </p>
 
-                              <div className="text-sm text-gray-500 flex flex-col gap-1">
+                              <div className="text-sm text-gray-500 flex flex-col gap-1 font-medium">
                                 <span>
-                                  Order ID: {dispute.order?._id || dispute.order || "-"}
+                                  Order:{" "}
+                                  {dispute.order?._id
+                                    ? `ORD-${dispute.order._id
+                                        .slice(-6)
+                                        .toUpperCase()}`
+                                    : dispute.order
+                                    ? `ORD-${String(dispute.order)
+                                        .slice(-6)
+                                        .toUpperCase()}`
+                                    : "-"}
                                 </span>
+
+                                {dispute.order?.totalPrice && (
+                                  <span>
+                                    Total: Rs.{" "}
+                                    {Number(dispute.order.totalPrice).toLocaleString()}
+                                  </span>
+                                )}
+
                                 <span>
                                   Opened By: {dispute.openedBy?.name || "Unknown"}
                                   {dispute.openedBy?.role
                                     ? ` (${dispute.openedBy.role})`
                                     : ""}
                                 </span>
+
                                 <span>
                                   Created:{" "}
                                   {dispute.createdAt
-                                    ? new Date(dispute.createdAt).toLocaleString()
+                                    ? new Date(
+                                        dispute.createdAt
+                                      ).toLocaleString()
                                     : "-"}
                                 </span>
+
                                 {dispute.resolutionNote && (
-                                  <span className="text-green-700 font-medium">
+                                  <span className="text-emerald-700 font-black">
                                     Resolution: {dispute.resolutionNote}
                                   </span>
                                 )}
@@ -513,7 +612,7 @@ const SupportCenter = () => {
                             <div className="flex flex-wrap gap-2">
                               <Link
                                 to={`/support/disputes/${dispute._id}`}
-                                className="px-4 py-2 rounded-xl bg-[#137f13] text-white font-bold hover:bg-[#0f6a0f] transition no-underline inline-flex items-center gap-2"
+                                className="px-4 py-3 rounded-2xl bg-[#1c2a1c] text-[#ccff00] font-black hover:opacity-95 transition no-underline inline-flex items-center gap-2 shadow-sm"
                               >
                                 <FaComments /> Open Chat
                               </Link>
@@ -522,10 +621,12 @@ const SupportCenter = () => {
                                 <select
                                   value={dispute.status}
                                   onChange={(e) =>
-                                    handleDisputeStatusUpdate(dispute._id, e.target.value)
+                                    handleDisputeStatusUpdate(
+                                      dispute._id,
+                                      e.target.value
+                                    )
                                   }
-                                  className="px-3 py-2 rounded-xl border border-gray-200 outline-none bg-white text-gray-900"
-                                >
+className="min-w-[150px] px-4 py-3 rounded-2xl border border-gray-200 outline-none bg-white text-gray-900 font-medium appearance-none focus:border-[#137f13] focus:ring-4 focus:ring-[#137f13]/10 transition shadow-sm"                                >
                                   <option>Open</option>
                                   <option>Under Review</option>
                                   <option>Resolved</option>
@@ -544,22 +645,27 @@ const SupportCenter = () => {
           </div>
 
           <div className="space-y-6">
-            <div className="bg-white rounded-[28px] shadow-sm border border-gray-100 p-5">
-              <h2 className="text-lg font-black text-gray-900 mb-4">
-                {activeTab === "tickets" ? "Create New Ticket" : "Create New Dispute"}
+            <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 p-6">
+              <h2 className="text-xl font-black text-gray-900 mb-5 tracking-tight">
+                {activeTab === "tickets"
+                  ? "Create New Ticket"
+                  : "Create New Dispute"}
               </h2>
 
               {activeTab === "tickets" ? (
                 <form onSubmit={handleCreateTicket} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                    <label className="block text-sm font-black text-gray-700 mb-2">
                       Subject
                     </label>
                     <input
                       type="text"
                       value={ticketForm.subject}
                       onChange={(e) =>
-                        setTicketForm({ ...ticketForm, subject: e.target.value })
+                        setTicketForm({
+                          ...ticketForm,
+                          subject: e.target.value,
+                        })
                       }
                       className={fieldClass}
                       placeholder="Enter ticket subject"
@@ -567,14 +673,17 @@ const SupportCenter = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                    <label className="block text-sm font-black text-gray-700 mb-2">
                       Description
                     </label>
                     <textarea
                       rows="5"
                       value={ticketForm.description}
                       onChange={(e) =>
-                        setTicketForm({ ...ticketForm, description: e.target.value })
+                        setTicketForm({
+                          ...ticketForm,
+                          description: e.target.value,
+                        })
                       }
                       className={`${fieldClass} resize-none`}
                       placeholder="Describe your issue"
@@ -582,13 +691,16 @@ const SupportCenter = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                    <label className="block text-sm font-black text-gray-700 mb-2">
                       Priority
                     </label>
                     <select
                       value={ticketForm.priority}
                       onChange={(e) =>
-                        setTicketForm({ ...ticketForm, priority: e.target.value })
+                        setTicketForm({
+                          ...ticketForm,
+                          priority: e.target.value,
+                        })
                       }
                       className={selectClass}
                     >
@@ -598,35 +710,118 @@ const SupportCenter = () => {
                     </select>
                   </div>
 
-                  <button className="w-full rounded-2xl bg-[#137f13] text-white font-bold py-3 hover:bg-[#0f6a0f] transition inline-flex items-center justify-center gap-2">
+                  <button className="w-full rounded-2xl bg-[#ccff00] text-[#1c2a1c] font-black py-3 hover:scale-[1.01] transition inline-flex items-center justify-center gap-2 shadow-lg">
                     <FaPlus /> Submit Ticket
                   </button>
                 </form>
               ) : (
-                <form onSubmit={handleCreateDispute} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                      Order ID
-                    </label>
-                    <input
-                      type="text"
-                      value={disputeForm.orderId}
-                      onChange={(e) =>
-                        setDisputeForm({ ...disputeForm, orderId: e.target.value })
-                      }
-                      className={fieldClass}
-                      placeholder="Enter order id"
-                    />
-                  </div>
+                <form onSubmit={handleCreateDispute} className="space-y-5">
+                  {!isStaff && (
+                    <div>
+                      <label className="block text-sm font-black text-gray-700 mb-2">
+                        Select Order
+                      </label>
+
+                      {loadingOrders ? (
+                        <div className="rounded-2xl border border-gray-200 bg-[#f8faf8] px-4 py-3 text-sm text-gray-500">
+                          Loading your orders...
+                        </div>
+                      ) : myOrders.length === 0 ? (
+                        <div className="rounded-2xl border border-dashed border-gray-300 bg-[#f8faf8] px-4 py-4 text-sm text-gray-500">
+                          No orders found. You need at least one order to raise a
+                          dispute.
+                        </div>
+                      ) : (
+                        <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
+                          {myOrders.map((order) => {
+                            const isSelected = selectedOrder?._id === order._id;
+
+                            return (
+                              <button
+                                key={order._id}
+                                type="button"
+                                onClick={() => handleSelectOrderForDispute(order)}
+                                className={`w-full text-left rounded-2xl border p-4 transition ${
+                                  isSelected
+                                    ? "border-[#137f13] bg-[#f0fdf4] shadow-sm"
+                                    : "border-gray-200 bg-white hover:border-[#137f13]/40 hover:bg-[#fafdfb]"
+                                }`}
+                              >
+                                <div className="flex items-start justify-between gap-3">
+                                  <div>
+                                    <p className="text-xs font-black uppercase tracking-widest text-[#137f13] mb-1">
+                                      {getShortOrderCode(order)}
+                                    </p>
+                                    <h4 className="text-sm font-black text-gray-900">
+                                      {getOrderTitle(order)}
+                                    </h4>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                      {order.orderItems?.length || 0} item(s)
+                                    </p>
+                                  </div>
+
+                                  <span
+                                    className={`text-[10px] font-black px-2.5 py-1 rounded-full ${
+                                      order.status === "Delivered"
+                                        ? "bg-emerald-100 text-emerald-700"
+                                        : order.status === "Pending"
+                                        ? "bg-amber-100 text-amber-700"
+                                        : "bg-gray-100 text-gray-700"
+                                    }`}
+                                  >
+                                    {order.status}
+                                  </span>
+                                </div>
+
+                                <div className="mt-3 flex items-center justify-between text-xs text-gray-500">
+                                  <span>
+                                    Total: Rs.{" "}
+                                    {Number(
+                                      order.totalPrice || order.total || 0
+                                    ).toLocaleString()}
+                                  </span>
+                                  <span>
+                                    {order.createdAt
+                                      ? new Date(
+                                          order.createdAt
+                                        ).toLocaleDateString()
+                                      : "-"}
+                                  </span>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {selectedOrder && (
+                    <div className="rounded-2xl border border-[#bbf7d0] bg-[#f0fdf4] px-4 py-3">
+                      <p className="text-xs font-black uppercase tracking-widest text-[#137f13] mb-1">
+                        Selected Order
+                      </p>
+                      <p className="text-sm font-black text-gray-900">
+                        {getShortOrderCode(selectedOrder)} —{" "}
+                        {getOrderTitle(selectedOrder)}
+                      </p>
+                      <p className="text-xs text-gray-600 mt-1">
+                        Hidden order ID will be submitted automatically.
+                      </p>
+                    </div>
+                  )}
 
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                    <label className="block text-sm font-black text-gray-700 mb-2">
                       Reason
                     </label>
                     <select
                       value={disputeForm.reason}
                       onChange={(e) =>
-                        setDisputeForm({ ...disputeForm, reason: e.target.value })
+                        setDisputeForm({
+                          ...disputeForm,
+                          reason: e.target.value,
+                        })
                       }
                       className={selectClass}
                     >
@@ -640,82 +835,68 @@ const SupportCenter = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                    <label className="block text-sm font-black text-gray-700 mb-2">
                       Description
                     </label>
                     <textarea
                       rows="5"
                       value={disputeForm.description}
                       onChange={(e) =>
-                        setDisputeForm({ ...disputeForm, description: e.target.value })
+                        setDisputeForm({
+                          ...disputeForm,
+                          description: e.target.value,
+                        })
                       }
                       className={`${fieldClass} resize-none`}
-                      placeholder="Describe the dispute"
+                      placeholder="Describe the dispute clearly"
                     />
                   </div>
 
-                  <button className="w-full rounded-2xl bg-[#137f13] text-white font-bold py-3 hover:bg-[#0f6a0f] transition inline-flex items-center justify-center gap-2">
+                  <button
+                    disabled={
+                      !disputeForm.orderId || !disputeForm.description.trim()
+                    }
+                    className="w-full rounded-2xl bg-[#ccff00] text-[#1c2a1c] font-black py-3 hover:scale-[1.01] transition inline-flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  >
                     <FaPlus /> Open Dispute
                   </button>
                 </form>
               )}
             </div>
 
-            <div className="bg-white rounded-[28px] shadow-sm border border-gray-100 p-5">
-              <h3 className="text-base font-black text-gray-900 mb-4">
-                Module Summary
+            <div className="bg-[#1c2a1c] rounded-[32px] p-6 text-white shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-28 h-28 bg-[#ccff00]/10 rounded-full blur-3xl" />
+              <h3 className="text-lg font-black mb-5 relative z-10">
+                Module Highlights
               </h3>
 
-              <div className="space-y-3 text-sm text-gray-600">
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
-                    <FaTicketAlt />
-                  </div>
-                  <div>
-                    <p className="font-bold text-gray-800">Support Tickets</p>
-                    <p>
-                      Create issues, track status, chat with support, and delete
-                      when needed.
-                    </p>
-                  </div>
+              <div className="space-y-4 relative z-10">
+                <div className="bg-white/5 border border-white/10 p-4 rounded-2xl">
+                  <p className="font-black text-[#ccff00] text-sm mb-1">
+                    Support Tickets
+                  </p>
+                  <p className="text-white/70 text-sm">
+                    Raise, track, reply and manage support communication.
+                  </p>
                 </div>
 
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-red-100 text-red-700 flex items-center justify-center shrink-0">
-                    <FaExclamationTriangle />
-                  </div>
-                  <div>
-                    <p className="font-bold text-gray-800">Dispute Management</p>
-                    <p>
-                      Open order-related disputes and follow resolution through a
-                      discussion thread.
-                    </p>
-                  </div>
+                <div className="bg-white/5 border border-white/10 p-4 rounded-2xl">
+                  <p className="font-black text-[#ccff00] text-sm mb-1">
+                    Dispute Resolution
+                  </p>
+                  <p className="text-white/70 text-sm">
+                    Select an order visually and open a dispute without typing
+                    long order IDs.
+                  </p>
                 </div>
 
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-green-100 text-green-700 flex items-center justify-center shrink-0">
-                    <FaCheckCircle />
-                  </div>
-                  <div>
-                    <p className="font-bold text-gray-800">Status Updates</p>
-                    <p>
-                      Admins and support staff can update statuses directly from
-                      the panel.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
-                    <FaClock />
-                  </div>
-                  <div>
-                    <p className="font-bold text-gray-800">Conversation History</p>
-                    <p>
-                      Each ticket and dispute has its own message history page.
-                    </p>
-                  </div>
+                <div className="bg-white/5 border border-white/10 p-4 rounded-2xl">
+                  <p className="font-black text-[#ccff00] text-sm mb-1">
+                    Conversation Threads
+                  </p>
+                  <p className="text-white/70 text-sm">
+                    Once created, messages work with dispute ID, not order ID.
+                  </p>
                 </div>
               </div>
             </div>
