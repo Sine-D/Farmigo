@@ -16,6 +16,8 @@ import SupportManagement from "./pages/SupportManagement";
 import SustainabilityManagement from "./pages/SustainabilityManagement";
 import CommunityManagement from "./pages/CommunityManagement";
 import LMSManagement from "./pages/LMSManagement";
+import CommunityForum from "./pages/CommunityForum";
+import LMSCourses from "./pages/LMSCourses";
 import Contact from "./pages/contact";
 import CartPage from "./pages/CartPage";
 import Explore from "./pages/Explore";
@@ -115,6 +117,8 @@ const App = () => {
           <Route path="/admin/sustainability" element={<SustainabilityManagement />} />
           <Route path="/admin/community" element={<CommunityManagement />} />
           <Route path="/admin/lms" element={<LMSManagement />} />
+          <Route path="/community" element={<CommunityForum />} />
+          <Route path="/lms" element={<LMSCourses />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/profile" element={<Profile />} />
 

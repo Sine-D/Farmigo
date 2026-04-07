@@ -11,9 +11,10 @@ import {
 
 const navLinks = [
   { path: "/", section: "home", display: "Home" },
+  { path: "/community", display: "Community" },
+  { path: "/lms", display: "LMS Academy" },
   { path: "/", section: "about", display: "About Us" },
-  { path: "/", section: "review", display: "Reviews" },
-  { path: "/", section: "contact", display: "Contact Us" },
+  { path: "/", section: "contact", display: "Contact" },
 ];
 
 import { toast } from "sonner";
