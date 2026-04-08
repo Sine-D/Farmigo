@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { FaTimes, FaPlus, FaTrash, FaGraduationCap, FaImage, FaLayerGroup, FaTags, FaAlignLeft } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { FaTimes, FaPlus, FaTrash, FaGraduationCap, FaImage, FaLayerGroup, FaTags, FaAlignLeft, FaChartLine } from 'react-icons/fa';
 import { toast } from 'sonner';
 
-const AddCourseModal = ({ isOpen, onClose, onRefresh }) => {
+const AddCourseModal = ({ isOpen, onClose, onRefresh, courseToEdit }) => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -14,6 +14,32 @@ const AddCourseModal = ({ isOpen, onClose, onRefresh }) => {
     modules: [{ title: '', contentUrl: '', contentType: 'Video' }]
   });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (courseToEdit) {
+      setFormData({
+        title: courseToEdit.title || '',
+        description: courseToEdit.description || '',
+        category: courseToEdit.category || 'Sustainable Farming',
+        level: courseToEdit.level || 'Beginner',
+        thumbnail: courseToEdit.thumbnail || '',
+        price: courseToEdit.price || 'FREE',
+        duration: courseToEdit.duration || '4h 30m',
+        modules: courseToEdit.modules?.length > 0 ? courseToEdit.modules : [{ title: '', contentUrl: '', contentType: 'Video' }]
+      });
+    } else {
+      setFormData({
+        title: '',
+        description: '',
+        category: 'Sustainable Farming',
+        level: 'Beginner',
+        thumbnail: '',
+        price: 'FREE',
+        duration: '4h 30m',
+        modules: [{ title: '', contentUrl: '', contentType: 'Video' }]
+      });
+    }
+  }, [courseToEdit, isOpen]);
 
   const categories = ['Sustainable Farming', 'Digital Marketing', 'Financial Literacy', 'Agri-Tech', 'Agriculture', 'Technology', 'Business', 'Science'];
   const levels = ['Beginner', 'Intermediate', 'Advanced'];
@@ -44,17 +70,30 @@ const AddCourseModal = ({ isOpen, onClose, onRefresh }) => {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5001/api/lms/courses', {
-        method: 'POST',
+      
+      // Clean up empty fields to let backend defaults take over
+      const dataToSubmit = { ...formData };
+      if (!dataToSubmit.thumbnail) delete dataToSubmit.thumbnail;
+      if (!dataToSubmit.price) dataToSubmit.price = 'FREE';
+      if (!dataToSubmit.duration) dataToSubmit.duration = '1h 00m';
+
+      const url = courseToEdit 
+        ? `http://localhost:5001/api/lms/courses/${courseToEdit._id}`
+        : 'http://localhost:5001/api/lms/courses';
+      
+      const method = courseToEdit ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method: method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(dataToSubmit)
       });
 
       if (response.ok) {
-        toast.success('Course created successfully!');
+        toast.success(courseToEdit ? 'Course information updated!' : 'Course published to Academy!');
         onRefresh();
         onClose();
         setFormData({
@@ -90,8 +129,12 @@ const AddCourseModal = ({ isOpen, onClose, onRefresh }) => {
                         <FaGraduationCap />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-black tracking-tight uppercase">Assemble New Course</h2>
-                        <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-1">Design a premium learning experience</p>
+                        <h2 className="text-2xl font-black tracking-tight uppercase">
+                            {courseToEdit ? 'Modify Existing Course' : 'Assemble New Course'}
+                        </h2>
+                        <p className="text-white/40 text-[10px] font-bold uppercase tracking-widest mt-1">
+                            {courseToEdit ? 'Refining the learning experience' : 'Design a premium learning experience'}
+                        </p>
                     </div>
                 </div>
                 <button 
@@ -289,7 +332,7 @@ const AddCourseModal = ({ isOpen, onClose, onRefresh }) => {
                 disabled={loading}
                 className="px-10 py-4 bg-[#137f13] text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-[0_10px_30px_rgba(19,127,19,0.3)] hover:scale-[1.05] transition-all disabled:opacity-50 flex items-center gap-3"
             >
-                {loading ? 'Processing...' : 'Deploy Course'}
+                {loading ? 'Processing...' : (courseToEdit ? 'Save Changes' : 'Deploy Course')}
             </button>
         </div>
       </div>

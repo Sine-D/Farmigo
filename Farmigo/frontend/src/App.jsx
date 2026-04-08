@@ -98,6 +98,7 @@ const LayoutWrapper = ({ children }) => {
     shouldHideNavbar ||
     location.pathname === "/dashboard" ||
     location.pathname === "/profile" ||
+    location.pathname === "/lms" ||
     location.pathname === "/admin";
 
   const shouldHideFooter =

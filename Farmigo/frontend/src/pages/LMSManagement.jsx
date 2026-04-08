@@ -14,6 +14,7 @@ const LMSManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [user, setUser] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [courseToEdit, setCourseToEdit] = useState(null);
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -34,6 +35,16 @@ const LMSManagement = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleEdit = (course) => {
+    setCourseToEdit(course);
+    setIsModalOpen(true);
+  };
+
+  const handleCreateNew = () => {
+    setCourseToEdit(null);
+    setIsModalOpen(true);
   };
 
   const getLevelColor = (level) => {
@@ -110,7 +121,7 @@ const LMSManagement = () => {
           </div>
 
           <button 
-            onClick={() => setIsModalOpen(true)}
+            onClick={handleCreateNew}
             className="flex items-center gap-3 px-8 py-4 bg-[#137f13] text-white rounded-2xl font-black text-sm shadow-[0_10px_30px_rgba(19,127,19,0.3)] hover:scale-[1.02] transition-all uppercase tracking-widest"
           >
             <FaPlusCircle /> Create New Course
@@ -175,7 +186,10 @@ const LMSManagement = () => {
                         </div>
 
                         <div className="flex items-center gap-3 mt-4 md:mt-0">
-                            <button className="flex items-center gap-2 px-5 py-3 bg-white text-gray-700 rounded-xl text-[10px] font-black uppercase tracking-widest border border-gray-100 hover:bg-gray-100 transition-all shadow-sm">
+                            <button 
+                                onClick={() => handleEdit(course)}
+                                className="flex items-center gap-2 px-5 py-3 bg-white text-gray-700 rounded-xl text-[10px] font-black uppercase tracking-widest border border-gray-100 hover:bg-gray-100 transition-all shadow-sm"
+                            >
                                 <FaEdit /> Edit Course
                             </button>
                             <button 
@@ -200,6 +214,7 @@ const LMSManagement = () => {
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         onRefresh={fetchCourses} 
+        courseToEdit={courseToEdit}
       />
     </div>
   );

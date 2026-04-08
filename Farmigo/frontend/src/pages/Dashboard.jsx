@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import {
   FaLeaf, FaSignOutAlt, FaUser, FaSnowflake,
   FaShoppingBasket, FaClipboardList, FaCog,
-  FaArrowRight, FaHeadset, FaRocket, FaShieldAlt
+  FaArrowRight, FaHeadset, FaRocket, FaShieldAlt, FaGraduationCap
 } from 'react-icons/fa';
 import { BiMoon, BiSun, BiTrendingUp } from "react-icons/bi";
 import ContactHistory from '../components/ContactHistory';
@@ -92,6 +92,21 @@ const Dashboard = () => {
       tagBg: "bg-amber-100 text-amber-700",
       iconBg: "bg-amber-500",
       barColor: "bg-amber-400",
+    },
+    {
+      icon: <FaGraduationCap />,
+      title: "LMS Academy",
+      desc: "Upskill with modern agricultural and business courses.",
+      tag: "Education",
+      stat: "4.8",
+      statLabel: "Avg. Rating",
+      link: "/lms",
+      accent: "#10b981",
+      accentLight: "#ecfdf5",
+      accentBorder: "#a7f3d0",
+      tagBg: "bg-emerald-100 text-emerald-700",
+      iconBg: "bg-emerald-500",
+      barColor: "bg-emerald-400",
     },
   ];
 

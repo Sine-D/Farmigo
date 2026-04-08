@@ -96,6 +96,28 @@ const deleteCourse = async (req, res) => {
     }
 };
 
+const updateCourse = async (req, res) => {
+    const course = await Course.findById(req.params.id);
+
+    if (course) {
+        course.title = req.body.title || course.title;
+        course.description = req.body.description || course.description;
+        course.category = req.body.category || course.category;
+        course.level = req.body.level || course.level;
+        course.thumbnail = req.body.thumbnail || course.thumbnail;
+        course.price = req.body.price || course.price;
+        course.duration = req.body.duration || course.duration;
+        course.modules = req.body.modules || course.modules;
+        course.quizzes = req.body.quizzes || course.quizzes;
+
+        const updatedCourse = await course.save();
+        res.json(updatedCourse);
+    } else {
+        res.status(404);
+        throw new Error('Course not found');
+    }
+};
+
 module.exports = {
     createCourse,
     getCourses,
@@ -103,4 +125,5 @@ module.exports = {
     updateProgress,
     getLearningDashboard,
     deleteCourse,
+    updateCourse,
 };

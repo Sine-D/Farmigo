@@ -40,7 +40,7 @@ const LMSCourses = () => {
         fetchCourses();
     }, []);
 
-    const filters = ['All', 'Agriculture', 'Technology', 'Business', 'Organic'];
+    const filters = ['All', 'Sustainable Farming', 'Digital Marketing', 'Financial Literacy', 'Agri-Tech', 'Agriculture', 'Technology', 'Business', 'Science'];
 
     const filteredCourses = courses?.filter(c => {
         const matchesFilter = activeFilter === 'All' || c.category === activeFilter;
@@ -206,26 +206,6 @@ const LMSCourses = () => {
                 )}
             </div>
 
-            {/* Trusted Badges */}
-            <div className="bg-[#1c2a1c] py-24 text-center">
-                <div className="container mx-auto px-6">
-                    <FaShieldAlt className="text-[#ccff00] text-4xl mb-6 mx-auto opacity-50" />
-                    <h2 className="text-3xl font-black text-white mb-2 uppercase tracking-tighter">Certified Standards</h2>
-                    <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-12">Authorized by National Agricultural Institutes</p>
-                    <div className="flex flex-wrap justify-center gap-12 sm:gap-24 opacity-60">
-                        {[
-                            { label: 'Courses Issued', value: '3.4k+' },
-                            { label: 'National Rank', value: '#1' },
-                            { label: 'Expert Tutors', value: '120+' }
-                        ].map((stat, i) => (
-                            <div key={i}>
-                                <h3 className="text-3xl font-black text-[#ccff00] mb-1">{stat.value}</h3>
-                                <p className="text-[9px] text-white/40 font-black uppercase tracking-widest">{stat.label}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
         </div>
     );
 };
