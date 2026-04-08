@@ -11,7 +11,7 @@ import {
 
 const navLinks = [
   { path: "/", section: "home", display: "Home" },
-  { path: "/community", display: "Community" },
+  { path: "/explore", display: "Marketplace" },
   { path: "/lms", display: "LMS Academy" },
   { path: "/", section: "about", display: "About Us" },
   { path: "/", section: "contact", display: "Contact" },

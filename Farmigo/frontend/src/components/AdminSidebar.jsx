@@ -21,13 +21,9 @@ const AdminSidebar = () => {
 
     const navItems = [
         { icon: <FaChartLine />, label: 'Overview', path: '/admin' },
-        { icon: <FaUsers />, label: 'User Directory', path: '/admin/users' },
-        { icon: <FaCheckCircle />, label: 'Farmer Approvals', path: '/admin/approvals' },
         { icon: <FaGraduationCap />, label: 'LMS Learning', path: '/admin/lms' },
-        { icon: <FaComments />, label: 'Community', path: '/admin/community' },
+
         { icon: <FaLeaf />, label: 'Sustainability', path: '/admin/sustainability' },
-        { icon: <FaShoppingBasket />, label: 'Marketplace', path: '/admin/market' },
-        { icon: <FaMoneyBillWave />, label: 'Transactions', path: '/admin/transactions' },
         { icon: <FaShieldAlt />, label: 'Disputes', path: '/admin/disputes' },
         { icon: <FaHeadset />, label: 'Support center', path: '/admin/support' },
     ];
