@@ -81,36 +81,66 @@ const LMSCourses = () => {
     return (
         <div className="min-h-screen bg-[#f8fafc]">
             {/* Hero Section - Explicit Dark Background */}
-            <section className="relative pt-40 pb-24 overflow-hidden bg-[#1c2a1c]">
-                <div className="absolute top-0 right-0 w-1/2 h-full bg-emerald-500/10 rounded-bl-[400px] blur-[120px] pointer-events-none"></div>
-                <div className="container mx-auto px-6 relative z-10 text-white">
-                    <div className="max-w-4xl">
-                        <div className="flex items-center gap-3 mb-8">
-                            <span className="px-5 py-2 bg-white/10 border border-white/20 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] backdrop-blur-xl">Farmigo Academy</span>
-                            <span className="w-2 h-2 bg-[#ccff00] rounded-full shadow-[0_0_15px_#ccff00]"></span>
+            {/* Premium Hero Section */}
+            <section className="relative pt-40 pb-28 flex items-center justify-center overflow-hidden bg-[#0d140d]">
+                {/* Dynamic Background Elements */}
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] pointer-events-none"></div>
+                <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[60%] bg-[#137f13] rounded-full mix-blend-screen filter blur-[150px] opacity-40"></div>
+                <div className="absolute top-[10%] -right-[10%] w-[40%] h-[50%] bg-[#ccff00] rounded-full mix-blend-screen filter blur-[150px] opacity-10"></div>
+                <div className="absolute -bottom-[20%] left-[20%] w-[60%] h-[50%] bg-[#0f5c0f] rounded-full mix-blend-screen filter blur-[150px] opacity-30"></div>
+
+                <div className="container mx-auto px-6 relative z-10">
+                    <div className="max-w-5xl mx-auto text-center">
+                        {/* Premium Badge */}
+                        <div className="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-10 shadow-[0_10px_30px_rgba(0,0,0,0.5)] hover:bg-white/10 transition-all cursor-pointer group">
+                            <span className="w-2.5 h-2.5 bg-[#ccff00] rounded-full shadow-[0_0_12px_#ccff00] animate-pulse"></span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/90 group-hover:text-white transition-colors">Farmigo Professional Academy</span>
                         </div>
-                        <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-10 leading-[1.1]">
-                            Master Your Trade at <br/>
-                            <span className="text-[#ccff00]">Farmigo</span> Academy.
+
+                        {/* Title */}
+                        <h1 className="text-6xl md:text-8xl font-black tracking-tight text-white mb-8 leading-[1.05] drop-shadow-2xl">
+                            Master Your Trade <br className="hidden md:block" />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ccff00] to-[#137f13] filter drop-shadow-lg">Empower</span> Your Future.
                         </h1>
-                        <p className="text-lg md:text-xl text-white/60 font-medium mb-12 max-w-2xl leading-relaxed">
-                            Professional guidance for modern agriculture. Learn sustainable practices and market strategies from industry experts.
+
+                        {/* Description */}
+                        <p className="text-lg md:text-2xl text-white/60 font-medium mb-14 max-w-3xl mx-auto leading-relaxed">
+                            Access world-class agricultural education. Learn sustainable practices, digital marketing, and advanced agri-tech from verified industry leaders.
                         </p>
                         
-                        <div className="flex flex-col sm:flex-row items-center gap-6 max-w-2xl">
-                            <div className="relative flex-1 group w-full">
-                                <FaSearch className="absolute left-6 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-[#ccff00] transition-colors" />
-                                <input 
-                                    type="text" 
-                                    placeholder="Search courses..." 
-                                    className="w-full pl-16 pr-8 py-5 bg-white/10 border border-white/10 rounded-3xl backdrop-blur-3xl focus:ring-4 focus:ring-emerald-500/20 font-bold transition-all text-white placeholder-white/40"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
+
+                        
+                        {/* Trust indicators */}
+                        <div className="mt-16 flex flex-wrap items-center justify-center gap-8 md:gap-16 opacity-70">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 shadow-inner">
+                                    <FaUsers className="text-xl text-[#ccff00]" />
+                                </div>
+                                <div className="text-left">
+                                    <h4 className="text-white font-black text-xl leading-none mb-1">10k+</h4>
+                                    <p className="text-[9px] text-white/50 uppercase tracking-widest font-black">Active Students</p>
+                                </div>
                             </div>
-                            <button className="px-12 py-5 bg-[#ccff00] text-[#1c2a1c] rounded-3xl font-black shadow-2xl hover:scale-[1.03] transition-all active:scale-95 text-sm uppercase tracking-widest">
-                                Explore
-                            </button>
+                            <div className="w-px h-10 bg-white/10 hidden md:block"></div>
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 shadow-inner">
+                                    <FaShieldAlt className="text-xl text-[#ccff00]" />
+                                </div>
+                                <div className="text-left">
+                                    <h4 className="text-white font-black text-xl leading-none mb-1">Certified</h4>
+                                    <p className="text-[9px] text-white/50 uppercase tracking-widest font-black">Expert Instructors</p>
+                                </div>
+                            </div>
+                            <div className="w-px h-10 bg-white/10 hidden md:block"></div>
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 shadow-inner">
+                                    <FaCheckCircle className="text-xl text-[#ccff00]" />
+                                </div>
+                                <div className="text-left">
+                                    <h4 className="text-white font-black text-xl leading-none mb-1">Lifetime</h4>
+                                    <p className="text-[9px] text-white/50 uppercase tracking-widest font-black">Course Access</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
