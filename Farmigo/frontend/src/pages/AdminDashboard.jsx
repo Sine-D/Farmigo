@@ -7,14 +7,11 @@ import {
   FaMoneyBillWave,
   FaChartLine,
   FaCheckCircle,
-  FaExclamationTriangle,
-  FaSignOutAlt,
-  FaCog,
   FaBell,
-  FaSearch,
-  FaHeadset
+  FaSearch
 } from 'react-icons/fa';
 import { toast } from "sonner";
+import AdminSidebar from '../components/AdminSidebar';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -84,25 +81,9 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
-    toast.success("Logged out successfully");
-    navigate('/login');
-  };
 
   if (!user) return null;
 
-  const sidebarItems = [
-    { icon: <FaChartLine />, label: 'Overview', active: true, path: null },
-    { icon: <FaUsers />, label: 'Users', path: null },
-    { icon: <FaCheckCircle />, label: 'Farmer Approvals', path: null },
-    { icon: <FaShoppingBasket />, label: 'Marketplace', path: null },
-    { icon: <FaMoneyBillWave />, label: 'Transactions', path: null },
-    { icon: <FaHeadset />, label: 'Tickets', path: '/support?tab=tickets' },
-    { icon: <FaExclamationTriangle />, label: 'Disputes', path: '/support?tab=disputes' },
-    { icon: <FaCog />, label: 'System Settings', path: null }
-  ];
 
   const statCards = [
     {
@@ -145,40 +126,7 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-[#f4f7f6] flex">
       {/* Sidebar */}
-      <div className="w-72 bg-[#1c2a1c] text-white p-6 flex flex-col fixed h-full shadow-2xl z-20">
-        <div className="flex items-center gap-3 mb-10 px-2">
-          <FaLeaf className="text-3xl text-[#ccff00]" />
-          <span className="text-2xl font-black tracking-tighter">
-            FARMIGO
-            <span className="text-[#ccff00] text-xs uppercase block">Admin Panel</span>
-          </span>
-        </div>
-
-        <nav className="flex-1 space-y-2">
-          {sidebarItems.map((item, i) => (
-            <button
-              key={i}
-              onClick={() => item.path && navigate(item.path)}
-              className={`w-full flex items-center gap-4 px-4 py-3 rounded-xl transition-all font-bold text-sm ${
-                item.active
-                  ? 'bg-[#ccff00] text-[#1c2a1c] shadow-[0_8px_20px_rgba(204,255,0,0.2)]'
-                  : 'text-white/60 hover:bg-white/5 hover:text-white'
-              } ${item.path ? 'cursor-pointer' : 'cursor-default'}`}
-            >
-              <span className="text-lg">{item.icon}</span>
-              {item.label}
-            </button>
-          ))}
-        </nav>
-
-        <button
-          onClick={handleLogout}
-          className="mt-auto flex items-center gap-4 px-4 py-3 rounded-xl border border-white/10 text-white/60 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 transition-all font-bold text-sm"
-        >
-          <FaSignOutAlt />
-          Logout Session
-        </button>
-      </div>
+      <AdminSidebar />
 
       {/* Main Content */}
       <div className="flex-1 ml-72 p-8 pt-10">

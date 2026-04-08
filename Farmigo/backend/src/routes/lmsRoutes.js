@@ -6,6 +6,7 @@ const {
     enrollInCourse,
     updateProgress,
     getLearningDashboard,
+    deleteCourse,
 } = require('../controllers/lmsController');
 const { protect, authorize } = require('../middleware/authMiddleware');
 
@@ -26,6 +27,9 @@ const asyncHandler = require('../middleware/asyncHandler');
 router.route('/courses')
     .post(protect, authorize('Admin'), asyncHandler(createCourse))
     .get(asyncHandler(getCourses));
+
+router.route('/courses/:id')
+    .delete(protect, authorize('Admin'), asyncHandler(deleteCourse));
 
 /**
  * @swagger

@@ -103,7 +103,7 @@ const LayoutWrapper = ({ children }) => {
   const shouldHideFooter =
     location.pathname === "/login" ||
     location.pathname === "/signup" ||
-    location.pathname === "/admin";
+    location.pathname.startsWith("/admin");
 
   return (
     <>

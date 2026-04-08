@@ -142,11 +142,17 @@ const LMSCourses = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                         {filteredCourses.map((course) => (
                             <div key={course._id} className="group bg-white rounded-[40px] overflow-hidden border border-gray-100 hover:shadow-2xl transition-all flex flex-col h-full shadow-sm">
-                                <div className="relative h-60 bg-[#0d1a0d] flex items-center justify-center overflow-hidden">
-                                    <FaBook className="text-5xl text-[#ccff00] opacity-20 group-hover:scale-125 group-hover:opacity-100 transition-all duration-700" />
+                                <div className="relative h-60 bg-[#0d1a0d] overflow-hidden">
+                                    {course.thumbnail ? (
+                                        <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center">
+                                            <FaBook className="text-5xl text-[#ccff00] opacity-20 group-hover:scale-125 group-hover:opacity-100 transition-all duration-700" />
+                                        </div>
+                                    )}
                                     <div className="absolute bottom-6 left-6">
                                         <span className="px-4 py-1.5 bg-[#ccff00] text-[#1c2a1c] rounded-xl text-[10px] font-black shadow-lg uppercase tracking-widest">
-                                            {course.level}
+                                            {course.level || 'Beginner'}
                                         </span>
                                     </div>
                                 </div>
@@ -155,7 +161,7 @@ const LMSCourses = () => {
                                     <div className="flex items-center justify-between mb-4">
                                         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#137f13]">#{course.category}</span>
                                         <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 rounded-lg text-[10px] font-black uppercase tracking-widest">
-                                            <FaStar className="text-amber-400" /> {course.rating}
+                                            <FaStar className="text-amber-400" /> {course.rating || 0}
                                         </div>
                                     </div>
                                     <h3 className="text-lg font-black text-gray-900 tracking-tight mb-4 group-hover:text-[#137f13] transition-colors leading-tight uppercase">
@@ -166,13 +172,13 @@ const LMSCourses = () => {
                                         <div className="flex items-center justify-between py-6 border-t border-gray-100 text-[10px] font-black text-gray-400 uppercase tracking-widest">
                                             <div className="flex items-center gap-4">
                                                 <div className="flex items-center gap-1.5">
-                                                    <FaClock className="text-emerald-500" /> {course.duration}
+                                                    <FaClock className="text-emerald-500" /> {course.duration || '0h 00m'}
                                                 </div>
                                                 <div className="flex items-center gap-1.5">
-                                                    <FaUsers className="text-blue-500" /> {course.students}
+                                                    <FaUsers className="text-blue-500" /> {course.studentCount || 0}
                                                 </div>
                                             </div>
-                                            <span className="text-gray-900 font-extrabold">{course.price}</span>
+                                            <span className="text-gray-900 font-extrabold">{course.price || 'FREE'}</span>
                                         </div>
 
                                         <button 

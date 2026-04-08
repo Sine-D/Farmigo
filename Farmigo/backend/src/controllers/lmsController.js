@@ -5,14 +5,18 @@ const Enrollment = require('../models/enrollmentModel');
 // @route   POST /api/lms/courses
 // @access  Private/Admin
 const createCourse = async (req, res) => {
-    const { title, description, category, modules, quizzes } = req.body;
+    const { title, description, category, level, thumbnail, modules, quizzes, price, duration } = req.body;
 
     const course = await Course.create({
         title,
         description,
         category,
+        level,
+        thumbnail,
         modules,
         quizzes,
+        price,
+        duration,
         instructor: req.user._id,
     });
 
@@ -80,10 +84,23 @@ const getLearningDashboard = async (req, res) => {
     res.json(enrollments);
 };
 
+const deleteCourse = async (req, res) => {
+    const course = await Course.findById(req.params.id);
+
+    if (course) {
+        await course.deleteOne();
+        res.json({ message: 'Course removed' });
+    } else {
+        res.status(404);
+        throw new Error('Course not found');
+    }
+};
+
 module.exports = {
     createCourse,
     getCourses,
     enrollInCourse,
     updateProgress,
     getLearningDashboard,
+    deleteCourse,
 };

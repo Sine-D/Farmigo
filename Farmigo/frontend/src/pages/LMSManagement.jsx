@@ -6,12 +6,14 @@ import {
 } from 'react-icons/fa';
 import { toast } from 'sonner';
 import AdminSidebar from '../components/AdminSidebar';
+import AddCourseModal from '../components/AddCourseModal';
 
 const LMSManagement = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [user, setUser] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const userData = localStorage.getItem('user');
@@ -27,13 +29,8 @@ const LMSManagement = () => {
         setCourses(data);
       }
     } catch (error) {
-      // Dummy data for demo
-      setCourses([
-        { _id: '1', title: 'Sustainable Farming 101', category: 'Agriculture', level: 'Beginner', students: 450, rating: 4.8 },
-        { _id: '2', title: 'Modern Irrigation Systems', category: 'Technology', level: 'Intermediate', students: 280, rating: 4.5 },
-        { _id: '3', title: 'Agri-Business Management', category: 'Business', level: 'Advanced', students: 150, rating: 4.9 },
-        { _id: '4', title: 'Soil Science & Nutrition', category: 'Science', level: 'Intermediate', students: 310, rating: 4.6 },
-      ]);
+      console.error("Error fetching courses:", error);
+      // Fallback dummy data if desired, but ideally we show what's in DB
     } finally {
       setLoading(false);
     }
@@ -45,6 +42,23 @@ const LMSManagement = () => {
       case 'Intermediate': return 'bg-blue-100 text-blue-600 border-blue-200';
       case 'Advanced': return 'bg-orange-100 text-orange-600 border-orange-200';
       default: return 'bg-gray-100 text-gray-600 border-gray-200';
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this course?')) return;
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:5001/api/lms/courses/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (response.ok) {
+            toast.success('Course deleted');
+            fetchCourses();
+        }
+    } catch (error) {
+        toast.error('Failed to delete course');
     }
   };
 
@@ -77,7 +91,7 @@ const LMSManagement = () => {
                 <p className="text-[10px] font-bold text-[#137f13] uppercase tracking-widest">Education Manager</p>
               </div>
               <div className="w-12 h-12 bg-[#ccff00] rounded-2xl flex items-center justify-center text-[#1c2a1c] font-black shadow-lg">
-                EM
+                {user?.name?.substring(0, 2).toUpperCase() || 'EM'}
               </div>
             </div>
           </div>
@@ -95,7 +109,10 @@ const LMSManagement = () => {
             <p className="text-gray-500 font-medium max-w-lg">Create, manage and track farmer education programs through our integrated LMS platform.</p>
           </div>
 
-          <button className="flex items-center gap-3 px-8 py-4 bg-[#137f13] text-white rounded-2xl font-black text-sm shadow-[0_10px_30px_rgba(19,127,19,0.3)] hover:scale-[1.02] transition-all uppercase tracking-widest">
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="flex items-center gap-3 px-8 py-4 bg-[#137f13] text-white rounded-2xl font-black text-sm shadow-[0_10px_30px_rgba(19,127,19,0.3)] hover:scale-[1.02] transition-all uppercase tracking-widest"
+          >
             <FaPlusCircle /> Create New Course
           </button>
         </div>
@@ -130,23 +147,27 @@ const LMSManagement = () => {
             </div>
 
             <div className="space-y-4">
-                {courses.map((course, i) => (
+                {courses.length > 0 ? courses.map((course, i) => (
                     <div key={i} className="flex flex-col md:flex-row items-center justify-between p-6 bg-gray-50 rounded-[28px] border border-transparent hover:border-[#137f13]/20 hover:bg-emerald-50/10 transition-all group">
                         <div className="flex items-center gap-6 flex-1 w-full">
-                            <div className="w-20 h-20 bg-[#1c2a1c] rounded-3xl flex items-center justify-center text-3xl shadow-sm text-emerald-50 group-hover:scale-105 transition-transform">
-                                <FaBook />
+                            <div className="w-20 h-20 bg-[#1c2a1c] rounded-3xl overflow-hidden flex items-center justify-center text-3xl shadow-sm text-emerald-50 group-hover:scale-105 transition-transform">
+                                {course.thumbnail ? (
+                                    <img src={course.thumbnail} alt={course.title} className="w-full h-full object-cover" />
+                                ) : (
+                                    <FaBook />
+                                )}
                             </div>
                             <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-1">
                                     <h4 className="font-black text-gray-900 tracking-tight group-hover:text-[#137f13] transition-colors uppercase text-sm">{course.title}</h4>
                                     <span className={`text-[9px] font-black px-2 py-0.5 rounded-full border uppercase tracking-tighter ${getLevelColor(course.level)}`}>
-                                        {course.level}
+                                        {course.level || 'Beginner'}
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-4 text-[10px] font-bold text-gray-400">
-                                    <span className="flex items-center gap-1.5 uppercase tracking-widest"><FaUsers className="text-[10px]" /> {course.students} Enrolled</span>
+                                    <span className="flex items-center gap-1.5 uppercase tracking-widest"><FaUsers className="text-[10px]" /> {course.studentCount || 0} Enrolled</span>
                                     <span className="w-1 h-1 bg-gray-300 rounded-full" />
-                                    <span className="flex items-center gap-1.5 uppercase tracking-widest"><FaChartLine className="text-[10px] text-emerald-400" /> {course.rating} Avg Rating</span>
+                                    <span className="flex items-center gap-1.5 uppercase tracking-widest"><FaChartLine className="text-[10px] text-emerald-400" /> {course.rating || 0} Avg Rating</span>
                                     <span className="w-1 h-1 bg-gray-300 rounded-full" />
                                     <span className="flex items-center gap-1.5 uppercase tracking-widest text-[#137f13]"># {course.category}</span>
                                 </div>
@@ -157,15 +178,29 @@ const LMSManagement = () => {
                             <button className="flex items-center gap-2 px-5 py-3 bg-white text-gray-700 rounded-xl text-[10px] font-black uppercase tracking-widest border border-gray-100 hover:bg-gray-100 transition-all shadow-sm">
                                 <FaEdit /> Edit Course
                             </button>
-                            <button className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm">
+                            <button 
+                                onClick={() => handleDelete(course._id)}
+                                className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm"
+                            >
                                 <FaTrashAlt />
                             </button>
                         </div>
                     </div>
-                ))}
+                )) : (
+                    <div className="py-20 text-center bg-gray-50 rounded-[32px] border-2 border-dashed border-gray-200">
+                        <FaGraduationCap className="text-4xl text-gray-300 mb-4 mx-auto" />
+                        <p className="text-gray-400 font-bold text-xs uppercase tracking-widest">No courses available. Start by creating one.</p>
+                    </div>
+                )}
             </div>
         </div>
       </div>
+
+      <AddCourseModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onRefresh={fetchCourses} 
+      />
     </div>
   );
 };
