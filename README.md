@@ -97,10 +97,6 @@ Farmigo/
    TWILIO_AUTH_TOKEN=your_token
    TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
    
-   # Default Admin (Auto-seeded on start)
-   Email=admin@farmigo.com
-   Password=AdminPassword@123
-   ```
 4. Start the development server:
    ```bash
    npm run dev
