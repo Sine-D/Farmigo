@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   FaSearch, FaMapMarkerAlt, FaCog, FaMoon, FaThLarge,
-  FaWind, FaTint, FaChevronRight, FaSun, FaCloudSun, FaCloud, FaCloudRain, FaSnowflake, FaBolt
+  FaWind, FaTint, FaChevronRight, FaSun, FaCloudSun, FaCloud, FaCloudRain, FaSnowflake, FaBolt, FaTachometerAlt
 } from 'react-icons/fa';
 
 const API_KEY = 'c15a125db1c412dd6244e6ff6c1b054b'; // OpenWeather API Key
