@@ -51,6 +51,20 @@ body {
   /* Prevent horizontal scroll */
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE and Edge */
+  
+  /* Disable text selection and copying */
+  user-select: none;
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none; /* Firefox */
+  -ms-user-select: none; /* IE10+ */
+}
+
+/* Re-enable selection for interactive input elements */
+input, textarea, [contenteditable="true"] {
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
