@@ -48,8 +48,8 @@ const WeatherWidget = () => {
       forecastData.list.forEach(item => {
         const date = new Date(item.dt * 1000);
         const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
-        // Try to get forecasts around midday
-        if (!seenDays.has(dayName) && date.getHours() >= 11 && date.getHours() <= 15) {
+        // Try to get forecasts around midday, excluding Thursday
+        if (!seenDays.has(dayName) && date.getHours() >= 11 && date.getHours() <= 15 && dayName !== 'Thu') {
           seenDays.add(dayName);
           dailyForecast.push({
             day: dayName,
@@ -126,9 +126,6 @@ const WeatherWidget = () => {
         <div className="flex items-center gap-3 w-full md:w-auto justify-end">
           <button className="text-gray-400 hover:text-white transition-colors"><FaCog size={18} /></button>
           <button className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.3)]"><FaMoon size={14} /></button>
-          <div className="w-8 h-8 bg-gray-500 rounded-full overflow-hidden border-2 border-white/10">
-             <img src="https://i.pravatar.cc/100?img=47" alt="Profile" className="w-full h-full object-cover"/>
-          </div>
         </div>
       </div>
 
@@ -186,19 +183,27 @@ const WeatherWidget = () => {
                <button className="text-xs font-medium flex items-center gap-1 bg-white/5 backdrop-blur-md px-3 py-1.5 rounded-full text-gray-300 hover:text-white hover:bg-white/10 transition-colors shadow-inner border border-white/5">View wide <span className="text-[10px]">✨</span></button>
              </div>
              
-             <div className="relative h-[220px] bg-white/5 backdrop-blur-md rounded-[28px] overflow-hidden border border-white/5 shadow-inner group">
-                {/* Map Background */}
-                <div className="absolute inset-0 opacity-20 bg-[url('https://upload.wikimedia.org/wikipedia/commons/e/ee/Sri_Lanka_location_map.svg')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{filter: 'invert(1) hue-rotate(90deg)'}}></div>
+             <div className="relative h-[220px] bg-[#0d1a0d] rounded-[28px] overflow-hidden border border-white/5 shadow-inner group">
+                {/* Genuine Satellite Imagery of Sri Lanka */}
+                <div 
+                  className="absolute inset-0 opacity-60 bg-[url('https://upload.wikimedia.org/wikipedia/commons/b/b2/Sri_Lanka_satellite_view.jpg')] bg-cover bg-center transition-transform duration-1000 group-hover:scale-110" 
+                  style={{filter: 'brightness(0.7) contrast(1.1) saturate(1.2)'}}
+                ></div>
                 
+                {/* Overlay Grid Line Pattern for Tech Look */}
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,_transparent_1px),_linear-gradient(90deg,rgba(255,255,255,0.03)_1px,_transparent_1px)] bg-[size:20px_20px] pointer-events-none"></div>
+
                 {/* Overlay Card */}
-                <div className="absolute flex flex-col items-center justify-center p-5 bg-[#132b13]/40 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                <div className="absolute flex flex-col items-center justify-center p-5 bg-[#0d1a0d]/60 backdrop-blur-sm rounded-2xl border border-white/10 shadow-2xl left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
                    <p className="text-white text-xs font-bold mb-3 text-center tracking-wide leading-tight px-4 max-w-[200px]">Explore detailed agricultural weather data across districts.</p>
                    <button className="w-full py-2.5 bg-gradient-to-r from-[#71f66a] to-[#137f13] text-white font-black rounded-xl text-xs hover:opacity-90 hover:scale-105 transition-all shadow-[0_5px_15px_rgba(113,246,106,0.3)]">Get started</button>
                 </div>
                 
-                {/* Map Pins */}
+                {/* Interactive Map Pins with Glow */}
                 {otherCities.map((c, i) => (
-                  <div key={i} className={`absolute w-3 h-3 bg-[#71f66a] rounded-full shadow-[0_0_15px_rgba(113,246,106,0.8)] border-2 border-[#0d1a0d] ${i === 0 ? 'top-[40%] left-[45%]' : i === 1 ? 'bottom-[20%] left-[40%]' : 'top-[20%] left-[45%]'}`} title={c.city}></div>
+                  <div key={i} className={`absolute w-3.5 h-3.5 bg-[#71f66a] rounded-full shadow-[0_0_20px_rgba(113,246,106,1)] border-2 border-white/40 z-10 animate-pulse ${i === 0 ? 'top-[45%] left-[48%]' : i === 1 ? 'bottom-[15%] left-[42%]' : 'top-[15%] left-[52%]'}`} title={c.city}>
+                    <div className="absolute -inset-2 bg-[#71f66a]/20 rounded-full blur-sm"></div>
+                  </div>
                 ))}
              </div>
           </div>
