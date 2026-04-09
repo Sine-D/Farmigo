@@ -126,7 +126,7 @@ const WeatherWidget = () => {
         <div className="flex items-center gap-3 w-full md:w-auto justify-end">
           <button className="text-gray-400 hover:text-white transition-colors"><FaCog size={18} /></button>
           <button className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.3)]"><FaMoon size={14} /></button>
-          <div className="w-8 h-8 bg-gray-500 rounded-full overflow-hidden border-2 border-[#333]">
+          <div className="w-8 h-8 bg-gray-500 rounded-full overflow-hidden border-2 border-white/10">
              <img src="https://i.pravatar.cc/100?img=47" alt="Profile" className="w-full h-full object-cover"/>
           </div>
         </div>
@@ -137,13 +137,13 @@ const WeatherWidget = () => {
         {/* Left Column */}
         <div className="flex-1">
           {/* Tabs */}
-          <div className="flex justify-between items-center mb-6 border-b border-[#333] pb-2">
+          <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-2">
             <div className="flex gap-6 text-sm">
-               <button className="text-white font-bold border-b-2 border-white pb-2 relative top-[9px]">Today</button>
+               <button className="text-white font-bold border-b-2 border-[#71f66a] pb-2 relative top-[9px]">Today</button>
                <button className="text-gray-400 font-medium hover:text-white pb-2 transition-colors">Tomorrow</button>
                <button className="text-gray-400 font-medium hover:text-white pb-2 transition-colors">Next 5 days</button>
             </div>
-            <div className="hidden sm:flex bg-[#2b2b2b] rounded-full p-1 text-xs shadow-inner">
+            <div className="hidden sm:flex bg-white/5 rounded-full p-1 text-xs shadow-inner ring-1 ring-white/5">
               <button className="bg-white text-black rounded-full px-4 py-1.5 font-bold shadow-sm">Forecast</button>
               <button className="text-gray-400 font-medium px-4 py-1.5 hover:text-white transition-colors">Air quality</button>
             </div>
@@ -152,26 +152,26 @@ const WeatherWidget = () => {
           {/* Days Row */}
           <div className="flex gap-3 overflow-x-auto pb-4 custom-scrollbar">
             {/* Current Day Highlighted */}
-            <div className="bg-gradient-to-br from-[#cce0ff] to-[#a3c2ff] text-black rounded-[28px] p-5 min-w-[220px] flex-shrink-0 flex flex-col justify-between relative shadow-[0_10px_30px_rgba(163,194,255,0.2)]">
+            <div className="bg-gradient-to-br from-[#d4fcd4] to-[#71f66a] text-[#0d1a0d] rounded-[28px] p-5 min-w-[220px] flex-shrink-0 flex flex-col justify-between relative shadow-[0_10px_30px_rgba(113,246,106,0.2)]">
                <div className="flex justify-between items-start mb-2">
                  <span className="font-black text-lg">{new Date().toLocaleDateString('en-US', { weekday: 'long' })}</span>
-                 <span className="text-xs font-black uppercase text-gray-700 bg-white/40 px-2 py-1 rounded-lg backdrop-blur-sm">{new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                 <span className="text-xs font-black uppercase text-[#137f13] bg-white/40 px-2 py-1 rounded-lg backdrop-blur-sm">{new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                </div>
                <div className="flex items-center gap-3 mb-4">
                  <span className="text-6xl font-black tracking-tighter">{currentWeather ? Math.round(currentWeather.main.temp) : '--'}°</span>
                  <span className="text-4xl drop-shadow-md">{currentWeather ? getWeatherIcon(currentWeather.weather[0].main) : '⛅'}</span>
                </div>
-               <div className="grid grid-cols-2 gap-y-3 text-[10px] font-bold text-gray-800">
-                 <div className="flex items-center gap-1.5 bg-white/30 px-2 py-1.5 rounded-lg"><FaSun className="text-yellow-600"/> Feels: {currentWeather ? Math.round(currentWeather.main.feels_like) : '--'}°</div>
+               <div className="grid grid-cols-2 gap-y-3 text-[10px] font-bold text-[#0d1a0d]/80">
+                 <div className="flex items-center gap-1.5 bg-white/30 px-2 py-1.5 rounded-lg"><FaSun className="text-orange-600"/> Feels: {currentWeather ? Math.round(currentWeather.main.feels_like) : '--'}°</div>
                  <div className="flex items-center gap-1.5 bg-white/30 px-2 py-1.5 rounded-lg"><FaTint className="text-blue-600"/> Humid: {currentWeather ? currentWeather.main.humidity : '--'}%</div>
-                 <div className="flex items-center gap-1.5 bg-white/30 px-2 py-1.5 rounded-lg"><FaWind className="text-gray-600"/> Wind: {currentWeather ? Math.round(currentWeather.wind.speed * 3.6) : '--'} Km/h</div>
-                 <div className="flex items-center gap-1.5 bg-white/30 px-2 py-1.5 rounded-lg"><FaTachometerAlt className="text-gray-600"/> Pres: {currentWeather ? currentWeather.main.pressure : '--'}MB</div>
+                 <div className="flex items-center gap-1.5 bg-white/30 px-2 py-1.5 rounded-lg"><FaWind className="text-emerald-700"/> Wind: {currentWeather ? Math.round(currentWeather.wind.speed * 3.6) : '--'} Km/h</div>
+                 <div className="flex items-center gap-1.5 bg-white/30 px-2 py-1.5 rounded-lg"><FaTachometerAlt className="text-emerald-700"/> Pres: {currentWeather ? currentWeather.main.pressure : '--'}MB</div>
                </div>
             </div>
 
             {/* Forecast Days */}
             {forecastList.map((d, i) => (
-              <div key={i} className="bg-[#2b2b2b] rounded-[28px] p-4 min-w-[85px] flex flex-col items-center justify-between py-6 flex-shrink-0 border border-[#333] hover:bg-[#333] hover:border-gray-600 transition-all cursor-pointer shadow-sm hover:shadow-lg hover:-translate-y-1">
+              <div key={i} className="bg-white/5 backdrop-blur-md rounded-[28px] p-4 min-w-[85px] flex flex-col items-center justify-between py-6 flex-shrink-0 border border-white/5 hover:bg-white/10 hover:border-[#71f66a]/30 transition-all cursor-pointer shadow-sm hover:shadow-lg hover:-translate-y-1">
                  <span className="text-sm font-bold text-gray-400 mb-4">{d.day}</span>
                  <span className="text-3xl mb-4 drop-shadow-lg">{d.icon}</span>
                  <span className="text-lg font-black">{d.temp}</span>
@@ -183,22 +183,22 @@ const WeatherWidget = () => {
           <div className="mt-8">
              <div className="flex justify-between items-center mb-4">
                <h3 className="font-bold text-lg">Sri Lanka map</h3>
-               <button className="text-xs font-medium flex items-center gap-1 bg-[#2b2b2b] px-3 py-1.5 rounded-full text-gray-300 hover:text-white hover:bg-[#333] transition-colors shadow-inner">View wide <span className="text-[10px]">✨</span></button>
+               <button className="text-xs font-medium flex items-center gap-1 bg-white/5 backdrop-blur-md px-3 py-1.5 rounded-full text-gray-300 hover:text-white hover:bg-white/10 transition-colors shadow-inner border border-white/5">View wide <span className="text-[10px]">✨</span></button>
              </div>
              
-             <div className="relative h-[220px] bg-[#222] rounded-[28px] overflow-hidden border border-[#333] shadow-inner group">
+             <div className="relative h-[220px] bg-white/5 backdrop-blur-md rounded-[28px] overflow-hidden border border-white/5 shadow-inner group">
                 {/* Map Background */}
-                <div className="absolute inset-0 opacity-30 bg-[url('https://upload.wikimedia.org/wikipedia/commons/e/ee/Sri_Lanka_location_map.svg')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{filter: 'invert(1)'}}></div>
+                <div className="absolute inset-0 opacity-20 bg-[url('https://upload.wikimedia.org/wikipedia/commons/e/ee/Sri_Lanka_location_map.svg')] bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{filter: 'invert(1) hue-rotate(90deg)'}}></div>
                 
                 {/* Overlay Card */}
-                <div className="absolute flex flex-col items-center justify-center p-5 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                <div className="absolute flex flex-col items-center justify-center p-5 bg-[#132b13]/40 backdrop-blur-md rounded-2xl border border-white/10 shadow-2xl left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
                    <p className="text-white text-xs font-bold mb-3 text-center tracking-wide leading-tight px-4 max-w-[200px]">Explore detailed agricultural weather data across districts.</p>
-                   <button className="w-full py-2.5 bg-gradient-to-r from-[#d8c4ff] to-[#cba6ff] text-[#4a2b8c] font-black rounded-xl text-xs hover:opacity-90 hover:scale-105 transition-all shadow-[0_5px_15px_rgba(216,196,255,0.3)]">Get started</button>
+                   <button className="w-full py-2.5 bg-gradient-to-r from-[#71f66a] to-[#137f13] text-white font-black rounded-xl text-xs hover:opacity-90 hover:scale-105 transition-all shadow-[0_5px_15px_rgba(113,246,106,0.3)]">Get started</button>
                 </div>
                 
                 {/* Map Pins */}
                 {otherCities.map((c, i) => (
-                  <div key={i} className={`absolute w-3 h-3 bg-yellow-400 rounded-full shadow-[0_0_15px_rgba(250,204,21,0.8)] border-2 border-[#222] ${i === 0 ? 'top-[40%] left-[45%]' : i === 1 ? 'bottom-[20%] left-[40%]' : 'top-[20%] left-[45%]'}`} title={c.city}></div>
+                  <div key={i} className={`absolute w-3 h-3 bg-[#71f66a] rounded-full shadow-[0_0_15px_rgba(113,246,106,0.8)] border-2 border-[#0d1a0d] ${i === 0 ? 'top-[40%] left-[45%]' : i === 1 ? 'bottom-[20%] left-[40%]' : 'top-[20%] left-[45%]'}`} title={c.city}></div>
                 ))}
              </div>
           </div>
@@ -208,13 +208,13 @@ const WeatherWidget = () => {
         <div className="w-full lg:w-[320px] flex flex-col gap-8">
            
            {/* Chance of Rain Graph */}
-           <div className="bg-[#2b2b2b] rounded-[28px] p-6 border border-[#333] shadow-inner relative overflow-hidden">
+           <div className="bg-white/5 backdrop-blur-md rounded-[28px] p-6 border border-white/5 shadow-inner relative overflow-hidden">
              {/* Decorative Gradient */}
-             <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 blur-3xl rounded-full"></div>
+             <div className="absolute top-0 right-0 w-32 h-32 bg-[#71f66a]/10 blur-3xl rounded-full"></div>
              
              <h3 className="font-bold text-sm mb-6 flex justify-between items-center">
                Chance of rain
-               <span className="bg-[#1c1c1c] p-2 rounded-xl"><FaCloudRain className="text-blue-400" /></span>
+               <span className="bg-white/5 p-2 rounded-xl border border-white/5"><FaCloudRain className="text-[#71f66a]" /></span>
              </h3>
              <div className="flex items-end gap-3 h-[130px] relative mt-2">
                 <div className="absolute -left-2 flex flex-col justify-between h-full text-[9px] font-bold text-gray-500 py-1">
@@ -222,10 +222,10 @@ const WeatherWidget = () => {
                   <span>Sunny</span>
                   <span>Rainy</span>
                 </div>
-                <div className="ml-10 flex items-end gap-4 w-full h-[120px] pb-4 border-b border-[#333]">
+                <div className="ml-10 flex items-end gap-4 w-full h-[120px] pb-4 border-b border-white/10">
                    {(forecastList.length > 0 ? forecastList.map(f => f.rainProb) : [40, 20, 80, 50, 40, 90]).slice(0,6).map((h, i) => (
-                     <div key={i} className="w-full bg-white/10 hover:bg-white/40 transition-colors rounded-t-lg relative group flex items-end justify-center" style={{height: `${Math.max(h, 10)}%`}}> 
-                       <div className="absolute opacity-0 group-hover:opacity-100 -top-8 bg-[#1c1c1c] text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg transition-opacity whitespace-nowrap">
+                     <div key={i} className="w-full bg-[#71f66a]/20 hover:bg-[#71f66a]/50 transition-colors rounded-t-lg relative group flex items-end justify-center" style={{height: `${Math.max(h, 10)}%`}}> 
+                       <div className="absolute opacity-0 group-hover:opacity-100 -top-8 bg-[#132b13] text-white text-[10px] font-bold px-2 py-1 rounded shadow-lg transition-opacity whitespace-nowrap border border-white/10">
                          {h}%
                        </div>
                        {h > 50 && <div className="absolute -top-4 w-full text-center text-[10px] animate-bounce">💧</div>}
@@ -242,18 +242,18 @@ const WeatherWidget = () => {
            <div className="flex-1 mt-2">
              <div className="flex justify-between items-center mb-5">
                <h3 className="font-bold text-sm">Other major districts</h3>
-               <button className="text-gray-400 font-bold text-[10px] uppercase tracking-wider hover:text-white flex items-center bg-[#2b2b2b] px-3 py-1.5 rounded-full transition-colors">Show All <FaChevronRight className="ml-1 text-[8px]" /></button>
+               <button className="text-gray-400 font-bold text-[10px] uppercase tracking-wider hover:text-white flex items-center bg-white/5 border border-white/5 px-3 py-1.5 rounded-full transition-colors">Show All <FaChevronRight className="ml-1 text-[8px]" /></button>
              </div>
              
              <div className="flex flex-col gap-3">
                 {otherCities.map((c, i) => (
-                  <div key={i} className="bg-[#2b2b2b] rounded-2xl p-4 flex justify-between items-center border border-[#333] hover:bg-[#333] hover:border-gray-600 transition-all cursor-pointer shadow-sm hover:shadow-lg group">
+                  <div key={i} className="bg-white/5 backdrop-blur-md rounded-2xl p-4 flex justify-between items-center border border-white/5 hover:bg-white/10 hover:border-[#71f66a]/30 transition-all cursor-pointer shadow-sm hover:shadow-lg group">
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-1">{c.region}</p>
-                      <h4 className="font-black text-sm mb-1 group-hover:text-emerald-400 transition-colors">{c.city}</h4>
+                      <h4 className="font-black text-sm mb-1 group-hover:text-[#71f66a] transition-colors">{c.city}</h4>
                       <p className="text-[11px] font-medium text-gray-400">{c.condition}</p>
                     </div>
-                    <div className="flex flex-col items-center bg-[#1c1c1c] px-4 py-2 rounded-xl group-hover:bg-[#222]">
+                    <div className="flex flex-col items-center bg-white/5 px-4 py-2 rounded-xl group-hover:bg-white/10 border border-white/5">
                       <span className="text-2xl mb-1 drop-shadow-md">{c.icon}</span>
                       <span className="font-black text-sm">{c.temp}</span>
                     </div>
