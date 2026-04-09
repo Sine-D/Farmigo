@@ -118,7 +118,7 @@ const Navbar = () => {
                   onClick={() => setExpanded(false)}
                 >
                   <FaUserCircle className="fs-5" />
-                  <span>{user.role === 'Admin' ? "Admin Panel" : "Member Portal"}</span>
+                  <span>{user.role === 'Admin' ? "Admin Panel" : "My Dashboard"}</span>
                 </Link>
                 <button 
                   onClick={handleLogout}
@@ -134,7 +134,7 @@ const Navbar = () => {
                 style={{ background: "linear-gradient(135deg, #71f66a, #137f13)", textDecoration: "none" }}
                 onClick={() => setExpanded(false)}
               >
-                Access Account
+                Login
               </Link>
             )}
           </div>
