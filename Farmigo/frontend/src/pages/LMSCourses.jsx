@@ -128,38 +128,6 @@ const LMSCourses = () => {
 
 
 
-                        {/* Trust indicators */}
-                        <div className="mt-16 flex flex-wrap items-center justify-center gap-8 md:gap-16 opacity-70">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 shadow-inner">
-                                    <FaUsers className="text-xl text-[#ccff00]" />
-                                </div>
-                                <div className="text-left">
-                                    <h4 className="text-white font-black text-xl leading-none mb-1">10k+</h4>
-                                    <p className="text-[9px] text-white/50 uppercase tracking-widest font-black">Active Students</p>
-                                </div>
-                            </div>
-                            <div className="w-px h-10 bg-white/10 hidden md:block"></div>
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 shadow-inner">
-                                    <FaShieldAlt className="text-xl text-[#ccff00]" />
-                                </div>
-                                <div className="text-left">
-                                    <h4 className="text-white font-black text-xl leading-none mb-1">Certified</h4>
-                                    <p className="text-[9px] text-white/50 uppercase tracking-widest font-black">Expert Instructors</p>
-                                </div>
-                            </div>
-                            <div className="w-px h-10 bg-white/10 hidden md:block"></div>
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10 shadow-inner">
-                                    <FaCheckCircle className="text-xl text-[#ccff00]" />
-                                </div>
-                                <div className="text-left">
-                                    <h4 className="text-white font-black text-xl leading-none mb-1">Lifetime</h4>
-                                    <p className="text-[9px] text-white/50 uppercase tracking-widest font-black">Course Access</p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </section>

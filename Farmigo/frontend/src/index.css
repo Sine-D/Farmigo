@@ -447,7 +447,7 @@ body.dark .marquee-content {
   .announcement-bar {
     width: 100%;
     padding: 8px 10px;
-    top: 56px;
+    top: 85px;
     /* if navbar height smaller on mobile */
   }
 
@@ -461,7 +461,7 @@ body.dark .marquee-content {
 @media (max-width: 900px) {
   .announcement-bar {
     padding: 9px 15px;
-    top: 64px;
+    top: 85px;
     border-radius: 50px;
   }
 
@@ -1858,6 +1858,7 @@ body.dark .user-info {
   .announcement-bar {
     width: 100% !important;
     border-radius: 50px !important;
+    top: 85px !important;
   }
 }
 
