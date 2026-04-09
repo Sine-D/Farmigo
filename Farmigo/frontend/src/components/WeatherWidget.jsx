@@ -95,31 +95,31 @@ const WeatherWidget = () => {
   };
 
   return (
-    <div className="w-full max-w-[1200px] mx-auto bg-[#1c1c1c] text-white p-6 md:p-8 rounded-[32px] font-sans my-12 relative overflow-hidden" style={{boxShadow: '0 20px 50px rgba(0,0,0,0.5)'}}>
-      {loading && <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
-        <div className="animate-spin w-12 h-12 border-4 border-white border-t-transparent rounded-full opacity-50"></div>
+    <div className="w-full max-w-[1200px] mx-auto bg-gradient-to-br from-[#0d1a0d] to-[#132b13] text-white p-6 md:p-8 rounded-[32px] font-sans my-12 relative overflow-hidden ring-1 ring-white/10" style={{boxShadow: '0 25px 60px rgba(0,0,0,0.4)'}}>
+      {loading && <div className="absolute inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div className="animate-spin w-12 h-12 border-4 border-[#71f66a] border-t-transparent rounded-full"></div>
       </div>}
       
       {/* Top Navbar */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4 relative z-10">
         <div className="flex items-center gap-4 w-full md:w-auto">
-          <button className="w-10 h-10 bg-[#2b2b2b] rounded-full flex items-center justify-center text-gray-300 hover:bg-[#3b3b3b] shadow-inner">
+          <button className="w-10 h-10 bg-white/5 backdrop-blur-md rounded-full flex items-center justify-center text-gray-300 hover:bg-white/10 ring-1 ring-white/10 transition-all shadow-inner">
             <FaThLarge />
           </button>
-          <div className="flex items-center gap-2 text-gray-300 text-sm font-bold bg-[#2b2b2b] px-4 py-2 rounded-full">
-            <FaMapMarkerAlt className="text-emerald-400" />
+          <div className="flex items-center gap-2 text-gray-200 text-sm font-bold bg-white/5 backdrop-blur-md px-4 py-2 rounded-full ring-1 ring-white/10">
+            <FaMapMarkerAlt className="text-[#71f66a]" />
             <span>{currentWeather ? `${currentWeather.name}, ${currentWeather.sys.country}` : 'Loading...'}</span>
           </div>
         </div>
 
         <form onSubmit={handleSearch} className="relative w-full md:w-[400px]">
-          <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 focus:text-white transition-colors" />
+          <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 focus:text-[#71f66a] transition-colors" />
           <input 
             type="text" 
             placeholder="Search Sri Lankan city..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#2b2b2b] text-white font-medium rounded-full py-2.5 pl-12 pr-4 outline-none focus:ring-2 focus:ring-[#4a5568] focus:bg-[#333] transition-all text-sm shadow-inner"
+            className="w-full bg-white/5 text-white font-medium rounded-full py-2.5 pl-12 pr-4 outline-none focus:ring-2 focus:ring-[#71f66a]/30 focus:bg-white/10 transition-all text-sm shadow-inner ring-1 ring-white/5"
           />
         </form>
 
