@@ -171,3 +171,17 @@ The API follows RESTful principles. Most protected routes require a Bearer Token
 - `PUT /api/users/:id/role` - Update user role
 - `GET /api/admin/stats` - Platform analytics
 - `GET /api/delivery/all` - Monitor all deliveries
+
+---
+
+## 📊 Reports & Quality Assurance
+
+Comprehensive project health and deployment reports are maintained in the `/reports` directory:
+
+- **[Testing & Static Analysis Report](./reports/testing_report.md)**: Details on code quality, linting results, and API coverage.
+- **[Deployment Readiness Report](./reports/deployment_report.md)**: Infrastructure configuration, build status, and deployment instructions.
+
+### How to Retrieve Reports
+1. **Linting Report**: Run `npm run lint` in the `frontend` folder to generate a fresh code quality scan.
+2. **API Documentation**: Visit `/api-docs` when the backend is running for live Swagger documentation.
+3. **App Metrics (Admin)**: Access the Sustainability Dashboard or Admin Stats within the application for real-time functional reports.
