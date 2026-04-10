@@ -1,13 +1,14 @@
 require('dotenv').config();
 const express = require('express');
-const mongoose = require("mongoose");
-
 const cors = require('cors');
 const connectDB = require('./config/db');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
+
+// Routes
 const userRoutes = require('./routes/userRoutes');
 const ticketRoutes = require('./routes/ticketRoutes');
 const productRoutes = require('./routes/productRoutes');
+const inventoryRoutes = require('./routes/inventoryRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
@@ -18,43 +19,45 @@ const makeOrderRoute = require('./routes/makeOrderRoute');
 const paymentRoutes = require('./routes/paymentRoutes');
 const disputeRoutes = require('./routes/disputeRoutes');
 const orderRoutes = require('./routes/orderRoutes');
-
-
-const { swaggerUi, specs } = require('./config/swagger');
 const refundRoutes = require('./routes/refundRoutes');
 const payoutRoutes = require('./routes/payoutRoutes');
 const invoiceRoutes = require('./routes/invoiceRoutes');
 const deliveryRoutes = require('./routes/deliveryRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 
-const User = require('./models/userModel');
-connectDB().then(async () => {
-    // Seed Admin User
-    const adminEmail = 'admin@farmigo.com';
-    const adminExists = await User.findOne({ email: adminEmail });
-    
-    if (!adminExists) {
-        await User.create({
-            name: 'System Admin',
-            email: adminEmail,
-            password: 'AdminPassword@123',
-            role: 'Admin',
-            isApproved: true,
-            isActive: true
-        });
-        console.log('Admin user created');
-    } else {
-        adminExists.password = 'AdminPassword@123';
-        adminExists.role = 'Admin';
-        await adminExists.save();
-        console.log('Admin user updated');
-    }
-}).catch(err => console.error("MongoDB Connection Error: ", err));
+// Swagger
+const { swaggerUi, specs } = require('./config/swagger');
 
-const app = express();
+const startServer = async () => {
+    try {
+        await connectDB();
 
-app.use(express.json());
-app.use(cors());
+        // ✅ Seed Admin User
+        const User = require('./models/userModel');
+        const adminEmail = 'admin@farmigo.com';
+        const adminExists = await User.findOne({ email: adminEmail });
+
+        if (!adminExists) {
+            await User.create({
+                name: 'System Admin',
+                email: adminEmail,
+                password: 'AdminPassword@123',
+                role: 'Admin',
+                isApproved: true,
+                isActive: true,
+            });
+            console.log('Admin user created');
+        } else {
+            adminExists.password = 'AdminPassword@123';
+            adminExists.role = 'Admin';
+            await adminExists.save();
+            console.log('Admin user updated');
+        }
+
+        const app = express();
+
+        app.use(express.json());
+        app.use(cors());
 
         // Swagger Docs
         app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
@@ -65,11 +68,15 @@ app.use(cors());
         });
 
         // Routes
-        app.post('/api/contact', contactRoutes); // Fallback direct
+        app.post('/api/contact', contactRoutes);
         app.use('/api/contact', contactRoutes);
         app.use('/api/users', userRoutes);
         app.use('/api/tickets', ticketRoutes);
         app.use('/api/products', productRoutes);
+
+        // ✅ YOUR INVENTORY (IMPORTANT)
+        app.use('/api/inventory', inventoryRoutes);
+
         app.use('/api/orders', orderRoutes);
         app.use('/api/admin', adminRoutes);
         app.use('/api/notifications', notificationRoutes);
@@ -84,16 +91,21 @@ app.use(cors());
         app.use('/api/payouts', payoutRoutes);
         app.use('/api/invoices', invoiceRoutes);
         app.use('/api/delivery', deliveryRoutes);
+
         // Error Middleware
         app.use(notFound);
         app.use(errorHandler);
 
         const PORT = process.env.PORT || 5000;
 
-        if (process.env.NODE_ENV !== 'production') {
-            app.listen(PORT, () => {
-                console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-            });
-        }
+        app.listen(PORT, () => {
+            console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+        });
 
-        module.exports = app;
+    } catch (error) {
+        console.error('Server failed to start:', error.message);
+        process.exit(1);
+    }
+};
+
+startServer();
