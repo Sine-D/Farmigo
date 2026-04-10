@@ -11,7 +11,7 @@ import {
 
 const navLinks = [
   { path: "/", section: "home", display: "Home" },
-  { path: "/explore", display: "Marketplace" },
+  { path: "/marketplace", display: "Marketplace" },
   { path: "/lms", display: "LMS Academy" },
   { path: "/", section: "about", display: "About Us" },
   { path: "/", section: "contact", display: "Contact" },
@@ -112,7 +112,7 @@ const Navbar = () => {
             {user ? (
               <div className="d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-2">
                 <Link
-                  to={user.role === 'Admin' ? "/admin" : "/dashboard"}
+                  to={user.role === 'Admin' ? "/admin" : user.role === 'Farmer' ? "/inventory/manage" : "/dashboard"}
                   className="d-flex align-items-center justify-content-center gap-2 px-5 py-2.5 rounded-xl font-bold text-white transition-all duration-300 hover:-translate-y-1 shadow-[0_10px_20px_rgba(113,246,106,0.2)]"
                   style={{ background: "linear-gradient(135deg, #137f13, #0d1a0d)", textDecoration: "none" }}
                   onClick={() => setExpanded(false)}

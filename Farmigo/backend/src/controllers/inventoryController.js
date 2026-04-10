@@ -381,7 +381,7 @@ exports.getLowStockItems = asyncHandler(async (req, res) => {
  * @access  Private
  */
 exports.getExpiringItems = asyncHandler(async (req, res) => {
-    const days = Math.max(1, parseInt(req.query.days) || 7);
+    const days = Math.max(1, parseInt(req.query.days) || 3);
     const { farmerId } = req.query;
 
     const now = new Date();
@@ -464,8 +464,23 @@ exports.getStockStats = asyncHandler(async (req, res) => {
                             },
                             lowStockCount: {
                                 $sum: {
-                                    $cond: [{ $lt: ["$quantity", "$minimumStockLevel"] }, 1, 0],
+                                    $cond: [{ $lte: ["$quantity", "$minimumStockLevel"] }, 1, 0],
                                 },
+                            },
+                            expiringSoonCount: {
+                                $sum: {
+                                    $cond: [
+                                        {
+                                            $and: [
+                                                { $exists: ["$expiryDate", true] },
+                                                { $lte: ["$expiryDate", new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)] },
+                                                { $gte: ["$expiryDate", new Date()] }
+                                            ]
+                                        },
+                                        1,
+                                        0
+                                    ]
+                                }
                             },
                             outOfStockCount: {
                                 $sum: { $cond: [{ $eq: ["$quantity", 0] }, 1, 0] },

@@ -2,8 +2,8 @@
  * ProductCard.jsx – Marketplace product card for FARMIGO inventory items.
  * Displays all key fields from the Inventory schema.
  */
-import { useState } from "react";
-import { FaStar, FaLeaf, FaMapMarkerAlt, FaShoppingCart, FaCheckCircle } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { FaStar, FaLeaf, FaMapMarkerAlt, FaShoppingCart, FaCheckCircle, FaGlobe } from "react-icons/fa";
 import { useCart } from "../../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import {
@@ -13,11 +13,17 @@ import {
   getCategoryImage,
   categoryConfig,
 } from "../../utils/formatters";
+import { getUSDRate, formatUSD } from "../../services/currencyService";
 
 const ProductCard = ({ item }) => {
   const { addToCart, cartItems } = useCart();
   const navigate = useNavigate();
   const [imgError, setImgError] = useState(false);
+  const [usdRate, setUsdRate] = useState(null);
+
+  useEffect(() => {
+    getUSDRate().then(setUsdRate);
+  }, []);
 
   const stock = getStockStatus(item.quantity, item.minimumStockLevel);
   const catCfg = categoryConfig[item.category] || categoryConfig.other;
@@ -84,10 +90,17 @@ const ProductCard = ({ item }) => {
 
         {/* Price + Location row */}
         <div className="flex items-center justify-between mb-2">
-          <span className="text-emerald-700 font-black text-lg">
-            {formatCurrency(item.pricePerUnit, item.currency || "LKR")}
-            <span className="text-gray-400 font-normal text-xs">/{item.unit}</span>
-          </span>
+          <div className="flex flex-col">
+            <span className="text-emerald-700 font-black text-lg">
+              {formatCurrency(item.pricePerUnit, item.currency || "LKR")}
+              <span className="text-gray-400 font-normal text-xs">/{item.unit}</span>
+            </span>
+            {usdRate && (
+              <span className="text-[10px] text-gray-400 font-bold flex items-center gap-1 -mt-1">
+                <FaGlobe className="text-[9px]" /> {formatUSD(item.pricePerUnit, usdRate)} USD
+              </span>
+            )}
+          </div>
           {item.location && (
             <div className="flex items-center gap-1 text-xs text-gray-400">
               <FaMapMarkerAlt className="text-[10px]" />

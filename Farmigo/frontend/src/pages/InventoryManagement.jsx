@@ -72,6 +72,9 @@ const InventoryManagement = () => {
   useEffect(() => {
     if (!user || !localStorage.getItem("token")) {
       navigate("/login");
+    } else if (user.role !== "Farmer" && user.role !== "admin" && user.role !== "Admin") {
+      toast.error("Unauthorized: You must be a farmer or admin to access this dashboard");
+      navigate("/marketplace");
     }
   }, [user, navigate]);
 

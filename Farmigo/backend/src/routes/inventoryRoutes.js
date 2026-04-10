@@ -25,6 +25,7 @@ const {
 
 
 const { validate, createInventorySchema, updateInventorySchema, reduceStockSchema } = require("../middleware/validate");
+const { protect, authorize } = require("../middleware/authMiddleware");
 const Inventory = require("../models/Inventory");
 
 // ─── Public Routes ────────────────────────────────────────────────────────────
@@ -73,25 +74,6 @@ const Inventory = require("../models/Inventory");
  */
 router.get("/", getAllInventory);
 
-/**
- * @swagger
- * /api/inventory/{id}:
- *   get:
- *     summary: Get a single inventory item by ID
- *     tags: [Inventory]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema: { type: string }
- *     responses:
- *       200:
- *         description: Inventory item details
- *       404:
- *         description: Item not found
- */
-router.get("/:id", getInventoryById);
-
 // ─── Alert Routes (Protected) ─────────────────────────────────────────────────
 
 /**
@@ -106,7 +88,7 @@ router.get("/:id", getInventoryById);
  *       200:
  *         description: Low stock items with urgency levels
  */
-router.get("/alerts/low-stock", getLowStockItems);
+router.get("/alerts/low-stock", protect, authorize("Farmer", "admin"), getLowStockItems);
 
 /**
  * @swagger
@@ -124,7 +106,7 @@ router.get("/alerts/low-stock", getLowStockItems);
  *       200:
  *         description: Expiring and already expired items
  */
-router.get("/alerts/expiring", getExpiringItems);
+router.get("/alerts/expiring", protect, authorize("Farmer", "admin"), getExpiringItems);
 
 // ─── Statistics ───────────────────────────────────────────────────────────────
 
@@ -140,7 +122,7 @@ router.get("/alerts/expiring", getExpiringItems);
  *       200:
  *         description: Aggregated inventory statistics
  */
-router.get("/stats/summary", getStockStats);
+router.get("/stats/summary", protect, authorize("Farmer", "admin"), getStockStats);
 
 // ─── Third-party Advisory ─────────────────────────────────────────────────────
 
@@ -160,7 +142,7 @@ router.get("/stats/summary", getStockStats);
  *       200:
  *         description: Weather data and farming advisories
  */
-router.get("/advisory/weather", getWeatherAdvisory);
+router.get("/advisory/weather", protect, authorize("Farmer", "admin"), getWeatherAdvisory);
 
 // ─── History Routes (Protected) ───────────────────────────────────────────────
 
@@ -176,7 +158,7 @@ router.get("/advisory/weather", getWeatherAdvisory);
  *       200:
  *         description: Paginated stock history
  */
-router.get("/history/my", getMyStockHistory);
+router.get("/history/my", protect, authorize("Farmer", "admin"), getMyStockHistory);
 
 /**
  * @swagger
@@ -190,7 +172,7 @@ router.get("/history/my", getMyStockHistory);
  *       200:
  *         description: Movement summary grouped by change type
  */
-router.get("/history/summary", getStockMovementSummary);
+router.get("/history/summary", protect, authorize("Farmer", "admin"), getStockMovementSummary);
 
 /**
  * @swagger
@@ -209,7 +191,7 @@ router.get("/history/summary", getStockMovementSummary);
  *       200:
  *         description: Paginated history for this item
  */
-router.get("/:id/history", getInventoryHistory);
+router.get("/:id/history", protect, authorize("Farmer", "admin"), getInventoryHistory);
 
 // ─── Farmer Routes ─────────────────────────────────────────────────────────────
 
@@ -227,6 +209,8 @@ router.get("/:id/history", getInventoryHistory);
  */
 router.get(
     "/my/listings",
+    protect,
+    authorize("Farmer", "admin"),
     getMyInventory
 );
 
@@ -254,6 +238,8 @@ router.get(
  */
 router.post(
     "/",
+    protect,
+    authorize("Farmer", "admin"),
     validate(createInventorySchema),
     createInventory
 );
@@ -283,6 +269,8 @@ router.post(
  */
 router.put(
     "/:id",
+    protect,
+    authorize("Farmer", "admin"),
     validate(updateInventorySchema),
     updateInventory
 );
@@ -308,6 +296,8 @@ router.put(
  */
 router.delete(
     "/:id",
+    protect,
+    authorize("Farmer", "admin"),
     deleteInventory
 );
 
@@ -332,6 +322,8 @@ router.delete(
  */
 router.delete(
     "/:id/hard",
+    protect,
+    authorize("admin"),
     hardDeleteInventory
 );
 
@@ -356,6 +348,8 @@ router.delete(
  */
 router.patch(
     "/:id/restore",
+    protect,
+    authorize("Farmer", "admin"),
     restoreInventory
 );
 
@@ -392,8 +386,13 @@ router.patch(
  */
 router.patch(
     "/:id/reduce-stock",
+    protect,
     validate(reduceStockSchema),
     reduceStock
 );
+
+// ─── Get Single (Moved after specific paths) ──────────────────────────────────
+
+router.get("/:id", getInventoryById);
 
 module.exports = router;

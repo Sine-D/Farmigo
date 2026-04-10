@@ -1,15 +1,6 @@
-/**
- * CartContext.jsx – Full cart state management with localStorage persistence.
- *
- * Replaces the minimal existing CartContext with a production-quality version:
- * - localStorage persistence (survives page refresh)
- * - stock limit enforcement
- * - item count badge
- * - total price & total items
- * - clearCart for post-checkout
- */
 import { createContext, useState, useEffect, useContext, useCallback } from "react";
 import { toast } from "sonner";
+import { reduceStock } from "../services/inventoryService";
 
 export const CartContext = createContext(null);
 
@@ -30,65 +21,82 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem(CART_KEY, JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // ── Add to Cart ─────────────────────────────────────────────────────────────
-  const addToCart = useCallback((product) => {
-    // product must have: _id (or id), productName, pricePerUnit, quantity (stock), unit
+  // ── Add to Cart (with Real-time Stock Reduction) ──────────────────────────
+  const addToCart = useCallback(async (product) => {
     const itemId = product._id || product.id;
     const availableStock = product.quantity ?? Infinity;
 
-    setCartItems((prev) => {
-      const existing = prev.find((i) => i._id === itemId);
+    if (availableStock <= 0) {
+      toast.error("This item is out of stock");
+      return;
+    }
 
-      if (existing) {
-        if (existing.cartQty >= availableStock) {
-          toast.warning(`Maximum available stock (${availableStock} ${product.unit || "units"}) already in cart`);
-          return prev;
+    try {
+      // Call backend to reduce stock immediately
+      const result = await reduceStock(itemId, {
+        quantityOrdered: 1,
+        note: "Added to cart (auto-reduction)"
+      });
+
+      if (result.lowStockWarning) {
+        toast.warning(result.lowStockWarning.message);
+      }
+
+      setCartItems((prev) => {
+        const existing = prev.find((i) => i._id === itemId);
+        if (existing) {
+          return prev.map((i) =>
+            i._id === itemId ? { ...i, cartQty: i.cartQty + 1 } : i
+          );
         }
-        toast.success(`${product.productName || product.name} quantity updated`);
-        return prev.map((i) =>
-          i._id === itemId ? { ...i, cartQty: i.cartQty + 1 } : i
-        );
-      }
 
-      if (availableStock === 0) {
-        toast.error("This item is out of stock");
-        return prev;
-      }
+        return [
+          ...prev,
+          {
+            _id: itemId,
+            productName: product.productName || product.name,
+            pricePerUnit: product.pricePerUnit || product.price,
+            unit: product.unit || "unit",
+            image: product.image || null,
+            farmerId: product.farmerId,
+            farmerName: product.farmerName || product.farmer || "FARMIGO Seller",
+            category: product.category,
+            availableStock: result.updatedInventory.quantity + 1, // Store what it was
+            isOrganic: product.isOrganic || false,
+            cartQty: 1,
+          },
+        ];
+      });
 
       toast.success(`🌿 ${product.productName || product.name} added to cart!`);
-      return [
-        ...prev,
-        {
-          _id: itemId,
-          productName: product.productName || product.name,
-          pricePerUnit: product.pricePerUnit || product.price,
-          unit: product.unit || "unit",
-          image: product.image || null,
-          farmerId: product.farmerId,
-          farmerName: product.farmerName || product.farmer || "FARMIGO Seller",
-          category: product.category,
-          availableStock,
-          isOrganic: product.isOrganic || false,
-          cartQty: 1,
-        },
-      ];
-    });
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Failed to add to cart");
+    }
   }, []);
 
   // ── Update Quantity ──────────────────────────────────────────────────────────
-  const updateQuantity = useCallback((itemId, newQty) => {
-    setCartItems((prev) =>
-      prev.map((i) => {
-        if (i._id !== itemId) return i;
-        if (newQty < 1) return i;
-        if (newQty > i.availableStock) {
-          toast.warning(`Only ${i.availableStock} ${i.unit} available`);
-          return i;
-        }
-        return { ...i, cartQty: newQty };
-      })
-    );
-  }, []);
+  const updateQuantity = useCallback(async (itemId, newQty) => {
+    const item = cartItems.find(i => i._id === itemId);
+    if (!item) return;
+
+    const diff = newQty - item.cartQty;
+    if (diff === 0) return;
+
+    if (diff > 0) {
+      try {
+        await reduceStock(itemId, { quantityOrdered: diff, note: "Cart quantity increased" });
+        setCartItems(prev => prev.map(i => i._id === itemId ? { ...i, cartQty: newQty } : i));
+      } catch (err) {
+        toast.error(err.response?.data?.message || "Stock update failed");
+      }
+    } else {
+      // Releasing stock would require another endpoint or allowing negative numbers
+      // For this demo, we'll just update local state and warn the user
+      // Note: A production system would have an 'increase-stock' or 'cancel-reservation' endpoint
+      setCartItems(prev => prev.map(i => i._id === itemId ? { ...i, cartQty: newQty } : i));
+      toast.info("Stock released locally (Backend re-stocking simulated)");
+    }
+  }, [cartItems]);
 
   // ── Remove Item ──────────────────────────────────────────────────────────────
   const removeFromCart = useCallback((itemId) => {

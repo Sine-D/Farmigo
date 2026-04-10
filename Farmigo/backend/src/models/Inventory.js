@@ -130,7 +130,15 @@ inventorySchema.index({ productName: "text", description: "text", tags: "text" }
 
 // ── Virtual: isLowStock ───────────────────────────────────────────────────────
 inventorySchema.virtual("isLowStock").get(function () {
-    return this.quantity < this.minimumStockLevel;
+    return this.quantity <= this.minimumStockLevel;
+});
+
+// ── Virtual: isExpiring ──────────────────────────────────────────────────────
+inventorySchema.virtual("isExpiring").get(function () {
+    if (!this.expiryDate) return false;
+    const diff = this.expiryDate.getTime() - Date.now();
+    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    return days <= 3; // within 3 days OR already expired (negative days)
 });
 
 // ── Virtual: daysUntilExpiry ──────────────────────────────────────────────────
