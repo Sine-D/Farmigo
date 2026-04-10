@@ -135,9 +135,7 @@ const PlaceOrder = () => {
             <input name="postalCode" placeholder="Postal Code" onChange={handleChange} />
             <input name="country" placeholder="Country" onChange={handleChange} />
 
-            <button type="button" onClick={goToPayment}>
-              Continue to Payment →
-            </button>
+            
           </div>
 
           {/* RIGHT */}
@@ -153,11 +151,16 @@ const PlaceOrder = () => {
                   {selectedProduct.price *
                     formData.items[0].quantity}
                 </p>
+
+                <button type="button" onClick={goToPayment}>
+              Continue to Payment →
+            </button>
               </div>
             ) : (
               <p>Select product</p>
             )}
           </div>
+          
         </form>
       </div>
     </div>

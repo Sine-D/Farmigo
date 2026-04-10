@@ -27,7 +27,9 @@ import { Toaster } from "sonner";
 import PlaceOrder from "./pages/PlaceOrder";
 import BuyerOrders from "./pages/BuyerOrders";
 import FarmerOrders from "./pages/FarmerOrders";
-import Payment from "./pages/PaymentPage";
+import PaymentPage from "./pages/PaymentPage";
+import PaymentSuccess from "./pages/PaymentSuccess";
+import CancelOrder from "./pages/CancelOrder";
 
 const sectionMap = {
   "/": "home",
@@ -76,6 +78,8 @@ const LayoutWrapper = ({ children }) => {
     "/dashboard",
     "/checkout",
     "/payment",
+    "/payment-success",
+    "/cancel-order",
     "/buyer-orders",
     "/farmer-orders",
   ];
@@ -121,7 +125,9 @@ const App = () => {
 
           {/* Orders */}
           <Route path="/checkout" element={<PlaceOrder />} />
-          <Route path="/payment" element={< Payment/>} />
+          <Route path="/payment" element={< PaymentPage/>} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/cancel-order" element={<CancelOrder />} />
           <Route path="/buyer-orders" element={<BuyerOrders />} />
           <Route path="/farmer-orders" element={<FarmerOrders />} />
         </Routes>
