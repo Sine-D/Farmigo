@@ -8,6 +8,8 @@ import {
 } from 'react-icons/fa';
 import { toast } from 'sonner';
 import AdminSidebar from '../components/AdminSidebar';
+import { API_BASE_URL } from '../utils/api';
+
 
 const SupportManagement = () => {
   const navigate = useNavigate();
@@ -26,7 +28,7 @@ const SupportManagement = () => {
   const fetchTickets = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5001/api/tickets/admin', {
+      const response = await fetch(`${API_BASE_URL}/tickets/admin`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -48,7 +50,7 @@ const SupportManagement = () => {
   const updateStatus = async (id, status) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/tickets/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/tickets/${id}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -91,137 +93,154 @@ const SupportManagement = () => {
   });
 
   return (
-    <div className="min-h-screen bg-[#f4f7f6] flex">
-      <AdminSidebar />
+    <div className="min-h-screen bg-[#f4f8f5] flex relative overflow-hidden font-sans">
+      <div className="absolute top-[0%] left-[20%] w-[40%] h-[40%] bg-emerald-300/20 rounded-full mix-blend-multiply filter blur-[100px] pointer-events-none"></div>
+      <div className="absolute bottom-[10%] right-[10%] w-[30%] h-[30%] bg-[#ccff00]/10 rounded-full mix-blend-multiply filter blur-[100px] pointer-events-none"></div>
       
-      <div className="flex-1 ml-72 p-8 pt-10">
-        {/* Top Header */}
-        <div className="flex items-center justify-between mb-10 bg-white p-6 rounded-[32px] shadow-sm border border-gray-100">
-          <div className="relative w-96">
-            <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+      <AdminSidebar className="relative z-20" />
+      
+      <div className="flex-1 ml-72 p-8 xl:p-12 relative z-10 h-screen overflow-y-auto w-full">
+        {/* Top Header Floating */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
+          <div className="relative w-full md:w-[450px] group">
+            <FaSearch className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#137f13] transition-colors text-lg" />
             <input 
               type="text" 
               placeholder="Search tickets by subject or farmer..." 
-              className="w-full pl-12 pr-4 py-3 bg-gray-50 rounded-2xl border-none focus:ring-2 focus:ring-[#137f13]/20 transition-all text-sm font-medium"
+              className="w-full pl-14 pr-6 py-4 bg-white/70 backdrop-blur-2xl rounded-[30px] border border-white shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] focus:bg-white focus:ring-4 focus:ring-[#137f13]/10 transition-all font-bold text-gray-700 outline-none placeholder-gray-400"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
 
           <div className="flex items-center gap-6">
-            <button className="relative p-3 bg-gray-50 rounded-2xl text-gray-600 hover:bg-gray-100 transition-all">
-              <FaBell />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+            <button className="relative w-14 h-14 bg-white/70 backdrop-blur-2xl border border-white rounded-[24px] text-gray-500 hover:text-[#137f13] hover:bg-white transition-all shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] flex items-center justify-center cursor-pointer group">
+              <FaBell className="text-xl group-hover:scale-110 transition-transform" />
+              <span className="absolute top-4 right-4 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
             </button>
-            <div className="flex items-center gap-4 pl-6 border-l border-gray-100">
-              <div className="text-right">
-                <p className="text-sm font-black text-gray-900">{user?.name}</p>
-                <p className="text-[10px] font-bold text-[#137f13] uppercase tracking-widest">Support Lead</p>
+            <div className="flex items-center gap-4 p-2 pr-6 bg-white/70 backdrop-blur-2xl border border-white rounded-[32px] shadow-[0_15px_40px_-15px_rgba(0,0,0,0.05)] cursor-pointer hover:bg-white transition-all group">
+              <div className="w-12 h-12 bg-gradient-to-br from-[#137f13] to-emerald-400 rounded-[24px] flex items-center justify-center text-white font-black shadow-lg shadow-emerald-500/30 group-hover:scale-105 transition-transform">
+                {user?.name?.substring(0, 2).toUpperCase() || 'SL'}
               </div>
-              <div className="w-12 h-12 bg-[#ccff00] rounded-2xl flex items-center justify-center text-[#1c2a1c] font-black shadow-lg">
-                SL
+              <div className="text-left">
+                <p className="text-sm font-black text-gray-900 leading-tight">{user?.name || 'Admin'}</p>
+                <p className="text-[10px] font-bold text-[#137f13] uppercase tracking-widest leading-tight">Support Lead</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Header Area */}
-        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 mb-10">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-[#137f13] text-white rounded-xl flex items-center justify-center shadow-lg shadow-[#137f13]/20">
-                <FaHeadset className="text-xl" />
-              </div>
-              <h1 className="text-3xl font-black text-gray-900 tracking-tight">Support Management</h1>
-            </div>
-            <p className="text-gray-500 font-medium">Coordinate resolution for farmer technical issues and disputes.</p>
-          </div>
+        {/* Hero Panel (Premium Glass styling) */}
+        <div className="relative bg-white/80 backdrop-blur-3xl p-10 rounded-[40px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] border border-white overflow-hidden group mb-10">
+            <div className="absolute right-0 top-0 w-1/2 h-full bg-gradient-to-l from-[#ccff00]/10 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
+            
+            <div className="relative z-10 flex flex-col xl:flex-row items-start xl:items-center justify-between gap-8">
+                <div>
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100/50 text-emerald-700 border border-emerald-200/50 rounded-2xl text-[10px] font-black uppercase tracking-widest mb-5">
+                        <FaHeadset className="text-sm" /> Support Engine
+                    </div>
+                    <h1 className="text-5xl font-black text-gray-900 tracking-tight mb-4 leading-tight">Support <br />Management</h1>
+                    <p className="text-gray-500 font-bold max-w-sm leading-relaxed text-sm">
+                        Coordinate resolution for farmer technical issues and disputes.
+                    </p>
+                </div>
 
-          <div className="flex items-center gap-3 bg-white p-2 rounded-2xl shadow-sm border border-gray-100 text-gray-500">
-            {['All', 'Open', 'Pending', 'Closed'].map(f => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${
-                  filter === f ? 'bg-[#137f13] text-white shadow-md' : 'hover:bg-gray-50'
-                }`}
-              >
-                {f}
-              </button>
-            ))}
-          </div>
+                <div className="flex flex-wrap items-center gap-3 bg-white/60 p-2 rounded-3xl shadow-sm border border-white/80 uppercase tracking-widest text-[9px] font-black text-gray-500">
+                  {['All', 'Open', 'Pending', 'Closed'].map(f => (
+                    <button
+                      key={f}
+                      onClick={() => setFilter(f)}
+                      className={`px-6 py-4 rounded-2xl transition-all ${
+                        filter === f ? 'bg-[#137f13] text-white shadow-lg shadow-[#137f13]/30' : 'hover:bg-white'
+                      }`}
+                    >
+                      {f}
+                    </button>
+                  ))}
+                </div>
+            </div>
         </div>
 
         {/* Tickets Grid */}
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-              <div className="animate-spin w-8 h-8 border-4 border-[#137f13] border-t-transparent rounded-full" />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-4">
-            {filteredTickets.map((ticket) => (
-              <div 
-                key={ticket._id}
-                className="bg-white rounded-[28px] p-6 border border-gray-100 hover:shadow-xl hover:border-[#137f13]/20 transition-all group flex flex-col md:flex-row items-center justify-between gap-6"
-              >
-                <div className="flex items-center gap-6 flex-1 w-full">
-                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-xl shadow-inner flex-shrink-0 ${getPriorityColor(ticket.priority)}`}>
-                    {getStatusIcon(ticket.status)}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-1">
-                      <h3 className="text-lg font-black text-gray-900 tracking-tight group-hover:text-[#137f13] transition-colors">{ticket.subject}</h3>
-                      <span className={`text-[10px] font-black px-2 py-0.5 rounded-full border ${getPriorityColor(ticket.priority)}`}>
-                        {ticket.priority.toUpperCase()}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4 text-xs font-bold text-gray-400">
-                      <span className="flex items-center gap-1.5"><FaTicketAlt className="text-[10px]" /> Ticket ID: #{ticket._id.slice(-6)}</span>
-                      <span className="hidden sm:block w-1 h-1 bg-gray-300 rounded-full" />
-                      <span className="hidden sm:block">Farmer: {ticket.user?.name}</span>
-                      <span className="hidden sm:block w-1 h-1 bg-gray-300 rounded-full" />
-                      <span className="hidden sm:block">Raised: {new Date(ticket.createdAt).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                </div>
+        <div className="bg-white/80 backdrop-blur-3xl rounded-[40px] p-8 lg:p-10 border border-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)]">
+            <div className="flex items-center justify-between mb-8">
+                <h3 className="text-xl font-black text-gray-900 tracking-tight flex items-center gap-4">
+                    <span className="w-12 h-12 bg-white text-[#137f13] rounded-[20px] flex items-center justify-center text-xl shadow-inner border border-emerald-50">
+                        <FaTicketAlt />
+                    </span>
+                    Active Tickets
+                </h3>
+            </div>
 
-                <div className="flex items-center gap-3">
-                  <button 
-                    onClick={() => navigate(`/support/tickets/${ticket._id}`)}
-                    className="flex items-center gap-2 px-6 py-3 bg-[#137f13]/10 text-[#137f13] rounded-xl font-bold text-sm hover:bg-[#137f13] hover:text-white transition-all"
-                  >
-                    <FaReply /> Open Chat
-                  </button>
-                  
-                  {ticket.status !== 'Closed' && (
-                    <button 
-                      onClick={() => updateStatus(ticket._id, 'Closed')}
-                      className="p-3 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-600 hover:text-white transition-all shadow-sm"
-                      title="Mark as Resolved"
-                    >
-                      <FaCheckCircle />
-                    </button>
-                  )}
-
-                  <button className="p-3 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm">
-                    <FaTrashAlt />
-                  </button>
-                  
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-gray-300 group-hover:text-[#137f13] transition-colors">
-                    <FaChevronRight className="text-sm" />
-                  </div>
-                </div>
+            {loading ? (
+              <div className="flex items-center justify-center py-20 bg-white/50 rounded-[32px] border-2 border-dashed border-gray-200">
+                  <div className="animate-spin w-8 h-8 border-4 border-[#137f13] border-t-transparent rounded-full" />
               </div>
-            ))}
+            ) : (
+              <div className="space-y-4">
+                {filteredTickets.map((ticket) => (
+                  <div 
+                    key={ticket._id}
+                    className="flex flex-col md:flex-row items-center justify-between p-5 bg-white rounded-[32px] border border-gray-100 hover:border-[#137f13]/30 hover:shadow-[0_15px_40px_-15px_rgba(19,127,19,0.15)] hover:-translate-y-1 transition-all group duration-300 gap-6"
+                  >
+                    <div className="flex items-center gap-6 flex-1 w-full">
+                      <div className={`w-16 h-16 rounded-[24px] flex items-center justify-center text-2xl shadow-sm flex-shrink-0 group-hover:scale-105 transition-transform ${getPriorityColor(ticket.priority)}`}>
+                        {getStatusIcon(ticket.status)}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3 mb-2">
+                          <h3 className="text-lg font-black text-gray-900 tracking-tight group-hover:text-[#137f13] transition-colors uppercase">{ticket.subject}</h3>
+                          <span className={`text-[9px] font-black px-3 py-1 rounded-xl border ${getPriorityColor(ticket.priority)} uppercase tracking-widest`}>
+                            {ticket.priority.toUpperCase()}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-4 text-[10px] font-bold text-gray-400">
+                          <span className="flex items-center gap-1.5 uppercase tracking-widest bg-gray-50 px-3 py-1.5 rounded-lg"><FaTicketAlt className="text-[10px]" /> ID: #{ticket._id.slice(-6)}</span>
+                          <span className="flex items-center gap-1.5 uppercase tracking-widest bg-gray-50 px-3 py-1.5 rounded-lg">User: {ticket.user?.name}</span>
+                          <span className="flex items-center gap-1.5 uppercase tracking-widest bg-gray-50 px-3 py-1.5 rounded-lg">Date: {new Date(ticket.createdAt).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                    </div>
 
-            {filteredTickets.length === 0 && (
-              <div className="text-center py-20 bg-gray-50 rounded-[40px] border-2 border-dashed border-gray-200">
-                <FaTicketAlt className="text-5xl text-gray-200 mb-4 mx-auto" />
-                <p className="text-gray-400 font-bold">No tickets match your current filters.</p>
+                    <div className="flex items-center gap-3 mt-6 md:mt-0 w-full md:w-auto">
+                      <button 
+                        onClick={() => navigate(`/support/tickets/${ticket._id}`)}
+                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-4 bg-[#137f13]/10 text-[#137f13] rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-[#137f13] hover:text-white transition-all shadow-sm"
+                      >
+                        <FaReply /> Reply
+                      </button>
+                      
+                      {ticket.status !== 'Closed' && (
+                        <button 
+                          onClick={() => updateStatus(ticket._id, 'Closed')}
+                          className="flex-1 md:flex-none p-4 bg-emerald-50 text-emerald-600 rounded-2xl hover:bg-emerald-600 hover:text-white transition-all shadow-sm flex items-center justify-center"
+                          title="Mark as Resolved"
+                        >
+                          <FaCheckCircle />
+                        </button>
+                      )}
+
+                      <button className="flex-1 md:flex-none p-4 bg-red-50 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all shadow-sm flex items-center justify-center">
+                        <FaTrashAlt />
+                      </button>
+                      
+                      <div className="hidden lg:flex w-12 h-12 rounded-[20px] items-center justify-center text-gray-300 group-hover:text-[#137f13] group-hover:bg-emerald-50 transition-all cursor-pointer">
+                        <FaChevronRight className="text-lg" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {filteredTickets.length === 0 && (
+                  <div className="text-center py-20 bg-white/50 rounded-[32px] border-2 border-dashed border-gray-200">
+                    <FaTicketAlt className="text-5xl text-gray-200 mb-4 mx-auto" />
+                    <p className="text-gray-400 font-bold uppercase tracking-widest text-xs">No tickets match your current filters.</p>
+                  </div>
+                )}
               </div>
             )}
-          </div>
-        )}
+        </div>
+
       </div>
     </div>
   );

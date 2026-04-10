@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaLeaf, FaArrowRight } from "react-icons/fa";
 import { GoogleLogin } from '@react-oauth/google';
 import { toast } from "sonner";
+import { API_BASE_URL } from '../utils/api';
+
 
 const Login = () => {
   const navigate = useNavigate();
@@ -36,7 +38,7 @@ const Login = () => {
     setLoading(true);
     
     try {
-      const response = await fetch('http://localhost:5001/api/users/google', {
+      const response = await fetch(`${API_BASE_URL}/users/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ credential: credentialResponse.credential }),
@@ -76,7 +78,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5001/api/users/login', {
+      const response = await fetch(`${API_BASE_URL}/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -104,7 +106,7 @@ const Login = () => {
         toast.error(data.message || 'Login failed');
       }
     } catch (err) {
-      toast.error('Network error. Please make sure the server is running on port 5001.');
+      toast.error('Network error. Please try again later.');
     } finally {
       setLoading(false);
     }

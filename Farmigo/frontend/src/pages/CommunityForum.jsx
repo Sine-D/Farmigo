@@ -5,6 +5,8 @@ import {
   FaRegLightbulb, FaCheckCircle, FaBell
 } from 'react-icons/fa';
 import { toast } from 'sonner';
+import { API_BASE_URL } from '../utils/api';
+
 
 const CommunityForum = () => {
     const [posts, setPosts] = useState([]);
@@ -15,7 +17,7 @@ const CommunityForum = () => {
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                const response = await fetch('http://localhost:5001/api/community/forum');
+                const response = await fetch(`${API_BASE_URL}/community/forum`);
                 if (response.ok) {
                     const data = await response.json();
                     setPosts(data);

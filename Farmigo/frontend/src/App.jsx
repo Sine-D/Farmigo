@@ -14,9 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import SupportManagement from "./pages/SupportManagement";
 import SustainabilityManagement from "./pages/SustainabilityManagement";
-import CommunityManagement from "./pages/CommunityManagement";
 import LMSManagement from "./pages/LMSManagement";
-import CommunityForum from "./pages/CommunityForum";
 import LMSCourses from "./pages/LMSCourses";
 import Contact from "./pages/contact";
 import CartPage from "./pages/CartPage";
@@ -82,7 +80,6 @@ const LayoutWrapper = ({ children }) => {
     "/admin",
     "/admin/support",
     "/admin/sustainability",
-    "/admin/community",
     "/admin/lms",
   ];
 
@@ -98,12 +95,14 @@ const LayoutWrapper = ({ children }) => {
     shouldHideNavbar ||
     location.pathname === "/dashboard" ||
     location.pathname === "/profile" ||
+    location.pathname === "/lms" ||
+    location.pathname === "/explore" ||
     location.pathname === "/admin";
 
   const shouldHideFooter =
     location.pathname === "/login" ||
     location.pathname === "/signup" ||
-    location.pathname === "/admin";
+    location.pathname.startsWith("/admin");
 
   return (
     <>
@@ -132,9 +131,7 @@ const App = () => {
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/support" element={<SupportManagement />} />
           <Route path="/admin/sustainability" element={<SustainabilityManagement />} />
-          <Route path="/admin/community" element={<CommunityManagement />} />
           <Route path="/admin/lms" element={<LMSManagement />} />
-          <Route path="/community" element={<CommunityForum />} />
           <Route path="/lms" element={<LMSCourses />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/profile" element={<Profile />} />

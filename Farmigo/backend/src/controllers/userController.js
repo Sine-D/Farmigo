@@ -78,12 +78,6 @@ const authUser = async (req, res) => {
     throw new Error('Account is deactivated');
   }
 
-  // If farmer but not approved
-  if (user.role === 'Farmer' && !user.isApproved) {
-    res.status(403);
-    throw new Error('Farmer account pending admin approval');
-  }
-
   if (await user.matchPassword(password)) {
     res.json({
       _id: user._id,
