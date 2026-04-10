@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
-  FaLeaf, FaSignOutAlt, FaUser, FaSnowflake,
-  FaShoppingBasket, FaClipboardList, FaCog,
-  FaArrowRight, FaHeadset, FaRocket, FaShieldAlt, FaGraduationCap
+  FaLeaf,
+  FaSignOutAlt,
+  FaCog,
+  FaHeadset,
+  FaRocket
 } from 'react-icons/fa';
-import { BiMoon, BiSun, BiTrendingUp } from "react-icons/bi";
-import ContactHistory from '../components/ContactHistory';
 import ProfileModal from '../components/ProfileModal';
 import FarmerDashboard from '../components/FarmerDashboard';
 import BuyerDashboard from '../components/BuyerDashboard';
-
-
 import { toast } from "sonner";
 
 const Dashboard = () => {
@@ -23,6 +21,7 @@ const Dashboard = () => {
   useEffect(() => {
     const userData = localStorage.getItem('user');
     const token = localStorage.getItem('token');
+
     if (!userData || !token) {
       navigate('/login');
       return;
@@ -57,52 +56,71 @@ const Dashboard = () => {
       case 'Buyer':
         return <BuyerDashboard user={user} handleLogout={handleLogout} />;
       default:
-        // Fallback for Admin or unknown roles
         return <BuyerDashboard user={user} handleLogout={handleLogout} />;
     }
   };
 
-
   return (
     <div className="min-h-screen bg-[#fcfcfc] text-gray-900 font-sans">
       <div className="pt-[110px] pb-20 px-4 sm:px-8 max-w-[1400px] mx-auto">
-        
         {renderDashboardContent()}
 
-        {/* BOTTOM UTILITY SECTION - Common for all roles */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div 
-              className="bg-[#1c2a1c] rounded-[40px] p-8 md:p-10 text-white flex items-center justify-between shadow-2xl relative overflow-hidden group cursor-pointer"
-              onClick={() => setIsProfileOpen(true)}
-            >
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
-                <div>
-                    <h3 className="text-2xl font-black mb-2">Account Settings</h3>
-                    <p className="text-white/60 font-medium text-sm">Security & multi-channel preferences.</p>
-                </div>
-                <div className="w-14 h-14 bg-[#ccff00] text-[#1c2a1c] rounded-2xl flex items-center justify-center shadow-xl hover:scale-110 transition-transform">
-                    <FaCog className="text-xl" />
-                </div>
+        {/* COMMON ACTION CARDS */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10">
+          {/* Support Centre Card */}
+          <div
+            className="bg-[#f0fdf4] border border-[#bbf7d0] rounded-[40px] p-8 md:p-10 text-gray-900 flex items-center justify-between shadow-xl relative overflow-hidden group cursor-pointer hover:-translate-y-1 transition-all duration-300"
+            onClick={() => navigate('/support')}
+          >
+            <div className="absolute inset-0 opacity-30 pointer-events-none bg-[radial-gradient(circle_at_top_right,_rgba(19,127,19,0.10),_transparent_45%)]" />
+            <div >
+              <h3 className="text-2xl font-black mb-2">Support Centre</h3>
+              <p className="text-gray-600 font-medium text-sm max-w-[220px]">
+                Raise tickets, open disputes, and manage support conversations.
+              </p>
             </div>
+            <div className="w-14 h-14 bg-[#137f13] text-white rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform">
+              <FaHeadset className="text-xl" />
+            </div>
+          </div>
 
-            <div className="bg-gradient-to-br from-[#137f13] to-[#1c2a1c] rounded-[40px] p-8 md:p-10 text-white flex items-center justify-between shadow-xl relative overflow-hidden">
-                <div className="relative z-10 flex items-center gap-6">
-                    <div className="w-16 h-16 rounded-3xl bg-[#ccff00] flex items-center justify-center text-[#1c2a1c] text-2xl shadow-2xl">
-                        <FaRocket />
-                    </div>
-                    <div>
-                        <h4 className="text-xl font-black mb-1">Scale your Farm</h4>
-                        <p className="text-white/70 text-sm font-medium">Read our new trade analytics guide.</p>
-                    </div>
-                </div>
-                <div className="absolute bottom-0 right-0 p-4 opacity-5">
-                    <FaLeaf className="text-9xl" />
-                </div>
+          {/* Account Settings */}
+          <div
+            className="bg-[#1c2a1c] rounded-[40px] p-8 md:p-10 text-white flex items-center justify-between shadow-2xl relative overflow-hidden group cursor-pointer"
+            onClick={() => setIsProfileOpen(true)}
+          >
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
+            <div>
+              <h3 className="text-2xl font-black mb-2">Account Settings</h3>
+              <p className="text-white/60 font-medium text-sm">
+                Security & multi-channel preferences.
+              </p>
             </div>
+            <div className="w-14 h-14 bg-[#ccff00] text-[#1c2a1c] rounded-2xl flex items-center justify-center shadow-xl hover:scale-110 transition-transform">
+              <FaCog className="text-xl" />
+            </div>
+          </div>
+
+          {/* Scale your Farm */}
+          <div className="bg-gradient-to-br from-[#137f13] to-[#1c2a1c] rounded-[40px] p-8 md:p-10 text-white flex items-center justify-between shadow-xl relative overflow-hidden">
+            <div className="relative z-10 flex items-center gap-6">
+              <div className="w-16 h-16 rounded-3xl bg-[#ccff00] flex items-center justify-center text-[#1c2a1c] text-2xl shadow-2xl">
+                <FaRocket />
+              </div>
+              <div>
+                <h4 className="text-xl font-black mb-1">Scale your Farm</h4>
+                <p className="text-white/70 text-sm font-medium">
+                  Read our new trade analytics guide.
+                </p>
+              </div>
+            </div>
+            <div className="absolute bottom-0 right-0 p-4 opacity-5">
+              <FaLeaf className="text-9xl" />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Profile Sync Popup */}
       <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} />
     </div>
   );
