@@ -12,6 +12,8 @@ import {
 } from 'react-icons/fa';
 import { toast } from "sonner";
 import AdminSidebar from '../components/AdminSidebar';
+import { API_BASE_URL } from '../utils/api';
+
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -49,7 +51,7 @@ const AdminDashboard = () => {
     try {
       const token = localStorage.getItem('token');
 
-      const response = await fetch('http://localhost:5001/api/admin/stats', {
+      const response = await fetch(`${API_BASE_URL}/admin/stats`, {
         headers: {
           Authorization: `Bearer ${token}`
         }

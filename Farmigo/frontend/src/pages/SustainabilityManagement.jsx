@@ -7,6 +7,8 @@ import {
 } from 'react-icons/fa';
 import { toast } from 'sonner';
 import AdminSidebar from '../components/AdminSidebar';
+import { API_BASE_URL } from '../utils/api';
+
 
 const SustainabilityManagement = () => {
   const [metrics, setMetrics] = useState(null);
@@ -22,11 +24,11 @@ const SustainabilityManagement = () => {
 
   const fetchSustainabilityData = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/sustainability/metrics');
+      const response = await fetch(`${API_BASE_URL}/sustainability/metrics`);
       const metricsData = await response.json();
       setMetrics(metricsData);
 
-      const surplusRes = await fetch('http://localhost:5001/api/sustainability/surplus');
+      const surplusRes = await fetch(`${API_BASE_URL}/sustainability/surplus`);
       const surplusData = await surplusRes.json();
       setSurplusItems(surplusData);
     } catch (error) {

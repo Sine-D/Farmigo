@@ -5,6 +5,8 @@ import {
     FaClock, FaChartLine, FaShieldAlt, FaFilter, FaBell, FaTimes
 } from 'react-icons/fa';
 import { toast } from 'sonner';
+import { API_BASE_URL } from '../utils/api';
+
 
 const LMSCourses = () => {
     const [courses, setCourses] = useState([]);
@@ -17,7 +19,7 @@ const LMSCourses = () => {
         const fetchCourses = async () => {
             try {
                 // Using a fallback for the URL if env is not defined
-                const response = await fetch('http://localhost:5001/api/lms/courses');
+                const response = await fetch(`${API_BASE_URL}/lms/courses`);
                 if (response.ok) {
                     const data = await response.json();
                     setCourses(data);
@@ -62,7 +64,7 @@ const LMSCourses = () => {
             return;
         }
         try {
-            const response = await fetch(`http://localhost:5001/api/lms/courses/${course._id}/enroll`, {
+            const response = await fetch(`${API_BASE_URL}/lms/courses/${course._id}/enroll`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` }
             });

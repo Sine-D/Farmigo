@@ -7,6 +7,8 @@ import {
 import { toast } from 'sonner';
 import AdminSidebar from '../components/AdminSidebar';
 import AddCourseModal from '../components/AddCourseModal';
+import { API_BASE_URL } from '../utils/api';
+
 
 const LMSManagement = () => {
   const [courses, setCourses] = useState([]);
@@ -24,7 +26,7 @@ const LMSManagement = () => {
 
   const fetchCourses = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/lms/courses');
+      const response = await fetch(`${API_BASE_URL}/lms/courses`);
       const data = await response.json();
       if (response.ok) {
         setCourses(data);
@@ -60,7 +62,7 @@ const LMSManagement = () => {
     if (!window.confirm('Are you sure you want to delete this course?')) return;
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5001/api/lms/courses/${id}`, {
+        const response = await fetch(`${API_BASE_URL}/lms/courses/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
         });

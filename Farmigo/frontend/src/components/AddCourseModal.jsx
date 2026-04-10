@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FaTimes, FaPlus, FaTrash, FaGraduationCap, FaImage, FaLayerGroup, FaTags, FaAlignLeft, FaChartLine } from 'react-icons/fa';
 import { toast } from 'sonner';
+import { API_BASE_URL } from '../utils/api';
+
 
 const AddCourseModal = ({ isOpen, onClose, onRefresh, courseToEdit }) => {
   const [formData, setFormData] = useState({
@@ -78,8 +80,8 @@ const AddCourseModal = ({ isOpen, onClose, onRefresh, courseToEdit }) => {
       if (!dataToSubmit.duration) dataToSubmit.duration = '1h 00m';
 
       const url = courseToEdit 
-        ? `http://localhost:5001/api/lms/courses/${courseToEdit._id}`
-        : 'http://localhost:5001/api/lms/courses';
+        ? `${API_BASE_URL}/lms/courses/${courseToEdit._id}`
+        : `${API_BASE_URL}/lms/courses`;
       
       const method = courseToEdit ? 'PUT' : 'POST';
 

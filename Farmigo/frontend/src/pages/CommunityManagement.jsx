@@ -6,6 +6,8 @@ import {
 } from 'react-icons/fa';
 import { toast } from 'sonner';
 import AdminSidebar from '../components/AdminSidebar';
+import { API_BASE_URL } from '../utils/api';
+
 
 const CommunityManagement = () => {
   const [posts, setPosts] = useState([]);
@@ -22,7 +24,7 @@ const CommunityManagement = () => {
 
   const fetchPosts = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/community/forum');
+      const response = await fetch(`${API_BASE_URL}/community/forum`);
       const data = await response.json();
       if (response.ok) {
         setPosts(data);
@@ -44,7 +46,7 @@ const CommunityManagement = () => {
     if (!window.confirm("Are you sure you want to remove this post?")) return;
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/community/forum/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/community/forum/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

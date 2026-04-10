@@ -8,6 +8,8 @@ import {
 } from 'react-icons/fa';
 import { toast } from 'sonner';
 import AdminSidebar from '../components/AdminSidebar';
+import { API_BASE_URL } from '../utils/api';
+
 
 const SupportManagement = () => {
   const navigate = useNavigate();
@@ -26,7 +28,7 @@ const SupportManagement = () => {
   const fetchTickets = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5001/api/tickets/admin', {
+      const response = await fetch(`${API_BASE_URL}/tickets/admin`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -48,7 +50,7 @@ const SupportManagement = () => {
   const updateStatus = async (id, status) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5001/api/tickets/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/tickets/${id}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
