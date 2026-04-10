@@ -103,8 +103,11 @@ const DisputeChatPage = () => {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-[#f4f7f6]">
-      <main className="max-w-[1300px] mx-auto px-4 sm:px-8 py-10">
+    <div className="min-h-screen bg-[#f4f8f5] relative overflow-hidden">
+      <div className="absolute top-[0%] left-[20%] w-[40%] h-[40%] bg-emerald-300/20 rounded-full mix-blend-multiply filter blur-[100px] pointer-events-none"></div>
+      <div className="absolute bottom-[10%] right-[10%] w-[30%] h-[30%] bg-[#ccff00]/10 rounded-full mix-blend-multiply filter blur-[100px] pointer-events-none"></div>
+
+      <main className="max-w-[1300px] mx-auto px-4 sm:px-8 py-10 relative z-10">
         {error && (
           <div className="mb-5 rounded-2xl border border-red-200 bg-red-50 text-red-700 px-4 py-3 font-medium shadow-sm">
             {error}
@@ -125,33 +128,36 @@ const DisputeChatPage = () => {
           </div>
         ) : (
           <>
-            <div className="mb-8 bg-white rounded-[32px] border border-gray-100 shadow-sm p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-5">
-              <div className="flex items-center gap-4">
-                <Link
-                  to="/support?tab=disputes"
-                  className="w-12 h-12 rounded-2xl border border-gray-200 bg-[#f8faf8] flex items-center justify-center text-gray-700 hover:text-[#137f13] hover:border-[#137f13] transition no-underline"
-                >
-                  <FaArrowLeft />
-                </Link>
+            <div className="relative bg-white/80 backdrop-blur-3xl p-10 rounded-[40px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] border border-white overflow-hidden group mb-8">
+              <div className="absolute right-0 top-0 w-1/2 h-full bg-gradient-to-l from-[#ccff00]/10 to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"></div>
 
-                <div className="w-14 h-14 rounded-2xl bg-[#1c2a1c] text-[#ccff00] flex items-center justify-center text-xl shadow-lg">
-                  <FaExclamationTriangle />
-                </div>
+              <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+                <div className="flex items-start gap-5">
+                  <Link
+                    to="/support?tab=disputes"
+                    className="w-14 h-14 rounded-[20px] bg-white text-gray-700 border border-gray-200 shadow-sm flex items-center justify-center hover:text-[#137f13] hover:border-[#137f13] transition no-underline mt-1"
+                  >
+                    <FaArrowLeft />
+                  </Link>
 
-                <div>
-                  <h1 className="text-2xl font-black text-gray-900 tracking-tight">
-                    Dispute Conversation
-                  </h1>
-                  <p className="text-sm text-gray-500 font-medium">
-                    Review and resolve order-related issues professionally
-                  </p>
+                  <div>
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-100/50 text-emerald-700 border border-emerald-200/50 rounded-2xl text-[10px] font-black uppercase tracking-widest mb-5">
+                      <FaExclamationTriangle className="text-sm" /> Dispute Conversation
+                    </div>
+                    <h1 className="text-5xl font-black text-gray-900 tracking-tight mb-4 leading-tight">
+                      Dispute <br /> Chat
+                    </h1>
+                    <p className="text-gray-500 font-bold max-w-sm leading-relaxed text-sm">
+                      Review order-related issues, discuss resolutions, and maintain clear communication.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
               <div className="xl:col-span-1">
-                <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm p-6">
+                <div className="bg-white/80 backdrop-blur-3xl rounded-[40px] p-6 border border-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)]">
                   <h2 className="text-xl font-black text-gray-900 mb-5">{dispute.reason}</h2>
 
                   <div className="space-y-3 text-sm text-gray-600 font-medium">
@@ -219,7 +225,7 @@ const DisputeChatPage = () => {
               </div>
 
               <div className="xl:col-span-2">
-                <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm p-5 flex flex-col h-[72vh]">
+                <div className="bg-white/80 backdrop-blur-3xl rounded-[40px] p-5 border border-white shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] flex flex-col h-[72vh]">
                   <div className="flex-1 overflow-y-auto pr-1 space-y-4">
                     {messages.length === 0 ? (
                       <div className="h-full flex items-center justify-center text-center text-gray-500 font-medium">
