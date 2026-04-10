@@ -13,7 +13,7 @@ const Signup = () => {
     email: '',
     password: '',
     cpassword: '',
-    role: 'farmer',
+    role: 'buyer',
     farmName: ''
   });
   const [loading, setLoading] = useState(false);
@@ -63,7 +63,7 @@ const Signup = () => {
       toast.error('All fields are required');
       return false;
     }
-    if (formData.role === 'Farmer' && !formData.farmName) {
+    if (formData.role.toLowerCase() === 'farmer' && !formData.farmName) {
       toast.error('Farm Name is required for farmers');
       return false;
     }
@@ -210,7 +210,7 @@ const Signup = () => {
                 />
               </div>
 
-              {formData.role === 'farmer' && (
+              {formData.role.toLowerCase() === 'farmer' && (
                 <div>
                   <input
                     type="text"
