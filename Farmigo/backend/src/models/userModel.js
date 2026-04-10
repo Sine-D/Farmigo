@@ -82,11 +82,7 @@ const userSchema = mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true,
-    },
-    whatsappOptIn: {
-      type: Boolean,
-      default: false
-    },
+    }
   },
   { timestamps: true }
 );

@@ -83,7 +83,7 @@ const orderSchema = new mongoose.Schema(
       min: [0, 'Total amount cannot be negative'],
     },
 
-    // 🌱 HARVEST BASED SCHEDULING
+    //HARVEST BASED SCHEDULING
     isPreOrder: { type: Boolean, default: false },
 
     harvestDate: {

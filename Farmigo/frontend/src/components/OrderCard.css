@@ -1,0 +1,182 @@
+/* =========================
+   ORDER CARD WRAPPER
+========================= */
+.order-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid #e2e8f0;
+  transition: transform 0.2s ease;
+}
+
+.order-card:hover {
+  transform: translateY(-3px);
+}
+
+/* =========================
+   HEADER SECTION
+========================= */
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 15px;
+  border-bottom: 1px solid #edf2f7;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+
+.order-header h3 {
+  font-size: 18px;
+  font-weight: bold;
+  color: #2f855a;
+  margin-bottom: 6px;
+}
+
+.order-header p {
+  margin: 3px 0;
+  font-size: 14px;
+  color: #4a5568;
+}
+
+.order-header .total {
+  font-weight: bold;
+  color: #1a202c;
+  margin-top: 8px;
+}
+
+/* =========================
+   ACTION BUTTONS
+========================= */
+.order-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.order-actions button {
+  border: none;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+/* Cancel button */
+.cancel-btn {
+  background: #ecc94b;
+  color: #1a202c;
+}
+
+.cancel-btn:hover {
+  background: #d69e2e;
+  color: white;
+}
+
+/* Deliver button */
+.deliver-btn {
+  background: #38a169;
+  color: white;
+}
+
+.deliver-btn:hover {
+  background: #2f855a;
+}
+
+/* Delete button */
+.delete-btn {
+  background: #e53e3e;
+  color: white;
+}
+
+.delete-btn:hover {
+  background: #c53030;
+}
+
+/* =========================
+   ITEMS SECTION
+========================= */
+.order-items {
+  margin-top: 10px;
+}
+
+.order-items h4 {
+  font-size: 16px;
+  margin-bottom: 10px;
+  color: #2d3748;
+}
+
+.item-box {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  background: #f0fff4;
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  border: 1px solid #c6f6d5;
+}
+
+.item-box img {
+  width: 65px;
+  height: 65px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.item-name {
+  font-weight: 600;
+  color: #1a202c;
+}
+
+.item-box p {
+  margin: 2px 0;
+  font-size: 14px;
+  color: #4a5568;
+}
+
+/* =========================
+   SHIPPING BOX
+========================= */
+.shipping-box {
+  margin-top: 15px;
+  background: #f7fafc;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.shipping-box h4 {
+  font-size: 15px;
+  margin-bottom: 8px;
+  color: #2d3748;
+}
+
+.shipping-box p {
+  margin: 3px 0;
+  font-size: 14px;
+  color: #4a5568;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 768px) {
+  .order-header {
+    flex-direction: column;
+  }
+
+  .order-actions {
+    justify-content: flex-start;
+  }
+
+  .item-box {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

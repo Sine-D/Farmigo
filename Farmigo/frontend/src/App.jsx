@@ -23,10 +23,11 @@ import DisputeChatPage from "./pages/DisputeChatPage";
 import Profile from "./pages/Profile";
 import { Toaster } from "sonner";
 
-//  My
+// My
 import PlaceOrder from "./pages/PlaceOrder";
 import BuyerOrders from "./pages/BuyerOrders";
 import FarmerOrders from "./pages/FarmerOrders";
+import Payment from "./pages/PaymentPage";
 
 const sectionMap = {
   "/": "home",
@@ -73,14 +74,15 @@ const LayoutWrapper = ({ children }) => {
     "/signup",
     "/profile",
     "/dashboard",
+    "/checkout",
+    "/payment",
+    "/buyer-orders",
+    "/farmer-orders",
   ];
 
   const shouldHideLayout = hideLayoutPaths.includes(location.pathname);
 
-  const shouldHideAnnouncement =
-    shouldHideLayout ||
-    location.pathname === "/dashboard" ||
-    location.pathname === "/profile";
+  const shouldHideAnnouncement = shouldHideLayout;
 
   return (
     <>
@@ -119,6 +121,7 @@ const App = () => {
 
           {/* Orders */}
           <Route path="/checkout" element={<PlaceOrder />} />
+          <Route path="/payment" element={< Payment/>} />
           <Route path="/buyer-orders" element={<BuyerOrders />} />
           <Route path="/farmer-orders" element={<FarmerOrders />} />
         </Routes>

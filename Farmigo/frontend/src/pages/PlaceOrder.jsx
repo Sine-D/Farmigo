@@ -1,15 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { createOrder } from "../utils/orderApi";
+import { getProducts } from "../utils/productApi";
+import { useNavigate } from "react-router-dom";
 import "./PlaceOrder.css";
 
 const PlaceOrder = () => {
+  const navigate = useNavigate();
+
+  const [products, setProducts] = useState([]);
+
   const [formData, setFormData] = useState({
-    items: [
-      {
-        productId: "",
-        quantity: 1,
-      },
-    ],
+    items: [{ productId: "", quantity: 1 }],
     shippingAddress: {
       address: "",
       city: "",
@@ -17,9 +18,18 @@ const PlaceOrder = () => {
       country: "",
     },
     paymentMethod: "cash_on_delivery",
+    deliveryMethod: "standard",
   });
 
   const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const { data } = await getProducts();
+      setProducts(data.filter((p) => p.isApproved && p.countInStock > 0));
+    };
+    fetchProducts();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,126 +37,127 @@ const PlaceOrder = () => {
     if (["address", "city", "postalCode", "country"].includes(name)) {
       setFormData({
         ...formData,
-        shippingAddress: {
-          ...formData.shippingAddress,
-          [name]: value,
-        },
-      });
-    } else if (name === "productId" || name === "quantity") {
-      setFormData({
-        ...formData,
-        items: [
-          {
-            ...formData.items[0],
-            [name]: name === "quantity" ? Number(value) : value,
-          },
-        ],
+        shippingAddress: { ...formData.shippingAddress, [name]: value },
       });
     } else {
       setFormData({ ...formData, [name]: value });
     }
   };
 
-  const submitHandler = async (e) => {
-    e.preventDefault();
-    try {
-      const { data } = await createOrder(formData);
-      setMessage("Order placed successfully!");
-      console.log(data);
-    } catch (error) {
-      setMessage(error.response?.data?.message || "Order failed");
+  const selectedProduct = products.find(
+    (p) => p._id === formData.items[0].productId
+  );
+
+  const goToPayment = () => {
+    if (!selectedProduct) {
+      setMessage("Please select a product first");
+      return;
     }
+
+    navigate("/payment", {
+      state: {
+        orderData: {
+          farmerId: selectedProduct.farmer,
+          items: [
+            {
+              name: selectedProduct.name,
+              image: selectedProduct.image,
+              productId: selectedProduct._id,
+              quantity: formData.items[0].quantity,
+              price: selectedProduct.price,
+            },
+          ],
+          shippingAddress: formData.shippingAddress,
+          totalAmount:
+            selectedProduct.price * formData.items[0].quantity,
+        },
+      },
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 p-8">
-      <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-3xl p-8">
-        <h2 className="text-3xl font-bold text-green-700 mb-6">Place Order</h2>
+    <div className="place-order-page">
+      <div className="place-order-container">
+        <h2 className="place-order-title">Checkout</h2>
 
-        {message && (
-          <div className="mb-4 p-3 rounded-xl bg-green-100 text-green-700">
-            {message}
+        {message && <div className="success-msg">{message}</div>}
+
+        <form className="place-order-grid">
+          {/* LEFT */}
+          <div className="place-order-card">
+            <h2>Product Details</h2>
+
+            <select
+              name="productId"
+              value={formData.items[0].productId}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  items: [
+                    {
+                      ...formData.items[0],
+                      productId: e.target.value,
+                    },
+                  ],
+                })
+              }
+            >
+              <option value="">Select Product</option>
+              {products.map((p) => (
+                <option key={p._id} value={p._id}>
+                  {p.name} - Rs.{p.price}
+                </option>
+              ))}
+            </select>
+
+            <input
+              type="number"
+              name="quantity"
+              value={formData.items[0].quantity}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  items: [
+                    {
+                      ...formData.items[0],
+                      quantity: Number(e.target.value),
+                    },
+                  ],
+                })
+              }
+              min="1"
+            />
+
+            <h2>Shipping Details</h2>
+
+            <input name="address" placeholder="Address" onChange={handleChange} />
+            <input name="city" placeholder="City" onChange={handleChange} />
+            <input name="postalCode" placeholder="Postal Code" onChange={handleChange} />
+            <input name="country" placeholder="Country" onChange={handleChange} />
+
+            <button type="button" onClick={goToPayment}>
+              Continue to Payment →
+            </button>
           </div>
-        )}
 
-        <form onSubmit={submitHandler} className="space-y-4">
-          <input
-            type="text"
-            name="productId"
-            placeholder="Product ID"
-            value={formData.items[0].productId}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl"
-            required
-          />
+          {/* RIGHT */}
+          <div className="place-order-card">
+            <h2>Order Summary</h2>
 
-          <input
-            type="number"
-            name="quantity"
-            placeholder="Quantity"
-            value={formData.items[0].quantity}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl"
-            required
-          />
-
-          <input
-            type="text"
-            name="address"
-            placeholder="Address"
-            value={formData.shippingAddress.address}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl"
-            required
-          />
-
-          <input
-            type="text"
-            name="city"
-            placeholder="City"
-            value={formData.shippingAddress.city}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl"
-            required
-          />
-
-          <input
-            type="text"
-            name="postalCode"
-            placeholder="Postal Code"
-            value={formData.shippingAddress.postalCode}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl"
-            required
-          />
-
-          <input
-            type="text"
-            name="country"
-            placeholder="Country"
-            value={formData.shippingAddress.country}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl"
-            required
-          />
-
-          <select
-            name="paymentMethod"
-            value={formData.paymentMethod}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-xl"
-          >
-            <option value="cash_on_delivery">Cash on Delivery</option>
-            <option value="card">Card</option>
-            <option value="bank_transfer">Bank Transfer</option>
-          </select>
-
-          <button
-            type="submit"
-            className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-full font-semibold"
-          >
-            Place Order
-          </button>
+            {selectedProduct ? (
+              <div className="order-summary-box">
+                <p>{selectedProduct.name}</p>
+                <p>Qty: {formData.items[0].quantity}</p>
+                <p>
+                  Total: Rs.
+                  {selectedProduct.price *
+                    formData.items[0].quantity}
+                </p>
+              </div>
+            ) : (
+              <p>Select product</p>
+            )}
+          </div>
         </form>
       </div>
     </div>
