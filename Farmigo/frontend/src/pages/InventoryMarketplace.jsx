@@ -75,6 +75,11 @@ const InventoryMarketplace = () => {
 
   useEffect(() => {
     fetchInventory();
+
+    // Listen for live inventory updates
+    const handleUpdate = () => fetchInventory();
+    window.addEventListener("inventoryUpdated", handleUpdate);
+    return () => window.removeEventListener("inventoryUpdated", handleUpdate);
   }, [fetchInventory]);
 
   useEffect(() => {

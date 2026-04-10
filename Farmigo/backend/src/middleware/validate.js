@@ -20,10 +20,9 @@ const createInventorySchema = Joi.object({
 
     farmerId: Joi.string()
         .pattern(/^[a-f\d]{24}$/i)
-        .required()
+        .optional()
         .messages({
             "string.pattern.base": "farmerId must be a valid MongoDB ObjectId",
-            "any.required": "Farmer ID is required",
         }),
 
     category: Joi.string()
@@ -74,6 +73,7 @@ const createInventorySchema = Joi.object({
     tags: Joi.array().items(Joi.string().trim()).max(10).optional(),
 
     isOrganic: Joi.boolean().default(false),
+    image: Joi.string().allow("").optional(),
 }).options({ stripUnknown: true });
 
 const updateInventorySchema = Joi.object({
@@ -103,6 +103,7 @@ const updateInventorySchema = Joi.object({
     tags: Joi.array().items(Joi.string().trim()).max(10).optional(),
     isOrganic: Joi.boolean().optional(),
     isActive: Joi.boolean().optional(),
+    image: Joi.string().allow("").optional(),
 }).options({ stripUnknown: true });
 
 const reduceStockSchema = Joi.object({

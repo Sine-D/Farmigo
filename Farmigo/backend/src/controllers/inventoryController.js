@@ -41,7 +41,7 @@ const recordStockHistory = async ({
  * @access  Private (farmer, admin)
  */
 exports.createInventory = asyncHandler(async (req, res) => {
-    if (req.user && req.user.role === "farmer") {
+    if (req.user && req.user.role?.toLowerCase() === "farmer") {
         req.body.farmerId = req.user._id;
     }
 
@@ -344,7 +344,7 @@ exports.getLowStockItems = asyncHandler(async (req, res) => {
         $expr: { $lt: ["$quantity", "$minimumStockLevel"] },
     };
 
-    if (req.user && req.user.role === "farmer") {
+    if (req.user && req.user.role?.toLowerCase() === "farmer") {
         filter.farmerId = req.user._id;
     } else if (farmerId) {
         filter.farmerId = farmerId;
@@ -393,7 +393,7 @@ exports.getExpiringItems = asyncHandler(async (req, res) => {
         expiryDate: { $exists: true, $gte: now, $lte: thresholdDate },
     };
 
-    if (req.user && req.user.role === "farmer") {
+    if (req.user && req.user.role?.toLowerCase() === "farmer") {
         filter.farmerId = req.user._id;
     } else if (farmerId) {
         filter.farmerId = farmerId;
@@ -414,7 +414,7 @@ exports.getExpiringItems = asyncHandler(async (req, res) => {
     const expiredItems = await Inventory.find({
         isActive: true,
         expiryDate: { $exists: true, $lt: now },
-        ...(req.user?.role === "farmer"
+        ...(req.user?.role?.toLowerCase() === "farmer"
             ? { farmerId: req.user._id }
             : farmerId
                 ? { farmerId }
@@ -445,9 +445,12 @@ exports.getExpiringItems = asyncHandler(async (req, res) => {
  */
 exports.getStockStats = asyncHandler(async (req, res) => {
     const matchStage =
-        req.user && req.user.role === "farmer"
+        req.user && req.user.role?.toLowerCase() === "farmer"
             ? { farmerId: req.user._id }
             : {};
+
+    const now = new Date();
+    const threeDaysLater = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
 
     const [stats] = await Inventory.aggregate([
         { $match: matchStage },
@@ -458,13 +461,34 @@ exports.getStockStats = asyncHandler(async (req, res) => {
                         $group: {
                             _id: null,
                             totalItems: { $sum: 1 },
-                            activeItems: { $sum: { $cond: ["$isActive", 1, 0] } },
+                            activeItems: {
+                                $sum: { $cond: ["$isActive", 1, 0] },
+                            },
                             totalQuantityValue: {
-                                $sum: { $multiply: ["$quantity", "$pricePerUnit"] },
+                                $sum: {
+                                    $multiply: [
+                                        { $ifNull: ["$quantity", 0] },
+                                        { $ifNull: ["$pricePerUnit", 0] },
+                                    ],
+                                },
                             },
                             lowStockCount: {
                                 $sum: {
-                                    $cond: [{ $lte: ["$quantity", "$minimumStockLevel"] }, 1, 0],
+                                    $cond: [
+                                        {
+                                            $and: [
+                                                { $eq: ["$isActive", true] },
+                                                {
+                                                    $lte: [
+                                                        { $ifNull: ["$quantity", 0] },
+                                                        { $ifNull: ["$minimumStockLevel", 0] },
+                                                    ],
+                                                },
+                                            ],
+                                        },
+                                        1,
+                                        0,
+                                    ],
                                 },
                             },
                             expiringSoonCount: {
@@ -472,18 +496,30 @@ exports.getStockStats = asyncHandler(async (req, res) => {
                                     $cond: [
                                         {
                                             $and: [
-                                                { $exists: ["$expiryDate", true] },
-                                                { $lte: ["$expiryDate", new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)] },
-                                                { $gte: ["$expiryDate", new Date()] }
-                                            ]
+                                                { $eq: ["$isActive", true] },
+                                                { $ne: ["$expiryDate", null] },
+                                                { $gte: ["$expiryDate", now] },
+                                                { $lte: ["$expiryDate", threeDaysLater] },
+                                            ],
                                         },
                                         1,
-                                        0
-                                    ]
-                                }
+                                        0,
+                                    ],
+                                },
                             },
                             outOfStockCount: {
-                                $sum: { $cond: [{ $eq: ["$quantity", 0] }, 1, 0] },
+                                $sum: {
+                                    $cond: [
+                                        {
+                                            $and: [
+                                                { $eq: ["$isActive", true] },
+                                                { $eq: [{ $ifNull: ["$quantity", 0] }, 0] },
+                                            ],
+                                        },
+                                        1,
+                                        0,
+                                    ],
+                                },
                             },
                         },
                     },
@@ -494,8 +530,8 @@ exports.getStockStats = asyncHandler(async (req, res) => {
                         $group: {
                             _id: "$category",
                             count: { $sum: 1 },
-                            totalQuantity: { $sum: "$quantity" },
-                            avgPrice: { $avg: "$pricePerUnit" },
+                            totalQuantity: { $sum: { $ifNull: ["$quantity", 0] } },
+                            avgPrice: { $avg: { $ifNull: ["$pricePerUnit", 0] } },
                         },
                     },
                     { $sort: { count: -1 } },
@@ -504,7 +540,12 @@ exports.getStockStats = asyncHandler(async (req, res) => {
                     { $match: { isActive: true } },
                     {
                         $addFields: {
-                            totalValue: { $multiply: ["$quantity", "$pricePerUnit"] },
+                            totalValue: {
+                                $multiply: [
+                                    { $ifNull: ["$quantity", 0] },
+                                    { $ifNull: ["$pricePerUnit", 0] },
+                                ],
+                            },
                         },
                     },
                     { $sort: { totalValue: -1 } },
@@ -524,8 +565,21 @@ exports.getStockStats = asyncHandler(async (req, res) => {
         },
     ]);
 
+    const safeStats = {
+        overview: stats?.overview?.[0] || {
+            totalItems: 0,
+            activeItems: 0,
+            totalQuantityValue: 0,
+            lowStockCount: 0,
+            expiringSoonCount: 0,
+            outOfStockCount: 0,
+        },
+        byCategory: stats?.byCategory || [],
+        topValueItems: stats?.topValueItems || [],
+    };
+
     res.status(200).json(
-        new ApiResponse(200, stats, "Stock statistics retrieved successfully")
+        new ApiResponse(200, safeStats, "Stock statistics retrieved successfully")
     );
 });
 

@@ -117,6 +117,10 @@ const inventorySchema = new mongoose.Schema(
             default: true,
             index: true,
         },
+        image: {
+            type: String,
+            default: "",
+        },
     },
     {
         timestamps: true,
