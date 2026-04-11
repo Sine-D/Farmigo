@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import "./Payment.css";
 
@@ -6,15 +6,30 @@ const PaymentPage = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
 
+  // Configuration for charges
+  const COD_CHARGE = 450; // Extra charge for COD in Rs.
+
   const order = state?.orderData;
 
   const [method, setMethod] = useState("card");
+  const [totalWithCharges, setTotalWithCharges] = useState(order?.totalAmount || 0);
   const [card, setCard] = useState({
     number: "",
     name: "",
     expiry: "",
     cvv: "",
   });
+
+  // Update total whenever the payment method changes
+  useEffect(() => {
+    if (order) {
+      if (method === "cod") {
+        setTotalWithCharges(order.totalAmount + COD_CHARGE);
+      } else {
+        setTotalWithCharges(order.totalAmount);
+      }
+    }
+  }, [method, order]);
 
   if (!order) return <p className="page-title">No order data found.</p>;
 
@@ -27,14 +42,20 @@ const PaymentPage = () => {
 
   const canPay = method !== "card" ? true : isCardValid;
 
-  // Navigate to Payment Success Page
   const handlePay = () => {
     if (!canPay) return;
-    // You can pass the order data to the success page if needed
-    navigate("/payment-success", { state: { order } });
+
+    // We pass the updated total (including COD charges if any) to the success page
+    const finalOrderData = {
+      ...order,
+      paymentMethod: method,
+      finalTotal: totalWithCharges,
+      codCharges: method === "cod" ? COD_CHARGE : 0
+    };
+
+    navigate("/payment-success", { state: { order: finalOrderData } });
   };
 
-  // Navigate to Cancel Order Page with confirmation
   const handleCancel = () => {
     const confirmCancel = window.confirm("Are you sure you want to cancel this order?");
     if (confirmCancel) {
@@ -103,20 +124,24 @@ const PaymentPage = () => {
             {method === "card" && (
               <div className="card-form">
                 <input
+                  type="text"
                   placeholder="Card Number (16 digits)"
                   maxLength="16"
                   onChange={(e) => setCard({ ...card, number: e.target.value })}
                 />
                 <input
+                  type="text"
                   placeholder="Name on Card"
                   onChange={(e) => setCard({ ...card, name: e.target.value })}
                 />
                 <div style={{ display: "flex", gap: "10px" }}>
                   <input
+                    type="text"
                     placeholder="MM/YY"
                     onChange={(e) => setCard({ ...card, expiry: e.target.value })}
                   />
                   <input
+                    type="password"
                     placeholder="CVV"
                     maxLength="3"
                     onChange={(e) => setCard({ ...card, cvv: e.target.value })}
@@ -126,14 +151,13 @@ const PaymentPage = () => {
             )}
 
             <div className="payment-info">
-              {method === "card" && "Supports Visa, Mastercard, and AMEX"}
-              {method === "koko" && "Split your payment into 3 installments"}
-              {method === "cod" && "Pay when the items reach your doorstep"}
-              {method === "paypal" && "Safe and secure PayPal checkout"}
+              {method === "card" && "Supports Visa, Mastercard, and AMEX. Delivery included."}
+              {method === "koko" && "Split your payment into 3 installments."}
+              {method === "cod" && `Cash on Delivery includes an additional Rs. ${COD_CHARGE} handling fee.`}
+              {method === "paypal" && "Safe and secure PayPal checkout."}
             </div>
           </div>
 
-          {/* BACK BUTTON - Bottom of Left Side */}
           <button className="back-link-btn" onClick={() => navigate(-1)}>
             ← Back to Checkout
           </button>
@@ -149,9 +173,17 @@ const PaymentPage = () => {
             <p><b>Product:</b> {order.items[0].name}</p>
             <p><b>Quantity:</b> {order.items[0].quantity}</p>
             <p><b>Shipping to:</b> {order.shippingAddress.city}, {order.shippingAddress.country}</p>
+            
+            <div className="price-breakdown">
+                <p>Base Amount: Rs.{order.totalAmount}</p>
+                {method === "cod" && (
+                    <p className="extra-charge">COD Handling Fee: + Rs.{COD_CHARGE}</p>
+                )}
+            </div>
+
             <hr style={{ margin: "10px 0", border: "0.5px solid #eee" }} />
             <p style={{ fontSize: "1.2rem", color: "var(--primary-green)" }}>
-              <b>Total Amount: Rs.{order.totalAmount}</b>
+              <b>Total Amount: Rs.{totalWithCharges}</b>
             </p>
           </div>
 
@@ -162,7 +194,7 @@ const PaymentPage = () => {
               disabled={!canPay}
               style={{ opacity: canPay ? 1 : 0.6 }}
             >
-              Pay Now →
+              {method === "cod" ? "Confirm Order" : "Pay Now →"}
             </button>
 
             <button className="cancel-order-btn" onClick={handleCancel}>

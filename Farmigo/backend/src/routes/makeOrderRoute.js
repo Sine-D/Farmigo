@@ -29,4 +29,41 @@ router.put('/payment/:id', protect, updatePaymentStatus);
 // Delete an order completely (hard delete)
 router.delete('/:id', protect, deleteOrder);
 
+// ------------------- PAYMENT ROUTES ------------------- //
+router.put('/payment/:id', protect, updatePaymentStatus);
+
+// ✅ ADD THIS EMAIL ROUTE
+router.post('/send-email', protect, async (req, res) => {
+  try {
+    const nodemailer = require("nodemailer");
+
+    const { email, orderId } = req.body;
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "your_email@gmail.com",
+        pass: "your_app_password",
+      },
+    });
+
+    await transporter.sendMail({
+      from: "Farmigo 🥬",
+      to: email,
+      subject: "Order Payment Successful",
+      html: `
+        <h2>Payment Successful 🎉</h2>
+        <p>Your Order ID: <b>${orderId}</b></p>
+        <p>Your order is now being processed.</p>
+      `,
+    });
+
+    res.json({ message: "Email sent successfully" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Email failed" });
+  }
+});
+
 module.exports = router;

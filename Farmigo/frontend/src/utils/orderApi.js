@@ -34,3 +34,13 @@ export const updatePaymentStatus = (id, data) =>
 
 // Delete order
 export const deleteOrder = (id) => API.delete(`/makeOrder/${id}`);
+
+// Send Email
+export const sendOrderEmail = (data) =>
+  API.post("/makeOrder/send-email", data);
+
+// Generate Invoice (optional backend)
+export const generateInvoice = (id) =>
+  API.get(`/makeOrder/invoice/${id}`, {
+    responseType: "blob",
+  });
