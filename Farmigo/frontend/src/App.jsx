@@ -106,6 +106,8 @@ const LayoutWrapper = ({ children }) => {
     location.pathname === "/signup" ||
     location.pathname === "/admin" ||
     location.pathname === "/inventory/manage";
+    location.pathname === "/support" ||
+    location.pathname.startsWith("/admin");
 
   return (
     <>

@@ -38,7 +38,7 @@ const productSchema = mongoose.Schema(
             default: false,
         },
 
-        // 🌱 NEW FIELDS FOR SMART HARVEST SYSTEM
+        //NEW FIELDS FOR SMART HARVEST SYSTEM
 
         harvestDate: {
             type: Date,

@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const orderSchema = new mongoose.Schema(
   {
-    // USERS
     buyerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
@@ -13,12 +12,10 @@ const orderSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
-
-    // ORDER ITEMS
     items: [
       {
-        name: { type: String, required: true }, // snapshot name
-        image: { type: String }, // optional snapshot
+        name: { type: String, required: true },
+        image: { type: String },
         productId: {
           type: mongoose.Schema.Types.ObjectId,
           ref: 'Product',
@@ -28,101 +25,52 @@ const orderSchema = new mongoose.Schema(
         price: { type: Number, required: true },
       },
     ],
-
-    // SHIPPING ADDRESS
     shippingAddress: {
       address: { type: String, required: true },
       city: { type: String, required: true },
       postalCode: { type: String, required: true },
       country: { type: String, required: true },
     },
-
-    // PAYMENT
     paymentMethod: {
       type: String,
       enum: ['card', 'cash_on_delivery', 'bank_transfer'],
       required: true,
     },
-
     paymentStatus: {
       type: String,
       enum: ['pending', 'paid', 'failed', 'refunded'],
       default: 'pending',
     },
-
     paymentResult: {
       id: { type: String },
       status: { type: String },
       update_time: { type: String },
       email_address: { type: String },
     },
-
-    isPaid: {
-      type: Boolean,
-      default: false,
-    },
-    paidAt: {
-      type: Date,
-    },
-
-    // PRICE DETAILS
-    taxPrice: {
-      type: Number,
-      default: 0,
-    },
-    shippingPrice: {
-      type: Number,
-      default: 0,
-    },
-    totalAmount: {
-      type: Number,
-      required: true,
-    },
-
-    // 🌱 HARVEST BASED SCHEDULING (NEW)
-
-    isPreOrder: {
-      type: Boolean,
-      default: false,
-    },
-
-    harvestDate: {
-      type: Date,
-    },
-
-    expectedDeliveryDate: {
-      type: Date,
-    },
-
-    // DELIVERY
+    isPaid: { type: Boolean, default: false },
+    paidAt: { type: Date },
+    taxPrice: { type: Number, default: 0 },
+    shippingPrice: { type: Number, default: 0 },
+    totalAmount: { type: Number, required: true },
+    isPreOrder: { type: Boolean, default: false },
+    harvestDate: { type: Date },
+    expectedDeliveryDate: { type: Date },
     deliveryStatus: {
       type: String,
       enum: [
         'pending',
-        'scheduled',          // waiting for harvest
-        'harvesting',         // farmer harvesting
+        'scheduled',
+        'harvesting',
         'ready_for_dispatch',
         'in_transit',
         'delivered',
-        'cancelled'
+        'cancelled',
       ],
       default: 'pending',
     },
-
-    isDelivered: {
-      type: Boolean,
-      default: false,
-    },
-    deliveredAt: {
-      type: Date,
-    },
-
-    trackingNumber: {
-      type: String,
-      unique: true,
-    },
-
-    // OVERALL ORDER STATUS
+    isDelivered: { type: Boolean, default: false },
+    deliveredAt: { type: Date },
+    trackingNumber: { type: String, unique: true },
     status: {
       type: String,
       enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
@@ -132,7 +80,6 @@ const orderSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// AUTO GENERATE TRACKING NUMBER
 orderSchema.pre('save', function (next) {
   if (!this.trackingNumber) {
     this.trackingNumber =
