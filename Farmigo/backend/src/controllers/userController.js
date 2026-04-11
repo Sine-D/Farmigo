@@ -3,7 +3,7 @@ const generateToken = require('../utils/generateToken');
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-// REGISTER USER
+// REGISTER
 const registerUser = async (req, res) => {
   const { name, email, password, role, phoneNumber, whatsappOptIn, location, farmDetails } = req.body;
 
@@ -60,12 +60,10 @@ const registerUser = async (req, res) => {
   }
 };
 
-// LOGIN USER
-
+// LOGIN
 const authUser = async (req, res) => {
   const { email, password } = req.body;
 
-  // IMPORTANT: must select password manually
   const user = await User.findOne({ email }).select('+password');
 
   if (!user) {
@@ -76,6 +74,11 @@ const authUser = async (req, res) => {
   if (!user.isActive) {
     res.status(401);
     throw new Error('Account is deactivated');
+  }
+
+  if (user.role === 'Farmer' && !user.isApproved) {
+    res.status(403);
+    throw new Error('Farmer account pending approval');
   }
 
   if (await user.matchPassword(password)) {
@@ -159,8 +162,6 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-// UPDATE USER PROFILE
-
 const updateUserProfile = async (req, res) => {
   const user = await User.findById(req.user._id).select('+password');
 
@@ -196,15 +197,12 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
-// GET ALL USERS (ADMIN)
-
+// ADMIN
 const getUsers = async (req, res) => {
   const users = await User.find({});
   res.json(users);
 };
 
-
-// APPROVE FARMER (ADMIN)
 const approveFarmer = async (req, res) => {
   const user = await User.findById(req.params.id);
 
@@ -213,18 +211,12 @@ const approveFarmer = async (req, res) => {
     throw new Error('User not found');
   }
 
-  if (user.role !== 'Farmer') {
-    res.status(400);
-    throw new Error('User is not a Farmer');
-  }
-
   user.isApproved = true;
   await user.save();
 
-  res.json({ message: 'Farmer approved successfully' });
+  res.json({ message: 'Farmer approved' });
 };
 
-// UPDATE USER STATUS (ADMIN)
 const updateUserStatus = async (req, res) => {
   const user = await User.findById(req.params.id);
 
@@ -236,10 +228,8 @@ const updateUserStatus = async (req, res) => {
   user.isActive = req.body.isActive;
   await user.save();
 
-  res.json({ message: 'User status updated successfully' });
+  res.json({ message: 'User status updated' });
 };
-
-// UPDATE USER ROLE (ADMIN)
 
 const updateUserRole = async (req, res) => {
   const user = await User.findById(req.params.id);
@@ -252,7 +242,7 @@ const updateUserRole = async (req, res) => {
   user.role = req.body.role || user.role;
   await user.save();
 
-  res.json({ message: 'User role updated successfully' });
+  res.json({ message: 'User role updated' });
 };
 
 // @desc    Delete user

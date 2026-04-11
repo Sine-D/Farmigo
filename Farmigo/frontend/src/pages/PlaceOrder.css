@@ -1,0 +1,199 @@
+/* PAGE WRAPPER */
+.place-order-page {
+  width: 100%;
+  min-height: 100vh;
+  background: var(--bg-gradient);
+  padding: 50px 20px;
+  font-family: var(--font-family);
+}
+
+/* CONTAINER */
+.place-order-container {
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* TITLE */
+.place-order-title {
+  text-align: center;
+  font-size: 34px;
+  font-weight: 700;
+  margin-bottom: 30px;
+  color: var(--primary-green);
+  letter-spacing: -0.5px;
+}
+
+/* SUCCESS MESSAGE */
+.success-msg {
+  text-align: center;
+  background: rgba(113, 246, 106, 0.15);
+  border: 1px solid rgba(19, 127, 19, 0.3);
+  color: var(--primary-green);
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+  font-weight: 500;
+}
+
+/* GRID */
+.place-order-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 30px;
+}
+
+/* CARD */
+.place-order-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s ease;
+}
+
+/* CARD HOVER */
+.place-order-card:hover {
+  transform: translateY(-3px);
+}
+
+/* SECTION HEADINGS (IMPORTANT SPACING UPGRADE 🔥) */
+.place-order-card h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-top: 25px;
+  margin-bottom: 18px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid rgba(19, 127, 19, 0.15);
+}
+
+/* FIRST HEADING FIX */
+.place-order-card h2:first-of-type {
+  margin-top: 0;
+}
+
+/* INPUTS */
+.place-order-card input,
+.place-order-card select {
+  width: 100%;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(19, 127, 19, 0.2);
+  background: white;
+  font-size: 14px;
+  transition: 0.3s ease;
+}
+
+/* INPUT FOCUS */
+.place-order-card input:focus,
+.place-order-card select:focus {
+  outline: none;
+  border-color: var(--primary-green);
+  box-shadow: 0 0 0 3px rgba(113, 246, 106, 0.2);
+}
+
+/* PRODUCT INFO BOX */
+.product-info {
+  background: rgba(113, 246, 106, 0.12);
+  border-left: 5px solid var(--primary-green);
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+.product-info p {
+  margin: 6px 0;
+  font-size: 14px;
+}
+
+/* DELIVERY SECTION */
+.delivery-dropdown {
+  margin-top: 10px;
+}
+
+/* DELIVERY TEXT */
+.place-order-card p {
+  color: #444;
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 15px;
+}
+
+/* BUTTON (MATCH APP STYLE) */
+.place-order-card button {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(
+    135deg,
+    var(--primary-green),
+    var(--secondary-green)
+  );
+  color: white;
+  font-weight: 700;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: 0.3s ease;
+  margin-top: 10px;
+}
+
+.place-order-card button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(19, 127, 19, 0.25);
+}
+
+/* ORDER SUMMARY */
+.order-summary-box {
+  background: rgba(255, 255, 255, 0.7);
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(19, 127, 19, 0.15);
+  margin-top: 10px;
+}
+
+.order-summary-box p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+/* HARVEST BOX */
+.harvest-box {
+  margin-top: 18px;
+  padding: 14px;
+  background: rgba(250, 176, 5, 0.12);
+  border-left: 5px solid var(--accent-color);
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+/* IMAGE STYLE (optional safety) */
+.place-order-card img {
+  border-radius: 14px;
+}
+
+/* SPACING FIX BETWEEN INPUT GROUPS */
+.place-order-card input + input,
+.place-order-card select + input,
+.place-order-card input + select {
+  margin-top: 10px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .place-order-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .place-order-card {
+    padding: 20px;
+  }
+
+  .place-order-title {
+    font-size: 26px;
+  }
+}

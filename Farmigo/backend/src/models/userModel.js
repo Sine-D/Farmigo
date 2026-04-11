@@ -22,7 +22,7 @@ const userSchema = mongoose.Schema(
       type: String,
       required: [true, 'Please add a password'],
       minlength: 6,
-      select: false, // Important for security
+      select: false,
     },
 
     role: {
@@ -31,17 +31,14 @@ const userSchema = mongoose.Schema(
       default: 'Buyer',
     },
 
-    phoneNumber: {
-      type: String,
-      trim: true,
+    phoneNumber: String,
+    whatsappOptIn: {
+      type: Boolean,
+      default: false,
     },
 
-    location: {
-      type: String,
-      trim: true,
-    },
+    location: String,
 
-    // FARMER-SPECIFIC DETAILS
     farmDetails: {
       farmName: {
         type: String,
@@ -49,11 +46,7 @@ const userSchema = mongoose.Schema(
           return this.role === 'Farmer';
         },
       },
-
-      size: {
-        type: String,
-      },
-
+      size: String,
       produceTypes: [
         {
           type: String,
@@ -71,20 +64,13 @@ const userSchema = mongoose.Schema(
       ],
     },
 
-    // BADGES SYSTEM
     badges: [
       {
-        name: {
-          type: String,
-        },
-        awardedAt: {
-          type: Date,
-          default: Date.now,
-        },
+        name: String,
+        awardedAt: { type: Date, default: Date.now },
       },
     ],
 
-    // FARMER APPROVAL
     isApproved: {
       type: Boolean,
       default: function () {
@@ -96,34 +82,21 @@ const userSchema = mongoose.Schema(
     isActive: {
       type: Boolean,
       default: true,
-    },
-    whatsappOptIn: {
-      type: Boolean,
-      default: false
-    },
+    }
   },
-  {
-    timestamps: true,
-  }
+  { timestamps: true }
 );
 
-
-// Encrypt password before saving
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
-    return next();  // Important fix
-  }
+  if (!this.isModified('password')) return next();
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
 
-
-// Match entered password with hashed password
 userSchema.methods.matchPassword = async function (enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+  return bcrypt.compare(enteredPassword, this.password);
 };
-
 
 module.exports = mongoose.model('User', userSchema);

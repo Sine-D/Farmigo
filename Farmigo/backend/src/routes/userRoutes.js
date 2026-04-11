@@ -84,53 +84,31 @@ router.post('/', asyncHandler(registerUser));
 router.post('/login', asyncHandler(authUser));
 router.post('/google', asyncHandler(googleLogin));
 
-/**
- * @swagger
- * /api/users/profile:
- *   get:
- *     summary: Get user profile
- *     tags: [Users]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Profile retrieved
- *   put:
- *     summary: Update user profile
- *     tags: [Users]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Profile updated
- */
-router.route('/profile')
-    .get(protect, asyncHandler(getUserProfile))
-    .put(protect, asyncHandler(updateUserProfile));
+// USER
+router
+  .route('/profile')
+  .get(protect, asyncHandler(getUserProfile))
+  .put(protect, asyncHandler(updateUserProfile));
 
-// Admin routes
-/**
- * @swagger
- * /api/users:
- *   get:
- *     summary: Get all users (Admin only)
- *     tags: [Admin]
- *     security:
- *       - bearerAuth: []
- */
-router.route('/')
-    .get(protect, authorize('Admin'), asyncHandler(getUsers));
+// ADMIN
+router
+  .route('/')
+  .get(protect, authorize('Admin'), asyncHandler(getUsers));
 
-router.route('/:id/approve')
-    .put(protect, authorize('Admin'), asyncHandler(approveFarmer));
+router
+  .route('/:id/approve')
+  .put(protect, authorize('Admin'), asyncHandler(approveFarmer));
 
-router.route('/:id/status')
-    .put(protect, authorize('Admin'), asyncHandler(updateUserStatus));
+router
+  .route('/:id/status')
+  .put(protect, authorize('Admin'), asyncHandler(updateUserStatus));
 
-router.route('/:id/role')
-    .put(protect, authorize('Admin'), asyncHandler(updateUserRole));
+router
+  .route('/:id/role')
+  .put(protect, authorize('Admin'), asyncHandler(updateUserRole));
 
-router.route('/:id')
-    .delete(protect, authorize('Admin'), asyncHandler(deleteUser));
+router
+  .route('/:id')
+  .delete(protect, authorize('Admin'), asyncHandler(deleteUser));
 
 module.exports = router;

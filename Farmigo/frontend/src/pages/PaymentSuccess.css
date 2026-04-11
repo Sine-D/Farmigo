@@ -1,0 +1,149 @@
+:root {
+  --primary-green: #2ecc71;
+  --secondary-green: #27ae60;
+  --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  --text-dark: #2c3e50;
+  --glass-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+}
+
+/* =========================
+   PAGE BACKGROUND
+========================= */
+.payment-page {
+  min-height: 100vh;
+  background: var(--bg-gradient);
+  padding: 40px 20px;
+  font-family: "Inter", sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* =========================
+   SUCCESS CARD
+========================= */
+.result-card {
+  width: 100%;
+  max-width: 520px;
+  background: white;
+  padding: 35px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  animation: slideUp 0.5s ease-out;
+}
+
+/* Animation */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =========================
+   SUCCESS ICON
+========================= */
+.status-icon.success {
+  width: 70px;
+  height: 70px;
+  background: var(--primary-green);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  font-weight: bold;
+  margin: 0 auto 20px;
+  box-shadow: 0 10px 25px rgba(46, 204, 113, 0.3);
+}
+
+/* =========================
+   TEXT
+========================= */
+.result-card h1 {
+  font-size: 26px;
+  color: var(--text-dark);
+  margin-bottom: 10px;
+}
+
+.result-card p {
+  color: #555;
+  font-size: 15px;
+}
+
+/* =========================
+   SUMMARY BOX
+========================= */
+.summary-box {
+  margin-top: 20px;
+  background: #f9fafb;
+  padding: 18px;
+  border-radius: 12px;
+  text-align: left;
+  border: 1px solid #edf2f7;
+  line-height: 1.8;
+  font-size: 14px;
+}
+
+/* =========================
+   ACTION BUTTONS
+========================= */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+/* Primary Button (Download invoice style) */
+.action-buttons button {
+  padding: 12px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.25s ease;
+}
+
+/* First button (Download Invoice) */
+.action-buttons button:first-child {
+  background: var(--primary-green);
+  color: white;
+}
+
+.action-buttons button:first-child:hover {
+  background: var(--secondary-green);
+  transform: translateY(-2px);
+}
+
+/* Secondary buttons */
+.action-buttons button:not(:first-child) {
+  background: #f1f5f9;
+  color: #333;
+  border: 1px solid #e2e8f0;
+}
+
+.action-buttons button:not(:first-child):hover {
+  background: #e2e8f0;
+  transform: translateY(-1px);
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 600px) {
+  .result-card {
+    padding: 25px;
+  }
+
+  .result-card h1 {
+    font-size: 22px;
+  }
+}
