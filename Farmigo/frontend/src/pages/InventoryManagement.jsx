@@ -38,6 +38,9 @@ import NotificationBell from "../components/inventory/NotificationBell";
 import LowStockPanel from "../components/inventory/LowStockPanel";
 import ExpiringItemsPanel from "../components/inventory/ExpiringItemsPanel";
 import StockHistoryPanel from "../components/inventory/StockHistoryPanel";
+import CropInfoPanel from "../components/inventory/CropInfoPanel";
+import SoilInfoPanel from "../components/inventory/SoilInfoPanel";
+import InventoryAnalytics from "../components/inventory/InventoryAnalytics";
 
 import ConfirmModal from "../components/common/ConfirmModal";
 import Loader from "../components/common/Loader";
@@ -57,9 +60,9 @@ const CATEGORIES = [
 // Safely unwrap axios / ApiResponse / already-unwrapped responses
 const unwrapResponse = (res) => {
   if (!res) return null;
-  if (res.data?.data !== undefined) return res.data.data; // axios + ApiResponse
-  if (res.data !== undefined) return res.data; // axios only
-  return res; // already unwrapped
+  if (res.data?.data !== undefined) return res.data.data;
+  if (res.data !== undefined) return res.data;
+  return res;
 };
 
 const InventoryManagement = () => {
@@ -96,7 +99,7 @@ const InventoryManagement = () => {
   const [loading, setLoading] = useState(true);
 
   // ── UI State ───────────────────────────────────────────────────────────────
-  const [activeTab, setActiveTab] = useState("overview"); // overview | inventory | alerts | history
+  const [activeTab, setActiveTab] = useState("overview");
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [sortBy, setSortBy] = useState("productName");
@@ -207,6 +210,7 @@ const InventoryManagement = () => {
   // ── CRUD Handlers ───────────────────────────────────────────────────────────
   const handleSave = async (payload) => {
     setServerErrors(null);
+
     try {
       if (editItem) {
         await updateInventory(editItem._id, payload);
@@ -271,7 +275,6 @@ const InventoryManagement = () => {
     <div className="min-h-screen bg-[#f8fafc] pb-20">
       {/* ── Dashboard Header ── */}
       <div className="bg-gradient-to-br from-emerald-800 via-emerald-900 to-teal-950 pt-12 pb-24 px-6 md:px-12 relative">
-        {/* Decorative Background Elements Wrapper */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[100px] -mr-48 -mt-48" />
           <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-teal-500/10 rounded-full blur-[80px] -ml-24 -mb-24" />
@@ -300,7 +303,10 @@ const InventoryManagement = () => {
             </div>
 
             <div className="flex items-center gap-4 relative z-[60]">
-              <NotificationBell lowStockRes={lowStockRes} expiryRes={expiryRes} />
+              <NotificationBell
+                lowStockRes={lowStockRes}
+                expiryRes={expiryRes}
+              />
 
               <button
                 onClick={() => {
@@ -386,109 +392,128 @@ const InventoryManagement = () => {
         {/* ── Tab Views ── */}
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
           {activeTab === "overview" && (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 space-y-8">
-                <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm relative overflow-hidden group">
-                  <div className="flex items-center justify-between mb-8">
-                    <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
-                        <FaLeaf />
-                      </div>
-                      Highest Value Produce
-                    </h3>
+            <>
+              <InventoryAnalytics items={items} stats={stats} />
 
-                    <button
-                      onClick={() => setActiveTab("inventory")}
-                      className="text-[10px] font-black text-emerald-600 hover:text-emerald-700 uppercase flex items-center gap-2 group"
-                    >
-                      See All Listings{" "}
-                      <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
-                    </button>
-                  </div>
+              {/* Top row */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 space-y-8">
+                  <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm relative overflow-hidden group">
+                    <div className="flex items-center justify-between mb-8">
+                      <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
+                          <FaLeaf />
+                        </div>
+                        Highest Value Produce
+                      </h3>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {(stats?.topValueItems || []).map((item, idx) => (
-                      <div
-                        key={item._id || `${item.productName}-${idx}`}
-                        className="p-5 rounded-[2rem] bg-gray-50/50 border border-transparent hover:border-emerald-100 hover:bg-white transition-all group/card"
+                      <button
+                        onClick={() => setActiveTab("inventory")}
+                        className="text-[10px] font-black text-emerald-600 hover:text-emerald-700 uppercase flex items-center gap-2 group"
                       >
-                        <div className="flex items-center gap-4">
-                          <span className="text-2xl font-black text-gray-200 group-hover/card:text-emerald-300 transition-colors">
-                            0{idx + 1}
-                          </span>
-                          <div className="min-w-0">
-                            <p className="font-black text-gray-800 truncate mb-0.5 uppercase tracking-tight">
-                              {item.productName}
-                            </p>
-                            <p className="text-xs font-bold text-emerald-600">
-                              LKR {Number(item.totalValue || 0).toLocaleString()}
-                            </p>
+                        See All Listings{" "}
+                        <FaArrowRight className="group-hover:translate-x-1 transition-transform" />
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {(stats?.topValueItems || []).map((item, idx) => (
+                        <div
+                          key={item._id || `${item.productName}-${idx}`}
+                          className="p-5 rounded-[2rem] bg-gray-50/50 border border-transparent hover:border-emerald-100 hover:bg-white transition-all group/card"
+                        >
+                          <div className="flex items-center gap-4">
+                            <span className="text-2xl font-black text-gray-200 group-hover/card:text-emerald-300 transition-colors">
+                              0{idx + 1}
+                            </span>
+                            <div className="min-w-0">
+                              <p className="font-black text-gray-800 truncate mb-0.5 uppercase tracking-tight">
+                                {item.productName}
+                              </p>
+                              <p className="text-xs font-bold text-emerald-600">
+                                LKR{" "}
+                                {Number(item.totalValue || 0).toLocaleString()}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm">
+                    <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight mb-8">
+                      Recent Movements
+                    </h3>
+                    <StockHistoryPanel history={history.slice(0, 5)} compact />
                   </div>
                 </div>
 
-                <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm">
-                  <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight mb-8">
-                    Recent Movements
-                  </h3>
-                  <StockHistoryPanel history={history.slice(0, 5)} compact />
+                <div className="space-y-8">
+                  <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm">
+                    <h3 className="text-lg font-black text-gray-900 uppercase tracking-tight mb-6">
+                      Inventory Mix
+                    </h3>
+
+                    <div className="space-y-5">
+                      {(stats?.byCategory || []).map((cat) => (
+                        <div key={cat._id || "uncategorized"} className="group">
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-xs font-black text-gray-500 uppercase tracking-widest capitalize">
+                              {cat._id || "other"}
+                            </span>
+                            <span className="text-xs font-black text-emerald-600">
+                              {cat.count || 0} Items
+                            </span>
+                          </div>
+
+                          <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-emerald-500 rounded-full transition-all duration-1000"
+                              style={{
+                                width: `${((cat.count || 0) / (totalItems || 1)) * 100}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <SoilInfoPanel />
                 </div>
               </div>
 
-              <div className="space-y-8">
-                <div className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-sm">
-                  <h3 className="text-lg font-black text-gray-900 uppercase tracking-tight mb-6">
-                    Inventory Mix
-                  </h3>
+              {/* Bottom row fills empty space */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <CropInfoPanel />
 
-                  <div className="space-y-5">
-                    {(stats?.byCategory || []).map((cat) => (
-                      <div key={cat._id || "uncategorized"} className="group">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-xs font-black text-gray-500 uppercase tracking-widest capitalize">
-                            {cat._id || "other"}
-                          </span>
-                          <span className="text-xs font-black text-emerald-600">
-                            {cat.count || 0} Items
-                          </span>
-                        </div>
-
-                        <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-emerald-500 rounded-full transition-all duration-1000"
-                            style={{
-                              width: `${((cat.count || 0) / (totalItems || 1)) * 100}%`,
-                            }}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="bg-emerald-900 rounded-[2.5rem] p-8 text-white relative overflow-hidden group">
+                <div className="bg-emerald-900 rounded-[2.5rem] p-8 text-white relative overflow-hidden group min-h-[260px] flex flex-col justify-between">
                   <div className="absolute -right-4 -bottom-4 text-emerald-800 text-9xl font-black group-hover:scale-110 transition-transform duration-700 opacity-20">
                     <FaLeaf />
                   </div>
-                  <h3 className="text-lg font-black uppercase mb-4 tracking-tight">
-                    Pro Tip
-                  </h3>
-                  <p className="text-sm text-emerald-100/70 font-medium leading-relaxed mb-6">
-                    Items reaching their expiry date (marked amber) should be
-                    promoted or discounted to ensure zero waste.
-                  </p>
-                  <button
-                    onClick={() => setActiveTab("alerts")}
-                    className="px-6 py-3 bg-emerald-400 text-emerald-900 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-white transition-all"
-                  >
-                    Track Alerts
-                  </button>
+
+                  <div>
+                    <h3 className="text-lg font-black uppercase mb-4 tracking-tight">
+                      Pro Tip
+                    </h3>
+                    <p className="text-sm text-emerald-100/70 font-medium leading-relaxed mb-6 max-w-md">
+                      Items reaching their expiry date (marked amber) should be
+                      promoted or discounted to ensure zero waste.
+                    </p>
+                  </div>
+
+                  <div>
+                    <button
+                      onClick={() => setActiveTab("alerts")}
+                      className="px-6 py-3 bg-emerald-400 text-emerald-900 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-white transition-all"
+                    >
+                      Track Alerts
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+            </>
           )}
 
           {activeTab === "inventory" && (

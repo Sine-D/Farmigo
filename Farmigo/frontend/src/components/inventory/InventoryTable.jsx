@@ -17,6 +17,7 @@ import {
   getStockStatus,
   categoryConfig,
 } from "../../utils/formatters";
+import MarketPriceWidget from "./MarketPriceWidget";
 
 const SortIcon = ({ field, sortBy, order }) => {
   if (sortBy !== field) {
@@ -145,6 +146,13 @@ const InventoryTable = ({
                             <FaLeaf size={8} /> Organic Certified
                           </span>
                         )}
+
+                        {/* Market Price Analysis */}
+                        <MarketPriceWidget 
+                          productName={item.productName} 
+                          farmerPrice={item.pricePerUnit} 
+                          currency={item.currency}
+                        />
                       </div>
                     </div>
                   </td>
