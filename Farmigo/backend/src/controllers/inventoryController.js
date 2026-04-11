@@ -331,6 +331,49 @@ exports.reduceStock = asyncHandler(async (req, res) => {
     );
 });
 
+// ─── 8.b RESTORE STOCK (Cart Removal / Cancellation) ──────────────────────────
+/**
+ * @desc    Restore stock quantity when an item is removed from cart or order is cancelled
+ * @route   PATCH /api/inventory/:id/restore-stock
+ * @access  Private
+ */
+exports.restoreStock = asyncHandler(async (req, res) => {
+    const { quantityRestored, orderId, note } = req.body;
+
+    const inventory = await Inventory.findById(req.params.id);
+
+    if (!inventory) {
+        throw new ApiError(404, "Inventory item not found");
+    }
+
+    const prevQuantity = inventory.quantity;
+    const amountToRestore = Number(quantityRestored);
+    inventory.quantity += amountToRestore;
+    await inventory.save();
+
+    await recordStockHistory({
+        inventoryId: inventory._id,
+        farmerId: inventory.farmerId,
+        productName: inventory.productName,
+        changeType: "RESTORED",
+        previousQuantity: prevQuantity,
+        changeAmount: amountToRestore,
+        newQuantity: inventory.quantity,
+        unit: inventory.unit,
+        orderId: orderId || null,
+        note: note || `Stock restored (Cart removal/Cancellation) ${orderId || ""}`,
+        performedBy: req.user ? req.user._id : null,
+    });
+
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            { updatedInventory: inventory },
+            `Stock restored successfully. New quantity: ${inventory.quantity} ${inventory.unit}`
+        )
+    );
+});
+
 // ─── 9. LOW STOCK ALERT ───────────────────────────────────────────────────────
 /**
  * @desc    Get all active inventory items where quantity < minimumStockLevel

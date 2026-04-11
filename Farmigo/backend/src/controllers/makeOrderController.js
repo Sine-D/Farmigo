@@ -1,4 +1,5 @@
 const Order = require('../models/makeOrderModel');
+const Inventory = require('../models/Inventory');
 
 // @desc    Create new order (Buyer)
 
@@ -175,9 +176,18 @@ exports.cancelOrder = async (req, res) => {
 
     await order.save();
 
+    // RESTORE STOCK TO INVENTORY
+    if (order.items && order.items.length > 0) {
+      for (const item of order.items) {
+        await Inventory.findByIdAndUpdate(item.productId, {
+          $inc: { quantity: item.quantity }
+        });
+      }
+    }
+
     res.status(200).json({
       success: true,
-      message: 'Order cancelled successfully',
+      message: 'Order cancelled successfully and stock restored',
       data: order
     });
 

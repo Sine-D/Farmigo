@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect, useContext, useCallback } from "react";
 import { toast } from "sonner";
-import { reduceStock } from "../services/inventoryService";
+import { reduceStock, restoreStock } from "../services/inventoryService";
 
 export const CartContext = createContext(null);
 
@@ -82,36 +82,69 @@ export const CartProvider = ({ children }) => {
     const diff = newQty - item.cartQty;
     if (diff === 0) return;
 
-    if (diff > 0) {
-      try {
-        await reduceStock(itemId, { quantityOrdered: diff, note: "Cart quantity increased" });
-        setCartItems(prev => prev.map(i => i._id === itemId ? { ...i, cartQty: newQty } : i));
-      } catch (err) {
-        toast.error(err.response?.data?.message || "Stock update failed");
+    try {
+      if (diff > 0) {
+        // Increase quantity in cart = reduce stock in backend
+        await reduceStock(itemId, { 
+          quantityOrdered: diff, 
+          note: "Cart quantity increased" 
+        });
+      } else {
+        // Decrease quantity in cart = restore stock in backend
+        await restoreStock(itemId, { 
+          quantityRestored: Math.abs(diff), 
+          note: "Cart quantity decreased" 
+        });
       }
-    } else {
-      // Releasing stock would require another endpoint or allowing negative numbers
-      // For this demo, we'll just update local state and warn the user
-      // Note: A production system would have an 'increase-stock' or 'cancel-reservation' endpoint
+      
       setCartItems(prev => prev.map(i => i._id === itemId ? { ...i, cartQty: newQty } : i));
-      toast.info("Stock released locally (Backend re-stocking simulated)");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Stock update failed");
     }
   }, [cartItems]);
 
-  // ── Remove Item ──────────────────────────────────────────────────────────────
-  const removeFromCart = useCallback((itemId) => {
-    setCartItems((prev) => {
-      const item = prev.find((i) => i._id === itemId);
-      if (item) toast.info(`${item.productName} removed from cart`);
-      return prev.filter((i) => i._id !== itemId);
-    });
-  }, []);
+  // ── Remove Item (Restores stock to backend) ──────────────────────────────────
+  const removeFromCart = useCallback(async (itemId) => {
+    const item = cartItems.find(i => i._id === itemId);
+    if (!item) return;
 
-  // ── Clear Cart ───────────────────────────────────────────────────────────────
-  const clearCart = useCallback(() => {
-    setCartItems([]);
-    toast.success("Cart cleared");
-  }, []);
+    try {
+      // Restore the full cart quantity back to the inventory
+      await restoreStock(itemId, {
+        quantityRestored: item.cartQty,
+        note: `Item removed from cart: ${item.productName}`
+      });
+
+      setCartItems((prev) => prev.filter((i) => i._id !== itemId));
+      toast.info(`${item.productName} removed from cart. Stock released.`);
+    } catch (err) {
+      toast.error("Failed to release stock. Removing from cart anyway.");
+      setCartItems((prev) => prev.filter((i) => i._id !== itemId));
+    }
+  }, [cartItems]);
+
+  // ── Clear Cart (Restores all stock) ──────────────────────────────────────────
+  const clearCart = useCallback(async () => {
+    if (cartItems.length === 0) return;
+
+    try {
+      // Loop through all items and restore their stock
+      const promises = cartItems.map(item => 
+        restoreStock(item._id, {
+          quantityRestored: item.cartQty,
+          note: "Cart cleared by user"
+        })
+      );
+
+      await Promise.all(promises);
+      setCartItems([]);
+      toast.success("Cart cleared and stock released");
+    } catch (err) {
+      console.error("Error clearing cart stock:", err);
+      setCartItems([]);
+      toast.error("Cart cleared (some stock might not have released properly)");
+    }
+  }, [cartItems]);
 
   // ── Derived values ───────────────────────────────────────────────────────────
   const totalItems = cartItems.reduce((sum, i) => sum + i.cartQty, 0);
@@ -119,6 +152,12 @@ export const CartProvider = ({ children }) => {
     (sum, i) => sum + i.pricePerUnit * i.cartQty,
     0
   );
+
+  // ── Finalize Cart (Clears local but keeps backend reduction) ────────────────
+  const finalizeCart = useCallback(() => {
+    setCartItems([]);
+    localStorage.removeItem(CART_KEY);
+  }, []);
 
   return (
     <CartContext.Provider
@@ -128,6 +167,7 @@ export const CartProvider = ({ children }) => {
         updateQuantity,
         removeFromCart,
         clearCart,
+        finalizeCart,
         totalItems,
         totalPrice,
       }}

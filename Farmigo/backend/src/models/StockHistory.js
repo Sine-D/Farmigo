@@ -38,6 +38,7 @@ const stockHistorySchema = new mongoose.Schema(
                     "EXPIRED",      // Stock removed due to expiry
                     "DAMAGED",      // Stock removed due to damage/spoilage
                     "RESTOCKED",    // Existing item quantity increased
+                    "RESTORED",     // Stock returned from cart/cancellation
                 ],
                 message: "{VALUE} is not a valid change type",
             },
