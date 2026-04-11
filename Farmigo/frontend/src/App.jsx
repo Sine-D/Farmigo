@@ -11,6 +11,11 @@ import Review from "./pages/Review";
 import Login from "./auth/Login";
 import Signup from "./auth/Signup";
 import Dashboard from "./pages/Dashboard";
+import AdminDashboard from "./pages/AdminDashboard";
+import SupportManagement from "./pages/SupportManagement";
+import SustainabilityManagement from "./pages/SustainabilityManagement";
+import LMSManagement from "./pages/LMSManagement";
+import LMSCourses from "./pages/LMSCourses";
 import Contact from "./pages/contact";
 import CartPage from "./pages/CartPage";
 import Explore from "./pages/Explore";
@@ -62,26 +67,52 @@ const FullLandingPage = () => {
 
 const LayoutWrapper = ({ children }) => {
   const location = useLocation();
-  const hideLayoutPaths = [
+
+  const isSupportPage =
+    location.pathname === "/support" ||
+    location.pathname.startsWith("/support/tickets/") ||
+    location.pathname.startsWith("/support/disputes/");
+
+  const hideNavbarPaths = [
     "/login",
     "/signup",
     "/profile",
+    "/admin",
+    "/admin/support",
+    "/admin/sustainability",
+    "/admin/lms",
   ];
 
-  const shouldHideLayout = hideLayoutPaths.includes(location.pathname);
-  const shouldHideAnnouncement = shouldHideLayout || location.pathname === "/dashboard" || location.pathname === "/profile";
+  // const shouldHideLayout = hideLayoutPaths.includes(location.pathname);
+  // const shouldHideAnnouncement = shouldHideLayout || 
+  //   location.pathname === "/dashboard" || 
+  //   location.pathname === "/profile" || 
+  //   location.pathname.startsWith("/admin");
+  const shouldHideNavbar =
+    hideNavbarPaths.includes(location.pathname) || isSupportPage;
+
+  const shouldHideAnnouncement =
+    shouldHideNavbar ||
+    location.pathname === "/dashboard" ||
+    location.pathname === "/profile" ||
+    location.pathname === "/lms" ||
+    location.pathname === "/explore" ||
+    location.pathname === "/admin";
+
+  const shouldHideFooter =
+    location.pathname === "/login" ||
+    location.pathname === "/signup" ||
+    location.pathname.startsWith("/admin");
 
   return (
     <>
       {!shouldHideAnnouncement && <AnnouncementBar />}
-      {!shouldHideLayout && <Navbar />}
+      {!shouldHideNavbar && <Navbar />}
       {children}
-      {!shouldHideLayout && <Footer />}
+      {!shouldHideFooter && <Footer />}
     </>
   );
 };
-
-
 
 const App = () => {
   return (
@@ -97,6 +128,11 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/support" element={<SupportManagement />} />
+          <Route path="/admin/sustainability" element={<SustainabilityManagement />} />
+          <Route path="/admin/lms" element={<LMSManagement />} />
+          <Route path="/lms" element={<LMSCourses />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/profile" element={<Profile />} />
 

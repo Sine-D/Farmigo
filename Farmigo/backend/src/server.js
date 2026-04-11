@@ -27,14 +27,34 @@ const invoiceRoutes = require('./routes/invoiceRoutes');
 const deliveryRoutes = require('./routes/deliveryRoutes');
 const contactRoutes = require('./routes/contactRoutes');
 
-const startServer = async () => {
-    try {
-        await connectDB();
+const User = require('./models/userModel');
+connectDB().then(async () => {
+    // Seed Admin User
+    const adminEmail = 'admin@farmigo.com';
+    const adminExists = await User.findOne({ email: adminEmail });
+    
+    if (!adminExists) {
+        await User.create({
+            name: 'System Admin',
+            email: adminEmail,
+            password: 'AdminPassword@123',
+            role: 'Admin',
+            isApproved: true,
+            isActive: true
+        });
+        console.log('Admin user created');
+    } else {
+        adminExists.password = 'AdminPassword@123';
+        adminExists.role = 'Admin';
+        await adminExists.save();
+        console.log('Admin user updated');
+    }
+}).catch(err => console.error("MongoDB Connection Error: ", err));
 
-        const app = express();
+const app = express();
 
-        app.use(express.json());
-        app.use(cors());
+app.use(express.json());
+app.use(cors());
 
         // Swagger Docs
         app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
@@ -70,13 +90,10 @@ const startServer = async () => {
 
         const PORT = process.env.PORT || 5000;
 
-        app.listen(PORT, () => {
-            console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-        });
-    } catch (error) {
-        console.error(`Error starting server: ${error.message}`);
-        process.exit(1);
-    }
-};
+        if (process.env.NODE_ENV !== 'production') {
+            app.listen(PORT, () => {
+                console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+            });
+        }
 
-startServer();
+        module.exports = app;

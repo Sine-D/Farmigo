@@ -6,11 +6,17 @@ const Product = require('../models/productModel');
 // @access  Private/Admin
 const getDashboardStats = async (req, res) => {
     const totalUsers = await User.countDocuments();
+    const totalFarmers = await User.countDocuments({ role: 'Farmer' });
+    const pendingApprovals = await User.countDocuments({ role: 'Farmer', isApproved: false });
     const totalProducts = await Product.countDocuments();
 
     res.json({
         totalUsers,
+        totalFarmers,
+        pendingApprovals,
         totalProducts,
+        totalSales: 154200, // Placeholder
+        activeListings: totalProducts
     });
 };
 

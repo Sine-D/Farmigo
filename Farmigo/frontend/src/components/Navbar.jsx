@@ -11,9 +11,10 @@ import {
 
 const navLinks = [
   { path: "/", section: "home", display: "Home" },
+  { path: "/explore", display: "Marketplace" },
+  { path: "/lms", display: "LMS Academy" },
   { path: "/", section: "about", display: "About Us" },
-  { path: "/", section: "review", display: "Reviews" },
-  { path: "/", section: "contact", display: "Contact Us" },
+  { path: "/", section: "contact", display: "Contact" },
 ];
 
 import { toast } from "sonner";
@@ -82,47 +83,56 @@ const Navbar = () => {
           <span className="fw-bold fs-3" style={{ color: "var(--text-dark)", letterSpacing: "-0.5px" }}>FARMIGO</span>
         </BsNavbar.Brand>
 
-        <BsNavbar.Toggle aria-controls="basic-navbar-nav" className="border-0 shadow-none">
-          <BiMenu className="fs-1" style={{ color: "var(--primary-green)" }} />
+        <BsNavbar.Toggle 
+          aria-controls="basic-navbar-nav" 
+          className="border-0 shadow-none p-2 rounded-xl bg-white/5 active:bg-white/10 transition-colors"
+        >
+          {expanded ? (
+            <span className="text-2xl text-[#71f66a] font-bold">✕</span>
+          ) : (
+            <BiMenu className="fs-1" style={{ color: scrolled ? "var(--primary-green)" : "#71f66a" }} />
+          )}
         </BsNavbar.Toggle>
 
         <BsNavbar.Collapse id="basic-navbar-nav">
-          <Nav className="mx-auto align-items-center">
+          <Nav className="mx-auto align-items-stretch lg:align-items-center mt-4 lg:mt-0">
             {navLinks.map((link, index) => (
               <Nav.Link
                 key={index}
                 onClick={() => handleNavClick(link.path, link.section)}
-                className="mx-2 nav-link-custom"
-                style={{ fontWeight: "500", fontSize: "1.05rem" }}
+                className="mx-2 nav-link-custom group"
+                style={{ fontWeight: "600" }}
               >
-                {link.display}
+                <span>{link.display}</span>
               </Nav.Link>
             ))}
           </Nav>
 
-          <div className="d-flex align-items-center gap-3 mt-3 mt-lg-0">
+          <div className="d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-3 mt-4 mt-lg-0">
             {user ? (
-              <div className="d-flex align-items-center gap-3">
+              <div className="d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-2">
                 <Link
-                  to="/dashboard"
-                  className="d-flex align-items-center gap-2 px-4 py-2 rounded-full font-bold text-white transition-all duration-300 hover:-translate-y-1 shadow-[0_4px_15px_rgba(19,127,19,0.3)]"
-                  style={{ backgroundColor: "var(--primary-green)", textDecoration: "none" }}
+                  to={user.role === 'Admin' ? "/admin" : "/dashboard"}
+                  className="d-flex align-items-center justify-content-center gap-2 px-5 py-2.5 rounded-xl font-bold text-white transition-all duration-300 hover:-translate-y-1 shadow-[0_10px_20px_rgba(113,246,106,0.2)]"
+                  style={{ background: "linear-gradient(135deg, #137f13, #0d1a0d)", textDecoration: "none" }}
+                  onClick={() => setExpanded(false)}
                 >
-                  <FaUserCircle className="fs-4" />
-                  <span>Dashboard</span>
+                  <FaUserCircle className="fs-5" />
+                  <span>{user.role === 'Admin' ? "Admin Panel" : "My Dashboard"}</span>
                 </Link>
                 <button 
                   onClick={handleLogout}
-                  className="text-xs font-bold text-gray-500 hover:text-red-500 transition-colors uppercase tracking-widest bg-transparent border-0"
+                  className="px-5 py-2.5 rounded-xl font-bold bg-white/5 text-gray-400 hover:text-red-400 transition-all border border-white/5 hover:border-red-400/30 text-sm"
                 >
-                  Logout
+                  Sign Out
                 </button>
               </div>
             ) : (
               <Link
                 to="/login"
-                className="px-6 py-2 rounded-full font-bold text-white transition-all duration-300 hover:-translate-y-1 shadow-[0_4px_15px_rgba(19,127,19,0.3)] hover:shadow-[0_8px_25px_rgba(19,127,19,0.4)]"
-                style={{ backgroundColor: "var(--primary-green)", textDecoration: "none" }}
+                className="px-6 py-2.5 rounded-xl font-bold text-white text-center transition-all duration-300 hover:-translate-y-1 shadow-[0_10px_20px_rgba(113,246,106,0.2)] ring-1 ring-[#71f66a]/30"
+                style={{ background: "linear-gradient(135deg, #71f66a, #137f13)", textDecoration: "none" }}
+                onClick={() => setExpanded(false)}
               >
                 Login
               </Link>
