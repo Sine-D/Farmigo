@@ -1,5 +1,10 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
 import AnnouncementBar from "./components/AnnouncmentBar";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -28,13 +33,20 @@ import DisputeChatPage from "./pages/DisputeChatPage";
 import Profile from "./pages/Profile";
 import { Toaster } from "sonner";
 
-// My
+// Orders / Payments
 import PlaceOrder from "./pages/PlaceOrder";
 import BuyerOrders from "./pages/BuyerOrders";
 import FarmerOrders from "./pages/FarmerOrders";
 import PaymentPage from "./pages/PaymentPage";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import CancelOrder from "./pages/CancelOrder";
+
+// Inventory Module
+import InventoryMarketplace from "./pages/InventoryMarketplace";
+import InventoryDetails from "./pages/InventoryDetails";
+import InventoryManagement from "./pages/InventoryManagement";
+
+import { CartProvider } from "./context/CartContext";
 
 const sectionMap = {
   "/": "home",
@@ -91,8 +103,6 @@ const LayoutWrapper = ({ children }) => {
 
   const shouldHideLayout = hideLayoutPaths.includes(location.pathname);
 
-  // const shouldHideAnnouncement = shouldHideLayout;
-
   const isSupportPage =
     location.pathname === "/support" ||
     location.pathname.startsWith("/support/tickets/") ||
@@ -106,17 +116,14 @@ const LayoutWrapper = ({ children }) => {
     "/admin/support",
     "/admin/sustainability",
     "/admin/lms",
+    "/inventory/manage",
   ];
 
-  // const shouldHideLayout = hideLayoutPaths.includes(location.pathname);
-  // const shouldHideAnnouncement = shouldHideLayout || 
-  //   location.pathname === "/dashboard" || 
-  //   location.pathname === "/profile" || 
-  //   location.pathname.startsWith("/admin");
   const shouldHideNavbar =
     hideNavbarPaths.includes(location.pathname) || isSupportPage;
 
-  const shouldHideAnnouncement =shouldHideLayout||
+  const shouldHideAnnouncement =
+    shouldHideLayout ||
     shouldHideNavbar ||
     location.pathname === "/dashboard" ||
     location.pathname === "/profile" ||
@@ -127,6 +134,8 @@ const LayoutWrapper = ({ children }) => {
   const shouldHideFooter =
     location.pathname === "/login" ||
     location.pathname === "/signup" ||
+    location.pathname === "/admin" ||
+    location.pathname === "/inventory/manage" ||
     location.pathname === "/support" ||
     location.pathname.startsWith("/admin");
 
@@ -143,42 +152,53 @@ const LayoutWrapper = ({ children }) => {
 const App = () => {
   return (
     <Router>
-      <Toaster position="top-right" richColors closeButton />
-      <LayoutWrapper>
-        <Routes>
-          {/* Landing */}
-          <Route path="/" element={<FullLandingPage />} />
-          <Route path="/about" element={<FullLandingPage />} />
-          <Route path="/review" element={<FullLandingPage />} />
-          <Route path="/contact" element={<FullLandingPage />} />
+      <CartProvider>
+        <Toaster position="top-right" richColors closeButton />
 
-          {/* General */}
-          <Route path="/explore" element={<Explore />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/support" element={<SupportManagement />} />
-          <Route path="/admin/sustainability" element={<SustainabilityManagement />} />
-          <Route path="/admin/lms" element={<LMSManagement />} />
-          <Route path="/lms" element={<LMSCourses />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/profile" element={<Profile />} />
+        <LayoutWrapper>
+          <Routes>
+            {/* Landing */}
+            <Route path="/" element={<FullLandingPage />} />
+            <Route path="/about" element={<FullLandingPage />} />
+            <Route path="/review" element={<FullLandingPage />} />
+            <Route path="/contact" element={<FullLandingPage />} />
 
-          {/* Support */}
-          <Route path="/support" element={<SupportCenter />} />
-          <Route path="/support/tickets/:id" element={<TicketChatPage />} />
-          <Route path="/support/disputes/:id" element={<DisputeChatPage />} />
+            {/* General */}
+            <Route path="/explore" element={<Explore />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/support" element={<SupportManagement />} />
+            <Route
+              path="/admin/sustainability"
+              element={<SustainabilityManagement />}
+            />
+            <Route path="/admin/lms" element={<LMSManagement />} />
+            <Route path="/lms" element={<LMSCourses />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/profile" element={<Profile />} />
 
-          {/* Orders */}
-          <Route path="/checkout" element={<PlaceOrder />} />
-          <Route path="/payment" element={< PaymentPage/>} />
-          <Route path="/payment-success" element={<PaymentSuccess />} />
-          <Route path="/cancel-order" element={<CancelOrder />} />
-          <Route path="/buyer-orders" element={<BuyerOrders />} />
-          <Route path="/farmer-orders" element={<FarmerOrders />} />
-        </Routes>
-      </LayoutWrapper>
+            {/* Inventory */}
+            <Route path="/marketplace" element={<InventoryMarketplace />} />
+            <Route path="/inventory/:id" element={<InventoryDetails />} />
+            <Route path="/inventory/manage" element={<InventoryManagement />} />
+
+            {/* Support */}
+            <Route path="/support" element={<SupportCenter />} />
+            <Route path="/support/tickets/:id" element={<TicketChatPage />} />
+            <Route path="/support/disputes/:id" element={<DisputeChatPage />} />
+
+            {/* Orders / Payments */}
+            <Route path="/checkout" element={<PlaceOrder />} />
+            <Route path="/payment" element={<PaymentPage />} />
+            <Route path="/payment-success" element={<PaymentSuccess />} />
+            <Route path="/cancel-order" element={<CancelOrder />} />
+            <Route path="/buyer-orders" element={<BuyerOrders />} />
+            <Route path="/farmer-orders" element={<FarmerOrders />} />
+          </Routes>
+        </LayoutWrapper>
+      </CartProvider>
     </Router>
   );
 };
