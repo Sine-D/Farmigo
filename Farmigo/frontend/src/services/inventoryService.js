@@ -95,6 +95,11 @@ export const reduceStock = async (id, payload) => {
   return res.data?.data;
 };
 
+export const restoreStock = async (id, payload) => {
+  const res = await api.patch(`/inventory/${id}/restore-stock`, payload);
+  return res.data?.data;
+};
+
 // ── Stock History ─────────────────────────────────────────────────────────────
 
 export const getInventoryHistory = async (id, params = {}) => {

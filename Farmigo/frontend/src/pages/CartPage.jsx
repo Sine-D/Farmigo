@@ -88,7 +88,7 @@ const CartItemRow = ({ item }) => {
 };
 
 const CartPage = () => {
-  const { cartItems, totalItems, totalPrice, clearCart } = useContext(CartContext);
+  const { cartItems, totalItems, totalPrice, clearCart, finalizeCart } = useContext(CartContext);
   const navigate = useNavigate();
 
   const deliveryFee = 0;
@@ -187,13 +187,34 @@ const CartPage = () => {
                 <FaCheckCircle /> You saved on free delivery!
               </div>
 
-              <button
-                id="cart-checkout-btn"
-                onClick={() => toast.info("Checkout integration coming soon!")}
-                className="w-full py-3.5 bg-emerald-600 text-white font-black rounded-xl hover:bg-emerald-700 transition-all shadow-md hover:shadow-emerald-200 text-sm flex items-center justify-center gap-2"
-              >
-                Proceed to Checkout →
-              </button>
+              {/* SIMULATED CHECKOUT FLOW */}
+              <div className="space-y-2 mt-4">
+                <button
+                  id="checkout-success-btn"
+                  onClick={() => {
+                    finalizeCart();
+                    toast.success("Checkout Successful! Stock is now final.");
+                    setTimeout(() => navigate("/dashboard"), 1500); 
+                  }}
+                  className="w-full py-3 bg-emerald-600 text-white font-black rounded-xl hover:bg-emerald-700 transition-all shadow-md text-xs flex items-center justify-center gap-2"
+                >
+                  <FaCheckCircle /> Finalize Order (Succeed)
+                </button>
+                
+                <button
+                  id="checkout-fail-btn"
+                  onClick={async () => {
+                    // Fail/Cancel: Restore all stock
+                    toast.loading("Cancelling... Restoring stock...");
+                    await clearCart();
+                    toast.dismiss();
+                    toast.error("Checkout Cancelled. Stock restored to inventory.");
+                  }}
+                  className="w-full py-3 bg-red-50 text-red-600 font-bold rounded-xl hover:bg-red-100 transition-all text-xs flex items-center justify-center gap-2"
+                >
+                  <FaTrash /> Cancel Order (Restore Stock)
+                </button>
+              </div>
 
               <div className="flex items-center justify-center gap-1.5 mt-4 text-xs text-gray-400">
                 <FaShieldAlt /> Secure & encrypted checkout

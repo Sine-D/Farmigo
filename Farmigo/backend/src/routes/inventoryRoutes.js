@@ -10,6 +10,7 @@ const {
     hardDeleteInventory,
     restoreInventory,
     reduceStock,
+    restoreStock,
     getLowStockItems,
     getExpiringItems,
     getStockStats,
@@ -24,7 +25,7 @@ const {
 } = require("../controllers/stockHistoryController");
 
 
-const { validate, createInventorySchema, updateInventorySchema, reduceStockSchema } = require("../middleware/validate");
+const { validate, createInventorySchema, updateInventorySchema, reduceStockSchema, restoreStockSchema } = require("../middleware/validate");
 const { protect, authorize } = require("../middleware/authMiddleware");
 const Inventory = require("../models/Inventory");
 
@@ -389,6 +390,40 @@ router.patch(
     protect,
     validate(reduceStockSchema),
     reduceStock
+);
+
+/**
+ * @swagger
+ * /api/inventory/{id}/restore-stock:
+ *   patch:
+ *     summary: Restore stock quantity (called when an item is removed from cart or checkout fails)
+ *     tags: [Inventory]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               quantityRestored: { type: number, minimum: 1 }
+ *               orderId: { type: string }
+ *               note: { type: string }
+ *     responses:
+ *       200:
+ *         description: Stock restored successfully
+ */
+router.patch(
+    "/:id/restore-stock",
+    protect,
+    validate(restoreStockSchema),
+    restoreStock
 );
 
 // ─── Get Single (Moved after specific paths) ──────────────────────────────────

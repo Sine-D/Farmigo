@@ -115,6 +115,15 @@ const reduceStockSchema = Joi.object({
     note: Joi.string().trim().max(200).optional(),
 }).options({ stripUnknown: true });
 
+const restoreStockSchema = Joi.object({
+    quantityRestored: Joi.number().min(1).required().messages({
+        "number.min": "Quantity restored must be at least 1",
+        "any.required": "Quantity restored is required",
+    }),
+    orderId: Joi.string().trim().optional(),
+    note: Joi.string().trim().max(200).optional(),
+}).options({ stripUnknown: true });
+
 // ─── Validation middleware factory ────────────────────────────────────────────
 
 /**
@@ -143,4 +152,5 @@ module.exports = {
     createInventorySchema,
     updateInventorySchema,
     reduceStockSchema,
+    restoreStockSchema,
 };
