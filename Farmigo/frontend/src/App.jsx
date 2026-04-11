@@ -28,6 +28,12 @@ import DisputeChatPage from "./pages/DisputeChatPage";
 import Profile from "./pages/Profile";
 import { Toaster } from "sonner";
 
+// ✅ Inventory Module
+import InventoryMarketplace from "./pages/InventoryMarketplace";
+import InventoryDetails from "./pages/InventoryDetails";
+import InventoryManagement from "./pages/InventoryManagement";
+import { CartProvider } from "./context/CartContext";
+
 const sectionMap = {
   "/": "home",
   "/about": "about",
@@ -81,13 +87,9 @@ const LayoutWrapper = ({ children }) => {
     "/admin/support",
     "/admin/sustainability",
     "/admin/lms",
+    "/inventory/manage",
   ];
 
-  // const shouldHideLayout = hideLayoutPaths.includes(location.pathname);
-  // const shouldHideAnnouncement = shouldHideLayout || 
-  //   location.pathname === "/dashboard" || 
-  //   location.pathname === "/profile" || 
-  //   location.pathname.startsWith("/admin");
   const shouldHideNavbar =
     hideNavbarPaths.includes(location.pathname) || isSupportPage;
 
@@ -102,6 +104,8 @@ const LayoutWrapper = ({ children }) => {
   const shouldHideFooter =
     location.pathname === "/login" ||
     location.pathname === "/signup" ||
+    location.pathname === "/admin" ||
+    location.pathname === "/inventory/manage";
     location.pathname === "/support" ||
     location.pathname.startsWith("/admin");
 
@@ -118,30 +122,41 @@ const LayoutWrapper = ({ children }) => {
 const App = () => {
   return (
     <Router>
-      <Toaster position="top-right" richColors closeButton />
-      <LayoutWrapper>
-        <Routes>
-          <Route path="/" element={<FullLandingPage />} />
-          <Route path="/about" element={<FullLandingPage />} />
-          <Route path="/review" element={<FullLandingPage />} />
-          <Route path="/contact" element={<FullLandingPage />} />
-          <Route path="/explore" element={<Explore />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/admin/support" element={<SupportManagement />} />
-          <Route path="/admin/sustainability" element={<SustainabilityManagement />} />
-          <Route path="/admin/lms" element={<LMSManagement />} />
-          <Route path="/lms" element={<LMSCourses />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/profile" element={<Profile />} />
+      <CartProvider>
+        <Toaster position="top-right" richColors closeButton />
 
-          <Route path="/support" element={<SupportCenter />} />
-          <Route path="/support/tickets/:id" element={<TicketChatPage />} />
-          <Route path="/support/disputes/:id" element={<DisputeChatPage />} />
-        </Routes>
-      </LayoutWrapper>
+        <LayoutWrapper>
+          <Routes>
+            <Route path="/" element={<FullLandingPage />} />
+            <Route path="/about" element={<FullLandingPage />} />
+            <Route path="/review" element={<FullLandingPage />} />
+            <Route path="/contact" element={<FullLandingPage />} />
+
+            <Route path="/explore" element={<Explore />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/support" element={<SupportManagement />} />
+            <Route path="/admin/sustainability" element={<SustainabilityManagement />} />
+            <Route path="/admin/lms" element={<LMSManagement />} />
+
+            <Route path="/lms" element={<LMSCourses />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/profile" element={<Profile />} />
+
+            {/* ✅ INVENTORY ROUTES */}
+            <Route path="/marketplace" element={<InventoryMarketplace />} />
+            <Route path="/inventory/:id" element={<InventoryDetails />} />
+            <Route path="/inventory/manage" element={<InventoryManagement />} />
+
+            <Route path="/support" element={<SupportCenter />} />
+            <Route path="/support/tickets/:id" element={<TicketChatPage />} />
+            <Route path="/support/disputes/:id" element={<DisputeChatPage />} />
+          </Routes>
+        </LayoutWrapper>
+      </CartProvider>
     </Router>
   );
 };

@@ -4,7 +4,7 @@ import {
   FaSave, FaTractor, FaTimes, FaEnvelope, FaLeaf, FaCheckCircle
 } from 'react-icons/fa';
 import { HiSparkles } from 'react-icons/hi';
-import { apiGet, apiPut } from '../utils/api';
+import api from '../services/api';
 import { toast } from 'sonner';
 
 /* ── Floating-label input ────────────────────────────────── */
@@ -60,7 +60,9 @@ const ProfileModal = ({ isOpen, onClose }) => {
 
   const fetchProfile = async () => {
     try {
-      const data = await apiGet('/users/profile');
+      const response = await api.get('/users/profile');
+      const data = response.data?.data || response.data;
+
       setUser(data);
       setFormData({
         name: data.name || '',
@@ -91,14 +93,16 @@ const ProfileModal = ({ isOpen, onClose }) => {
     e.preventDefault();
     setSaving(true);
     try {
-      const updatedUser = await apiPut('/users/profile', formData);
+      const response = await api.put('/users/profile', formData);
+      const updatedUser = response.data?.data || response.data;
+
       localStorage.setItem('user', JSON.stringify(updatedUser));
       toast.success('Profile synchronized!');
       setTimeout(() => {
-          window.location.reload();
+        window.location.reload();
       }, 800);
     } catch (err) {
-      toast.error(err.message || 'Failed to update profile.');
+      toast.error(err.response?.data?.message || err.message || 'Failed to update profile.');
     } finally {
       setSaving(false);
     }
@@ -117,29 +121,29 @@ const ProfileModal = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-[1000] flex items-end sm:items-center justify-center px-0 sm:px-6">
-      {/* backdrop */}
       <div
         className="absolute inset-0 bg-[#0d1a0d]/70 backdrop-blur-md transition-opacity"
         onClick={onClose}
       />
 
-      {/* sheet */}
-      <div className="relative w-full sm:max-w-[580px] bg-white rounded-t-[40px] sm:rounded-[36px] shadow-[0_-20px_80px_rgba(0,0,0,0.25)] overflow-hidden"
-        style={{ animation: 'slideUp .35s cubic-bezier(.2,.8,.2,1)' }}>
-
-        {/* ── Header ──────────────────────────────── */}
+      <div
+        className="relative w-full sm:max-w-[580px] bg-white rounded-t-[40px] sm:rounded-[36px] shadow-[0_-20px_80px_rgba(0,0,0,0.25)] overflow-hidden"
+        style={{ animation: 'slideUp .35s cubic-bezier(.2,.8,.2,1)' }}
+      >
         <div className="relative overflow-hidden">
-          {/* dark gradient bg */}
           <div className="absolute inset-0 bg-gradient-to-br from-[#1c2a1c] via-[#0f3d0f] to-[#1c2a1c]" />
-          {/* glow blobs */}
           <div className="absolute top-0 right-0 w-48 h-48 bg-[#ccff00]/20 rounded-full -mr-12 -mt-12 blur-[60px]" />
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#71f66a]/15 rounded-full -ml-8 -mb-8 blur-[40px]" />
-          {/* grid */}
-          <div className="absolute inset-0 opacity-[0.04]"
-            style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px)', backgroundSize: '32px 32px' }} />
+          <div
+            className="absolute inset-0 opacity-[0.04]"
+            style={{
+              backgroundImage:
+                'linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px)',
+              backgroundSize: '32px 32px'
+            }}
+          />
 
           <div className="relative z-10 p-7 flex items-center gap-5">
-            {/* Avatar */}
             {loading ? (
               <div className="w-16 h-16 rounded-2xl bg-white/10 animate-pulse" />
             ) : (
@@ -157,7 +161,9 @@ const ProfileModal = ({ isOpen, onClose }) => {
               ) : (
                 <>
                   <div className="flex items-center gap-2 mb-1.5">
-                    <span className="text-[#ccff00]/60 text-[9px] font-black uppercase tracking-[0.3em]">{user?.role}</span>
+                    <span className="text-[#ccff00]/60 text-[9px] font-black uppercase tracking-[0.3em]">
+                      {user?.role}
+                    </span>
                     <span className="flex items-center gap-1 bg-[#ccff00]/15 border border-[#ccff00]/20 text-[#ccff00] text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full">
                       <HiSparkles className="text-[7px]" /> Verified
                     </span>
@@ -168,7 +174,6 @@ const ProfileModal = ({ isOpen, onClose }) => {
               )}
             </div>
 
-            {/* Close */}
             <button
               onClick={onClose}
               className="flex-shrink-0 w-10 h-10 rounded-2xl bg-white/10 hover:bg-red-500/20 border border-white/10 hover:border-red-400/30 flex items-center justify-center text-white/60 hover:text-red-400 transition-all"
@@ -177,7 +182,6 @@ const ProfileModal = ({ isOpen, onClose }) => {
             </button>
           </div>
 
-          {/* Tabs inside header */}
           <div className="relative z-10 flex gap-1 px-7 pb-3">
             {tabs.map(tab => {
               const Icon = tab.icon;
@@ -196,7 +200,6 @@ const ProfileModal = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        {/* ── Body ────────────────────────────────── */}
         {loading ? (
           <div className="p-10 flex flex-col items-center justify-center gap-4">
             <div className="w-10 h-10 rounded-full border-4 border-[#137f13]/20 border-t-[#137f13] animate-spin" />
@@ -205,8 +208,6 @@ const ProfileModal = ({ isOpen, onClose }) => {
         ) : (
           <form onSubmit={handleSubmit}>
             <div className="p-7 space-y-4 max-h-[50vh] overflow-y-auto custom-scrollbar" style={{ animation: 'fadeIn .2s ease' }}>
-
-              {/* Personal tab */}
               {activeTab === 'personal' && (
                 <>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -216,13 +217,12 @@ const ProfileModal = ({ isOpen, onClose }) => {
                       <FloatingInput icon={FaMapMarkerAlt} label="Location" name="location" value={formData.location} onChange={handleChange} required />
                     </div>
                     <div className="sm:col-span-2">
-                      <FloatingInput icon={FaEnvelope} label="Email (Locked)" name="email" value={user.email} disabled />
+                      <FloatingInput icon={FaEnvelope} label="Email (Locked)" name="email" value={user?.email || ''} disabled />
                     </div>
                   </div>
                 </>
               )}
 
-              {/* Farm tab */}
               {activeTab === 'farm' && isFarmer && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
@@ -240,7 +240,15 @@ const ProfileModal = ({ isOpen, onClose }) => {
                             type="button"
                             onClick={() => {
                               const existing = formData.farmDetails.produceTypes || [];
-                              setFormData(prev => ({ ...prev, farmDetails: { ...prev.farmDetails, produceTypes: active ? existing.filter(t => t !== type) : [...existing, type] } }));
+                              setFormData(prev => ({
+                                ...prev,
+                                farmDetails: {
+                                  ...prev.farmDetails,
+                                  produceTypes: active
+                                    ? existing.filter(t => t !== type)
+                                    : [...existing, type]
+                                }
+                              }));
                             }}
                             className={`py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all
                               ${active ? 'bg-[#1c2a1c] text-[#ccff00] border border-[#ccff00]/20' : 'bg-gray-50 text-gray-500 border border-gray-100 hover:border-[#137f13]/30'}`}
@@ -255,7 +263,6 @@ const ProfileModal = ({ isOpen, onClose }) => {
                 </div>
               )}
 
-              {/* Alerts tab */}
               {activeTab === 'alerts' && (
                 <div
                   className={`p-5 rounded-[24px] border-2 cursor-pointer transition-all duration-500 flex items-center justify-between
@@ -284,7 +291,6 @@ const ProfileModal = ({ isOpen, onClose }) => {
               )}
             </div>
 
-            {/* ── Save button ─────────────────────── */}
             <div className="px-7 pb-7 pt-3 border-t border-gray-100">
               <button
                 type="submit"
