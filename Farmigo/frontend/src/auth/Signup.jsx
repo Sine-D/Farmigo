@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FaLeaf, FaArrowRight } from "react-icons/fa";
 import { GoogleLogin } from '@react-oauth/google';
 import { toast } from "sonner";
+import { API_BASE_URL } from '../utils/api';
+
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -11,7 +13,7 @@ const Signup = () => {
     email: '',
     password: '',
     cpassword: '',
-    role: 'farmer',
+    role: 'buyer',
     farmName: ''
   });
   const [loading, setLoading] = useState(false);
@@ -28,7 +30,7 @@ const Signup = () => {
     setLoading(true);
     
     try {
-      const response = await fetch('http://localhost:5001/api/users/google', {
+      const response = await fetch(`${API_BASE_URL}/users/google`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ credential: credentialResponse.credential }),
@@ -61,7 +63,7 @@ const Signup = () => {
       toast.error('All fields are required');
       return false;
     }
-    if (formData.role === 'Farmer' && !formData.farmName) {
+    if (formData.role.toLowerCase() === 'farmer' && !formData.farmName) {
       toast.error('Farm Name is required for farmers');
       return false;
     }
@@ -105,7 +107,7 @@ const Signup = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:5001/api/users', {
+      const response = await fetch(`${API_BASE_URL}/users`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -124,7 +126,7 @@ const Signup = () => {
         toast.error(data.message || 'Registration failed');
       }
     } catch (err) {
-      toast.error('Network error. Please make sure the server is running on port 5001.');
+      toast.error('Network error. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -208,7 +210,7 @@ const Signup = () => {
                 />
               </div>
 
-              {formData.role === 'farmer' && (
+              {formData.role.toLowerCase() === 'farmer' && (
                 <div>
                   <input
                     type="text"

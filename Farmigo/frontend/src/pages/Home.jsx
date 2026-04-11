@@ -3,6 +3,7 @@ import mainImage from "../assets/images/home1.png";
 import sideImage1 from "../assets/images/home2.png";
 import sideImage2 from "../assets/images/home3.png";
 import { FaLeaf, FaSnowflake, FaStore, FaUsers } from "react-icons/fa";
+import WeatherWidget from "../components/WeatherWidget";
 
 const stats = [
   { icon: <FaSnowflake />, value: "150+", label: "Cold Storages", bg: "bg-blue-50", text: "text-blue-500" },
@@ -78,6 +79,10 @@ const Home = () => {
           </div>
         </div>
 
+      </div>
+
+      <div className="max-w-[1200px] mx-auto mt-20 relative z-10">
+        <WeatherWidget />
       </div>
 
       {/* Animation Styles */}
