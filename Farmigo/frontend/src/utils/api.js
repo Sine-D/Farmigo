@@ -1,7 +1,9 @@
 import api from "../services/api";
 
 export const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5001/api";
+  import.meta.env.VITE_API_BASE_URL ||
+  (import.meta.env.PROD ? "/api" : "http://localhost:5001/api");
+
 
 export const apiGet = async (endpoint) => {
   const response = await api.get(endpoint);

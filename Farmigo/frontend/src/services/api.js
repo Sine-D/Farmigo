@@ -6,8 +6,12 @@
 import axios from "axios";
 
 // 🔥 IMPORTANT: matches your backend (port 5001 + /api)
+// On Vercel, if backend and frontend are in the same project, we can use a relative path
 const BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5001/api";
+  import.meta.env.VITE_API_BASE_URL || 
+  (import.meta.env.PROD ? "/api" : "http://localhost:5001/api");
+
+
 
 // Create axios instance
 const api = axios.create({
